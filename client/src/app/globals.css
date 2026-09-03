@@ -1,0 +1,356 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F7F4EF;
+  --foreground: #5C6A64;
+  --primary: #F3F1E9;
+  --primary-hover: #E4E3D9;
+  --secondary: #0e4127;
+  --secondary-hover: #1f8049;
+  --title: #20302C;
+  --paragraph: #141E1C;
+  --secondary-light: #D8E8DC;
+  --shadow: 0px 4.42184px 107.23px rgb(229, 224, 211);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --font-secondary: "Newsreader", serif;
+  --font-primary: "Hanken Grotesk", sans-serif;
+  --font-serif: "Newsreader", serif;
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-secondary-light: var(--secondary-light);
+  --color-text-hover: var(--title);
+  --color-text: var(--paragraph);
+  --color-title: var(--title);
+  --color-paragraph: var(--paragraph);
+  --box-shadow: 0px 4.42184px 107.23px rgb(229, 224, 211);
+}
+
+@theme {
+  --shadow-btn: 0 0 15px 5px #EDE6DC;
+  --shadow-card: 0px 4.42184px 107.23px #F7F4EF;
+}
+
+/* Header cart icon: a one-shot pop + ring pulse when an item is added,
+   rather than a continuous animation. */
+@keyframes cart-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  28% {
+    transform: scale(1.42) rotate(-8deg);
+  }
+
+  55% {
+    transform: scale(.92) rotate(4deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes cart-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 46, .55);
+  }
+
+  100% {
+    box-shadow: 0 0 0 20px rgba(217, 119, 46, 0);
+  }
+}
+
+.cart-pulse {
+  animation: cart-pop .62s cubic-bezier(.34, 1.56, .64, 1);
+  border-radius: 9999px;
+}
+
+.cart-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  animation: cart-ring .62s ease-out;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  background: #F7F4EF;
+  color: var(--foreground);
+  font-family: "Hanken Grotesk", sans-serif;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.btn {
+  background: linear-gradient(92.23deg,
+      #ff56f6 21.43%,
+      #b936ee 50.63%,
+      #3bace2 100%,
+      #406aff 117.04%);
+  box-shadow: 0px 4.42184px 107.23px rgba(255, 86, 246, 0.51);
+}
+
+.btn:hover {
+  background: linear-gradient(92.23deg,
+      #406aff 21.43%,
+      #3bace2 50.63%,
+      #b936ee 100%,
+      #ff56f6 117.04%);
+
+  box-shadow: 0px 2.42184px 50.23px rgba(255, 39, 244, 0.51);
+}
+
+.card-shadow {
+  box-shadow: 0px 4.42184px 107.23px rgb(243, 236, 227);
+}
+
+.btn:hover {
+  background: linear-gradient(92.23deg,
+      #406aff 21.43%,
+      #3bace2 50.63%,
+      #b936ee 100%,
+      #ff56f6 117.04%);
+
+  box-shadow: 0px 2.42184px 50.23px rgba(255, 39, 244, 0.51);
+}
+
+
+.gradient,
+.active {
+  background: linear-gradient(92.23deg,
+      #406aff 21.43%,
+      #3bace2 50.63%,
+      #b936ee 100%,
+      #ff56f6 117.04%);
+}
+
+.active:hover {
+  box-shadow: 0px 4.42184px 107.23px rgba(255, 86, 246, 0.51);
+}
+
+.active {
+  color: #fff;
+  padding: 1rem;
+  border-radius: 100%;
+}
+
+@layer base {
+  body {
+    @apply font-secondary text-lg leading-8 text-white;
+  }
+
+  .h2 {
+    @apply font-primary text-[32px] mb-6 tracking-[10%] uppercase;
+  }
+
+  .h3 {
+    @apply font-primary font-semibold text-[26px] mb-6 leading-[46px];
+  }
+
+  .btn {
+    @apply rounded-full font-primary text-white font-medium;
+  }
+
+  .btn-sm {
+    @apply h-[48px] px-6 text-sm;
+  }
+
+  .btn-lg {
+    @apply h-[56px] px-10 text-base;
+  }
+
+  .btn-link {
+    @apply text-base;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r text-transparent bg-clip-text from-[#42A6E3] to-[#FF56F6] font-bold font-primary hover:from-[#FF56F6] hover:to-[#42A6E3];
+  }
+
+  .section {
+    @apply py-8 lg:py-24 lg:h-screen flex items-center;
+  }
+}
+
+@layer utilities {
+
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+
+.container {
+  width: 100%;
+  max-width: 1240px;
+  padding: 0 15px;
+  margin: 0 auto;
+}
+
+/* For tablets and medium screens */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 20px;
+    margin: 0 auto;
+  }
+}
+
+/* For desktops and large screens */
+@media (min-width: 1200px) {
+  .container {
+    padding: 0 30px;
+    margin: 0 auto;
+  }
+}
+
+
+
+
+
+
+/* TipTap editor basic styles */
+.ProseMirror {
+  outline: none;
+  min-height: 300px;
+}
+
+.ProseMirror p {
+  margin-bottom: 1rem;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid rgb(37, 42, 49);
+  padding-left: 1rem;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+.ProseMirror pre {
+  background: #f1f5f9;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.ProseMirror code {
+  background: #f1f5f9;
+  padding: 0.2rem 0.3rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+}
+
+.ProseMirror li {
+  list-style: disc;
+}
+
+
+.ProseMirror .text-left {
+  text-align: left;
+}
+
+.ProseMirror .text-center {
+  text-align: center;
+}
+
+.ProseMirror .text-right {
+  text-align: right;
+}
+
+.ProseMirror .text-justify {
+  text-align: justify;
+}
+
+
+/* TipTap editor heading styles */
+.ProseMirror h1 {
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem !important;
+  font-weight: bold !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem !important;
+  font-weight: bold !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.ProseMirror h4 {
+  font-size: 1.125rem !important;
+  font-weight: bold !important;
+}
+
+.ProseMirror h5 {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+}
+
+.ProseMirror h6 {
+  font-size: 0.875rem !important;
+  font-weight: bold !important;
+}
+
+
+
+.playfair-display {
+  font-family: "Newsreader", serif;
+}
+
+
+
+@keyframes top-bar {
+  0% {
+    transform: translateX(0%)
+  }
+
+  50% {
+    transform: translateX(-100%)
+  }
+
+  100% {
+    transform: translateX(0%)
+  }
+}
