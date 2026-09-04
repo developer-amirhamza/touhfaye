@@ -1,0 +1,579 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     String              @id @default(dbgenerated("gen_random_uuid()"))
+  email                  String              @unique
+  password               String
+  verify_email           Boolean?            @default(false)
+  status                 String?             @default("ACTIVE")
+  avatar                 String?
+  mobile                 String?
+  last_login_date        DateTime?           @db.Timestamp(6)
+  refresh_token          String?
+  forgot_password_otp    String?
+  forgot_password_expire DateTime?           @db.Timestamp(6)
+  createdAt              DateTime?           @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime?           @default(now()) @db.Timestamp(6)
+  role                   String?             @default("CONSUMER")
+  firstName              String?
+  lastName               String?
+  accountApplication     AccountApplication?
+  cart                   Cart?
+  deliverySites          DeliverySite[]
+  negotiatedPrices       NegotiatedPrice[]
+  quotes                 Quote[]
+  reviews                Reviews[]
+  standingOrders         StandingOrder[]
+  subscriptions          Subscription[]
+  order                  Order[]
+}
+
+model AccountApplication {
+  id             String    @id @default(dbgenerated("gen_random_uuid()"))
+  userId         String    @unique
+  requestedRole  String
+  status         String    @default("PENDING")
+  businessName   String?
+  abn            String?
+  businessType   String?
+  contactName    String?
+  contactPhone   String?
+  organisation   String?
+  creditApproved Boolean   @default(false)
+  // 30-day invoice credit limit ($), set by the admin alongside creditApproved.
+  // Only meaningful when creditApproved is true.
+  creditLimit    Float?
+  notes          String?
+  reviewedBy     String?
+  reviewedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model Setting {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model PricingTier {
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  productId    String?
+  role         String   @default("TRADE")
+  minQuantity  Int
+  pricePerUnit Float
+  label        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([productId, role, minQuantity])
+}
+
+model PriceOverride {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  productId String
+  role      String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, role])
+}
+
+model DeliverySite {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String
+  label     String
+  address   String
+  phone     String?
+  contact   String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model NegotiatedPrice {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId    String
+  productId String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([userId])
+}
+
+model Subscription {
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId          String
+  status          String   @default("ACTIVE")
+  intervalDays    Int      @default(30)
+  nextRunAt       DateTime
+  shippingAddress String
+  phone           String
+  items           Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status, nextRunAt])
+}
+
+model StandingOrder {
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  userId          String
+  status          String   @default("ACTIVE")
+  intervalDays    Int      @default(30)
+  nextRunAt       DateTime
+  shippingAddress String
+  phone           String
+  items           Json
+  paymentMethod   String   @default("Invoice")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status, nextRunAt])
+}
+
+model Quote {
+  id               String      @id @default(dbgenerated("gen_random_uuid()"))
+  quoteNumber      String      @unique
+  userId           String
+  status           String      @default("DRAFT")
+  participantRef   String?
+  planManagerEmail String?
+  supplyPeriod     String      @default("Monthly")
+  subtotal         Float       @default(0)
+  discount         Float       @default(0)
+  delivery         Float       @default(0)
+  gst              Float       @default(0)
+  total            Float       @default(0)
+  validUntil       DateTime?
+  notes            String?
+  convertedOrderId String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items            QuoteItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Enquiry {
+  id               String    @id @default(dbgenerated("gen_random_uuid()"))
+  type             String    @default("GENERAL")
+  status           String    @default("NEW")
+  userId           String?
+  name             String?
+  email            String?
+  phone            String?
+  company          String?
+  participantNeed  String?
+  availableFunding String?
+  message          String?
+  quoteId          String?
+  // Requested call/meeting time for type = "MEETING" (B2B "book a meeting,
+  // we'll call you" requests). Unused by other enquiry types.
+  preferredAt      DateTime?
+  handledBy        String?
+  handledAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([type])
+  @@index([status])
+}
+
+model QuoteItem {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  quoteId     String
+  productId   String
+  productName String
+  size        String?
+  absorbency  String?
+  dailyPads   Int      @default(0)
+  days        Int      @default(0)
+  totalPads   Int      @default(0)
+  unitPrice   Float    @default(0)
+  lineTotal   Float    @default(0)
+  createdAt   DateTime @default(now())
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+}
+
+model Product {
+  id            String       @id @default(dbgenerated("gen_random_uuid()"))
+  title         String
+  images        String[]
+  description   String?
+  price         Float
+  discount      Float?
+  stock         Int          @default(0)
+  colors        String[]
+  categoryId    String?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  isFeatured    Boolean      @default(false)
+  deletedAt     DateTime?
+  sizes         String[]
+  subcategoryId String?
+  absorbency    String?
+  keyFeatures   String[]     @default([])
+  pack          String?
+  pricingNotes  String?
+  more_details  Json?
+  cartItems     CartItem[]
+  category      Category?    @relation(fields: [categoryId], references: [id])
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  reviews       Reviews[]
+  orderItems    OrderItem[]
+}
+
+model Reviews {
+  id        String   @id @default(uuid())
+  comment   String?
+  createdAt DateTime @default(now())
+  productId String
+  rating    Int
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Category {
+  id            String        @id @default(dbgenerated("gen_random_uuid()"))
+  title         String        @unique
+  slug          String        @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  products      Product[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         String    @id @default(uuid())
+  title      String
+  slug       String
+  categoryId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  products   Product[]
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, slug])
+  @@unique([categoryId, title])
+}
+
+model Cart {
+  id        String     @id @default(dbgenerated("gen_random_uuid()"))
+  token     String?    @unique
+  userId    String?    @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+}
+
+model CartItem {
+  id                       String   @id @default(dbgenerated("gen_random_uuid()"))
+  cartId                   String
+  productId                String
+  quantity                 Int      @default(1)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  subscriptionIntervalDays Int?
+  cart                     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product                  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id                    String      @id @default(dbgenerated("gen_random_uuid()"))
+  orderNumber           String      @unique
+  userId                String?
+  guestEmail            String?
+  guestPhone            String?
+  guestAddress          String?
+  shippingAddress       String      @map("shipping_address")
+  phone                 String
+  email                 String
+  subtotal              Float
+  shippingCost          Float       @default(0)
+  tax                   Float       @default(0)
+  total                 Float
+  paymentMethod         String      @default("Stripe")
+  paymentStatus         String      @default("Pending")
+  orderStatus           String      @default("Pending")
+  statusHistory         Json?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  stripeSessionId       String?     @unique
+  stripePaymentIntentId String?
+  discount              Float       @default(0)
+  firstName             String?
+  lastName              String?
+  fundingDetails        Json?
+  adminNote             String?
+  orderNote             String?
+  items                 OrderItem[]
+  user                  User?       @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
+  orderId      String
+  productId    String
+  productName  String
+  productImage String?
+  price        Float
+  quantity     Int
+  total        Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String?
+  location  String?
+  quote     String
+  rating    Int      @default(5)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Blog {
+  id            String    @id @default(uuid())
+  title         String
+  slug          String    @unique
+  excerpt       String?
+  content       String
+  featuredImage String?
+  authorId      String?
+  category      String?
+  tags          String[]
+  views         Int       @default(0)
+  isPublished   Boolean   @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([slug])
+  @@index([authorId])
+}
+
+// A single FAQ entry. `surface` says which page type it shows on; the
+// matching target field is only meaningful for its own surface (blogId for
+// BLOG_POST, productId for PRODUCT_PAGE, category for FAQ_PAGE) — every
+// surface renders through the same FaqAccordion, so all of them get
+// FAQPage structured data for free.
+model Faq {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  // FAQ_PAGE | BLOG_POST | BLOG_LIST | PRODUCT_PAGE | PRODUCT_LIST | PORTAL
+  surface   String   @default("FAQ_PAGE")
+  blogId    String?
+  productId String?
+  // Audience this FAQ is written for, e.g. "Family Carers" or "Pharmacists"
+  // — one of a fixed list the admin picks from, only used on surface FAQ_PAGE.
+  category  String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([surface])
+  @@index([blogId])
+  @@index([productId])
+  @@index([category])
+}
+
+// A participant's support-coordination NDIS plan: budget, billing rates and
+// item codes for claims, and the plan's date window. `startDate`/`endDate`
+// are plain "YYYY-MM-DD" calendar dates (not DateTime) because all budget
+// pacing math in the admin UI works in whole calendar days with no time
+// component or timezone — storing them as DateTime would just reintroduce
+// timezone-shift bugs into date-only arithmetic that doesn't need one.
+model ScPlan {
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  participant    String
+  ndisNumber     String?
+  coordinator    String
+  rate           Float
+  travelRate     Float         @default(0)
+  itemCode       String
+  travelItemCode String?
+  budget         Float         @default(0)
+  startDate      String
+  endDate        String
+  reportLeadDays Int           @default(42)
+  color          String        @default("#2f6feb")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  entries        ScTimeEntry[]
+}
+
+// A single logged support-coordination time entry (support or travel),
+// billed against its plan's rate/travelRate. Deleting a plan with entries
+// is blocked in the controller rather than cascaded, so billing history
+// is never silently lost.
+model ScTimeEntry {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  planId      String
+  plan        ScPlan   @relation(fields: [planId], references: [id])
+  date        String
+  startTime   String
+  endTime     String
+  hours       Float
+  // "support" | "travel"
+  type        String
+  activity    String
+  note        String?
+  coordinator String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([planId])
+  @@index([date])
+}
+
+// Admin-managed downloadable file for the Retailer/Distributor portals —
+// POS/shelf-talker signage for retailers, lab/certification reports for
+// distributors. `fileUrl` is a plain URL (same pattern as Product.images /
+// Blog.featuredImage) since there's no upload pipeline for this yet.
+model PortalResource {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  fileUrl     String
+  // "CERTIFICATION" | "POS_ASSET"
+  category    String
+  // "RETAILER" | "DISTRIBUTOR" | "ALL"
+  audience    String   @default("ALL")
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([audience])
+}
+
+model TeamTask {
+  id             String    @id @default(dbgenerated("gen_random_uuid()"))
+  type           String    @default("TASK")
+  title          String
+  description    String?
+  status         String    @default("OPEN")
+  priority       String    @default("NORMAL")
+  createdById    String
+  createdByName  String
+  acceptedById   String?
+  acceptedByName String?
+  acceptedAt     DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model WaitlistEntry {
+  id        String    @id @default(dbgenerated("gen_random_uuid()"))
+  name      String
+  email     String    @unique
+  postcode  String
+  country   String    @default("Australia")
+  buyerType String
+  consent   Boolean   @default(false)
+  consentAt DateTime?
+  utm       String?
+  createdAt DateTime  @default(now())
+
+  @@index([buyerType])
+  @@index([createdAt])
+}
+
+model TrainingSession {
+  id            String                 @id @default(dbgenerated("gen_random_uuid()"))
+  tag           String
+  title         String
+  description   String
+  audience      String
+  durationMin   Int
+  sessionType   String                 @default("LIVE")
+  startsAt      DateTime?
+  capacity      Int?
+  isPublished   Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  registrations TrainingRegistration[]
+
+  @@index([isPublished])
+  @@index([startsAt])
+}
+
+model TrainingRegistration {
+  id        String          @id @default(dbgenerated("gen_random_uuid()"))
+  sessionId String
+  name      String
+  email     String
+  createdAt DateTime        @default(now())
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, email])
+  @@index([sessionId])
+}
+
+model RedditPost {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  subreddit   String
+  title       String
+  author      String
+  flair       String
+  upvotes     Int      @default(0)
+  comments    Int      @default(0)
+  url         String?
+  postedAt    DateTime @default(now())
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished])
+  @@index([postedAt])
+}
