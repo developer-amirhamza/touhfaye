@@ -18,14 +18,14 @@ export default function Home() {
 
   return (
     <div className="grid grid-cols-1 gap-0 mb-10 h-full bg-pr">
-      <Hero />
+      {/* <Hero /> */}
       <div className="grid grid-cols-1">
         <CategoryWiseProducts />
       </div>
-      <EntryPoints />
-      <ProductFinderCalculator />
-      <NdisSupportSection />
-      <YouAreNotAlone />
+      {/* <EntryPoints /> */}
+      {/* <ProductFinderCalculator /> */}
+      {/* <NdisSupportSection /> */}
+      {/* <YouAreNotAlone /> */}
 
 
       {/* Hero infographic strip */}
@@ -52,13 +52,13 @@ export default function Home() {
         </div>
       </div> */}
       {/* <FeatureSection /> */}
-      <CareGuidesSection />
-      <div id="community" className="scroll-mt-27.5">
+      {/* <CareGuidesSection /> */}
+      {/* <div id="community" className="scroll-mt-27.5">
         <CommunitySection />
       </div>
       <RedditFeedSection />
       <TrainingSessionsSection />
-        <TestimonialsSection />
+        <TestimonialsSection /> */}
 
       {/* <TrustedStrip /> */}
       {/* <div className="grid container bg-primary  gap-10">

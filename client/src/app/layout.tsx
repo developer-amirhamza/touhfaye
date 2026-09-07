@@ -5,8 +5,8 @@ import { ReduxProvider } from "@/redux/provider";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Bestiee | Always by your side",
-  description: "Always by your side",
+  title: "Touhfaye",
+  description: "",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
