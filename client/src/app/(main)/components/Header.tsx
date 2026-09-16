@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { IoCall } from 'react-icons/io5'
 import { MdVerified } from 'react-icons/md'
 import { FaTruck, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
-import logo from "@/assets/bestiee-logo.png"
+import logo from "@/assets/touhfaye-logo.png"
 import { BsCart4 } from 'react-icons/bs'
 import { GoTriangleDown, GoTriangleUp } from 'react-icons/go'
 import { useRouter } from 'next/navigation'

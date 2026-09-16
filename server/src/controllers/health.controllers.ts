@@ -14,7 +14,7 @@ const emailConfig = () => {
     provider: smtp ? "SMTP" : process.env.RESEND_API_KEY ? "Resend (fallback)" : "NONE",
     smtpHost: smtp ? process.env.SMTP_HOST : null,
     smtpPort: smtp ? Number(process.env.SMTP_PORT) || 587 : null,
-    from: process.env.EMAIL_FROM || "Bestiee <info@mybestiee.com.au>",
+    from: process.env.EMAIL_FROM || "Touhfaye <info@mytouhfaye.com.au>",
   };
 };
 
@@ -41,10 +41,10 @@ export const sendTestEmail = async (req: AuthRequest, res: Response) => {
     const startedAt = Date.now();
     const result: any = await sendEmail({
       sendTo: to,
-      subject: `Bestiee email test — ${new Date().toLocaleString("en-AU")}`,
+      subject: `Touhfaye email test — ${new Date().toLocaleString("en-AU")}`,
       html: `<div style="font-family:sans-serif;max-width:520px">
                <h2 style="color:#2E7D71">✅ Email delivery is working</h2>
-               <p>This test was sent from the Bestiee server.</p>
+               <p>This test was sent from the Touhfaye server.</p>
                <ul>
                  <li><b>Provider:</b> ${cfg.provider}</li>
                  <li><b>SMTP host:</b> ${cfg.smtpHost ?? "—"}</li>

@@ -93,7 +93,7 @@ const Hero = () => {
                     </Link>
 
                     <div className="bg-white/10 rounded-2xl p-4 flex flex-col gap-2 aspect-square">
-                        <div className="text-xs font-bold tracking-wider opacity-80 shrink-0">BESTIEE VLOG</div>
+                        <div className="text-xs font-bold tracking-wider opacity-80 shrink-0">TOUHFAYE VLOG</div>
                         <div className="flex flex-col gap-1.5 flex-1 min-h-0">
                             {VLOG_ITEMS.map((v) => (
                                 <button

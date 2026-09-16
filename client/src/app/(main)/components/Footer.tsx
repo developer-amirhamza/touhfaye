@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import logo from "@/assets/bestiee-logo.png";
+import logo from "@/assets/touhfaye-logo.png";
 import Image from 'next/image';
 import Link from 'next/link';
 import { IoCall, IoMail, IoLocationSharp } from 'react-icons/io5';
@@ -43,7 +43,7 @@ const Footer = () => {
                      <Image src={logo} alt='Health U Australia' className='  max-w-30 px-2 rounded-md  bg-white   w-full justify-self-start items-center-safe   ' />
 
                     <p className="text-white text-sm leading-relaxed">
-                       Bestiee is a registered NDIS provider supplying continence and personal care products to Australian families, carers and aged-care facilities.
+                       Touhfaye is a registered NDIS provider supplying continence and personal care products to Australian families, carers and aged-care facilities.
                     </p>
                 </div>
 
@@ -96,9 +96,9 @@ const Footer = () => {
                             <IoCall className="text-white shrink-0" size={16} />
                             0481 707 758
                         </a>
-                        <a href="mailto:hello@mybestiee.com.au" className="flex items-center gap-2 hover:text-white-hover transition-colors">
+                        <a href="mailto:hello@mytouhfaye.com.au" className="flex items-center gap-2 hover:text-white-hover transition-colors">
                             <IoMail className="text-white shrink-0" size={16} />
-                            hello@mybestiee.com.au
+                            hello@mytouhfaye.com.au
                         </a>
                         <div className="flex items-center gap-2">
                             <IoLocationSharp className="text-white shrink-0" size={16} />
@@ -108,19 +108,19 @@ const Footer = () => {
                     {/* Social icons */}
                     <div className="flex items-center text-background gap-3 mt-1">
                         <Link
-                            href="https://www.facebook.com/aubestiee/"
+                            href="https://www.facebook.com/autouhfaye/"
                             className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover flex items-center justify-center transition-colors"
                         >
                             <FaFacebookF size={14} />
                         </Link>
                         <Link
-                            href="https://www.instagram.com/bestieeau/"
+                            href="https://www.instagram.com/touhfayeau/"
                             className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover flex items-center justify-center transition-colors"
                         >
                             <FaInstagram size={14} />
                         </Link>
                         <Link
-                            href="https://www.linkedin.com/company/bestiee"
+                            href="https://www.linkedin.com/company/touhfaye"
                             className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover flex items-center justify-center transition-colors"
                         >
                             <FaLinkedinIn size={14} />
@@ -132,7 +132,7 @@ const Footer = () => {
             {/* Bottom bar */}
             <div className="border-t border-primary mt-5 ">
                 <div className="container mx-auto  px-6  flex flex-col  sm:flex-row items-center justify-between gap-2 text-xs text-white-hover">
-                    <p className='py-5'>© {new Date().getFullYear()} Bestiee · ABN 00 000 000 000</p>
+                    <p className='py-5'>© {new Date().getFullYear()} Touhfaye · ABN 00 000 000 000</p>
                     <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
                             <MdVerified className="text-[#1a56db]" size={13} />

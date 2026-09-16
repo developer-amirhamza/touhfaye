@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // Brand splash intro: the "B" badge scales/fades in on the brand-green
-// backdrop, the "Bestiee" wordmark and tagline follow, a sliding loading
+// backdrop, the "Touhfaye" wordmark and tagline follow, a sliding loading
 // bar plays throughout, then the curtain lifts. Mounts the instant the
 // component renders (no waiting on window "load"), so it always covers the
 // site before any content is visible.
@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 // Shown once per browser, ever — not once per tab/session — so a returning
 // visitor never sees it again after their first visit. The storage key was
 // bumped for this redesign so everyone sees the new splash once.
-const INTRO_SEEN_KEY = "bestiee_intro_seen_v2";
+const INTRO_SEEN_KEY = "touhfaye_intro_seen_v2";
 const CONTENT_AT_MS = 100;   // badge starts fading in almost immediately
 const CONTENT_HOLD_MS = 1500; // how long the splash sits before the curtain lifts
 const REVEAL_MS = 650;       // curtain-lift slide-up duration
@@ -167,9 +167,9 @@ export default function IntroOverlay() {
       >
         <div className="intro-content">
           <div className="intro-badge">
-            <img src="/favicon.png" alt="Bestiee" />
+            <img src="/favicon.png" alt="Touhfaye" />
           </div>
-          <span className="intro-wordmark">Bestiee</span>
+          <span className="intro-wordmark">Touhfaye</span>
           <span className="intro-tagline">Comfort, delivered discreetly</span>
         </div>
 

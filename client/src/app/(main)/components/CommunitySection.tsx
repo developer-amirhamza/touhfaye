@@ -28,39 +28,39 @@ interface SocialPost {
 // Illustrative brand content matching the design mock — not live engagement
 // data, so no like/comment counts or post dates are shown as if real.
 const POSTS: SocialPost[] = [
-    { id: 'discreet-delivery', platform: 'Instagram', handle: '@mybestiee', tag: '#DiscreetDelivery', swatch: '#d8e8dc',
-        cap: 'Discreet on the outside. Confident on the inside. Every Bestiee order ships in plain, unmarked packaging.',
+    { id: 'discreet-delivery', platform: 'Instagram', handle: '@mytouhfaye', tag: '#DiscreetDelivery', swatch: '#d8e8dc',
+        cap: 'Discreet on the outside. Confident on the inside. Every Touhfaye order ships in plain, unmarked packaging.',
         body: 'We get asked about our packaging more than anything else. So here it is: a plain box, no branding, no product names, nothing on the label that says what is inside. Your order looks like any other parcel on the doorstep.',
-        media: { kind: 'image', src: shelfPhoto, alt: 'Bestiee Active packs on a kitchen bench' } },
-    { id: 'incontinence-tips', platform: 'TikTok', handle: '@mybestiee', tag: '#IncontinenceTips', swatch: '#ece2d2',
+        media: { kind: 'image', src: shelfPhoto, alt: 'Touhfaye Active packs on a kitchen bench' } },
+    { id: 'incontinence-tips', platform: 'TikTok', handle: '@mytouhfaye', tag: '#IncontinenceTips', swatch: '#ece2d2',
         cap: 'Pads or pull up pants? 30 seconds to work out which one you actually need.',
         body: 'Pads sit inside your own underwear and suit light to moderate needs. Pull up pants replace underwear and hold more, which is usually the answer overnight. Most people end up using both.',
         media: { kind: 'video', src: '/social/video-1.mp4' } },
-    { id: 'support-at-home', platform: 'Facebook', handle: 'Bestiee Australia', tag: '#SupportAtHome', swatch: '#dbe2ea',
+    { id: 'support-at-home', platform: 'Facebook', handle: 'Touhfaye Australia', tag: '#SupportAtHome', swatch: '#dbe2ea',
         cap: 'Big news for carers: continence products are claimable under Support at Home. Here is how to use your funding.',
         body: 'Support at Home replaced the older home care packages, and continence supplies sit under assistive products and consumables. Your provider can order on your behalf and we invoice them directly.',
-        media: { kind: 'image', src: rangePhoto, alt: 'The Bestiee range on a pharmacy shelf' } },
-    { id: 'absorbency-guide', platform: 'Instagram', handle: '@mybestiee', tag: '#AbsorbencyGuide', swatch: '#ece2d2',
+        media: { kind: 'image', src: rangePhoto, alt: 'The Touhfaye range on a pharmacy shelf' } },
+    { id: 'absorbency-guide', platform: 'Instagram', handle: '@mytouhfaye', tag: '#AbsorbencyGuide', swatch: '#ece2d2',
         cap: 'Absorbency levels, explained without the jargon. Save this one for your next order.',
         body: 'Light is for occasional small leaks. Moderate covers a few changes a day and is where most people start. Heavy or overnight is for full release or a full night of cover. Count your daily changes first, then pick.',
         media: { kind: 'video', src: '/social/video-2.mp4' } },
-    { id: 'sizing-guide', platform: 'TikTok', handle: '@mybestiee', tag: '#SizingGuide', swatch: '#d8e8dc',
+    { id: 'sizing-guide', platform: 'TikTok', handle: '@mytouhfaye', tag: '#SizingGuide', swatch: '#d8e8dc',
         cap: 'How to measure for the right size in under a minute. A snug fit is what stops leaks.',
         body: 'Measure around the widest part of your hips, standing up, with a soft tape. M is 80 to 110cm, L is 100 to 135cm, XL is 130 to 170cm. Between two sizes? Take the smaller one for a firmer seal.',
         media: { kind: 'video', src: '/social/video-3.mp4' } },
-    { id: 'ndis-provider', platform: 'Facebook', handle: 'Bestiee Australia', tag: '#NDISProvider', swatch: '#dbe2ea',
+    { id: 'ndis-provider', platform: 'Facebook', handle: 'Touhfaye Australia', tag: '#NDISProvider', swatch: '#dbe2ea',
         cap: 'Registered NDIS provider. Itemised quotes back the same business day, every time.',
         body: 'Send us the participant name, the products and the period you need covered. We return a branded, itemised quote ready to forward to a plan manager or coordinator, usually the same business day.',
         media: { kind: 'swatch' } },
-    { id: 'carer-support', platform: 'Instagram', handle: '@mybestiee', tag: '#CarerSupport', swatch: '#dbe2ea',
+    { id: 'carer-support', platform: 'Instagram', handle: '@mytouhfaye', tag: '#CarerSupport', swatch: '#dbe2ea',
         cap: 'A carer asked how to start the conversation. Our honest answer: ask, do not announce.',
         body: 'This conversation is rarely about the products. It is about someone feeling they are losing control of something private. Pick a calm moment, keep it short, use plain words, and let them make the final choice.',
         media: { kind: 'video', src: '/social/video-4.mp4' } },
-    { id: 'overnight-protection', platform: 'TikTok', handle: '@mybestiee', tag: '#OvernightProtection', swatch: '#ece2d2',
+    { id: 'overnight-protection', platform: 'TikTok', handle: '@mytouhfaye', tag: '#OvernightProtection', swatch: '#ece2d2',
         cap: 'Night routine that actually gets everyone a full night of sleep.',
         body: 'Using a day product overnight is the number one cause of broken sleep. Use an overnight rated product, add a waterproof bed pad as insurance, and check the leg seal before lights out.',
         media: { kind: 'video', src: '/social/video-5.mp4' } },
-    { id: 'australia-wide', platform: 'Facebook', handle: 'Bestiee Australia', tag: '#AustraliaWide', swatch: '#d8e8dc',
+    { id: 'australia-wide', platform: 'Facebook', handle: 'Touhfaye Australia', tag: '#AustraliaWide', swatch: '#d8e8dc',
         cap: 'Free discreet delivery Australia wide on every order over $99.',
         body: 'Orders over $99 ship free anywhere in Australia. Everything goes out in plain unmarked packaging, and we dispatch same day on weekdays when you order before 2pm AEST.',
         media: { kind: 'swatch' } },
@@ -75,9 +75,9 @@ const PLATFORM_ICON: Record<Platform, React.ReactNode> = {
 // Only accounts already published elsewhere on the real site (footer) get a
 // real follow link — no destination is invented for platforms without one.
 const PLATFORM_URL: Partial<Record<Platform, string>> = {
-    Facebook: 'https://www.facebook.com/aubestiee/',
-    Instagram: 'https://www.instagram.com/bestieeau/',
-    TikTok: 'https://www.tiktok.com/@actualbestiee0',
+    Facebook: 'https://www.facebook.com/autouhfaye/',
+    Instagram: 'https://www.instagram.com/touhfayeau/',
+    TikTok: 'https://www.tiktok.com/@actualtouhfaye0',
 }
 
 const TABS: Array<'All' | Platform> = ['All', 'Instagram', 'Facebook', 'TikTok']
@@ -118,10 +118,10 @@ const CommunitySection = () => {
                 <div className="flex justify-between items-end flex-wrap gap-4 mb-6">
                     <div>
                         <span className="bg-[#d8e8dc] text-secondary font-semibold rounded-full px-4.5 py-2 text-sm">
-                            @mybestiee
+                            @mytouhfaye
                         </span>
                         <h2 className="font-secondary text-4xl md:text-5xl text-text-hover tracking-tight mt-3.5">
-                            Follow Bestiee
+                            Follow Touhfaye
                         </h2>
                         <p className="text-base md:text-lg text-text mt-2">
                             Incontinence care tips, product guides and NDIS news, every week.

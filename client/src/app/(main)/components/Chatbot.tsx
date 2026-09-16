@@ -78,7 +78,7 @@ const Chatbot = () => {
 
     // Set once the visitor enters the Product & Cost assistant flow — swaps
     // the header/footer to match that design's dedicated widget instead of
-    // the general "Chat with Bestiee" chrome.
+    // the general "Chat with Touhfaye" chrome.
     const [assistantSubtitle, setAssistantSubtitle] = useState<string | null>(null);
 
     // Loaded once the chat opens, and read via the ref (not the state
@@ -123,7 +123,7 @@ const Chatbot = () => {
                 {
                     id: idSeq++,
                     sender: "bot",
-                    text: "Hi, I am Bestiee. I can find the right product for you, or work out what it will cost. Which would you like?",
+                    text: "Hi, I am Touhfaye. I can find the right product for you, or work out what it will cost. Which would you like?",
                 },
                 // {
                 //     id: idSeq++,
@@ -343,7 +343,7 @@ const Chatbot = () => {
         return (
             <button
                 onClick={() => setOpen(true)}
-                aria-label="Chat with Bestiee"
+                aria-label="Chat with Touhfaye"
                 className="fixed bottom-5 right-5 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-secondary-hover text-white shadow-lg hover:bg-secondary transition-colors"
             >
                 <RiChat3Fill size={26} />
@@ -361,7 +361,7 @@ const Chatbot = () => {
                     </div>
                     <div className="min-w-0">
                         <span className="font-bold text-[19px] block leading-tight">
-                            {assistantSubtitle ? "Product & Cost Assistant" : "Chat with Bestiee"}
+                            {assistantSubtitle ? "Product & Cost Assistant" : "Chat with Touhfaye"}
                         </span>
                         {assistantSubtitle && <span className="block text-sm text-white/80 leading-tight">{assistantSubtitle}</span>}
                     </div>

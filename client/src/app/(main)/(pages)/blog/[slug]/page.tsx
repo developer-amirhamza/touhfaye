@@ -9,7 +9,7 @@ import Loader from '@/app/(main)/components/UI/Loader';
 import Breadcrumb from '@/app/(main)/components/UI/Breadcrumb';
 import FaqAccordion, { FaqItem } from '@/app/(main)/components/UI/FaqAccordion';
 import { SITE_URL } from '@/utils/siteConfig';
-import bestieeLogo from '@/assets/bestiee-logo.png';
+import touhfayeLogo from '@/assets/touhfaye-logo.png';
 
 interface Blog {
   id: string;
@@ -74,11 +74,11 @@ const BlogDetailPage = () => {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: blog.title,
-    author: { "@type": "Organization", name: "Bestiee" },
+    author: { "@type": "Organization", name: "Touhfaye" },
     publisher: {
       "@type": "Organization",
-      name: "Bestiee",
-      logo: { "@type": "ImageObject", url: `${SITE_URL}${bestieeLogo.src}` },
+      name: "Touhfaye",
+      logo: { "@type": "ImageObject", url: `${SITE_URL}${touhfayeLogo.src}` },
     },
     datePublished: blog.publishedAt,
     dateModified: blog.updatedAt || blog.publishedAt,

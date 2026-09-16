@@ -22,7 +22,7 @@ export default function NdisSupportSection() {
             <div className="container mx-auto px-6">
                 <div className="flex flex-col items-center text-center gap-3 mb-10">
                     <span className="bg-[#d8e8dc] text-secondary font-semibold rounded-full px-4.5 py-2 text-sm">
-                        Why Bestiee
+                        Why Touhfaye
                     </span>
                     <h2 className="font-secondary text-4xl md:text-5xl text-text-hover tracking-tight">
                         Care that works, care that lasts

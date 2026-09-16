@@ -217,13 +217,13 @@ export const emailQuote = async (req: AuthRequest, res: Response) => {
 
     await sendEmail({
       sendTo: Array.from(new Set(recipients)).join(","),
-      subject: `Your Bestiee quote ${quote.quoteNumber}`,
+      subject: `Your Touhfaye quote ${quote.quoteNumber}`,
       html: `<p>Hi ${fullName},</p>
              <p>Please find attached your quote <b>${quote.quoteNumber}</b>
              (${quote.supplyPeriod} supply), valid until
              ${quote.validUntil ? new Date(quote.validUntil).toLocaleDateString("en-AU") : "—"}.</p>
              <p>Total: <b>$${quote.total.toFixed(2)}</b></p>
-             <p>— The Bestiee team</p>`,
+             <p>— The Touhfaye team</p>`,
       attachments: [{ filename: `quote-${quote.quoteNumber}.pdf`, content: pdf }],
     });
 

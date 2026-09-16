@@ -57,7 +57,7 @@ const SignUp = async (req: Request, res: Response) => {
         // Email failure shouldn't fail the signup — the account is already created.
         const emailResult = await sendEmail({
             sendTo: email,
-            subject: "Verify email from Bestiee",
+            subject: "Verify email from Touhfaye",
             html: verifyEmailTemplate({
                 firstName,
                 url: verifyEmailUrl,

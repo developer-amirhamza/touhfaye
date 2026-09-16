@@ -37,7 +37,7 @@ function CreditInner() {
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <p className="text-gray-700">30-day invoice credit hasn't been approved on your account yet.</p>
           <p className="text-sm text-gray-500 mt-2">
-            Contact hello@mybestiee.com.au if you'd like to apply for credit terms.
+            Contact hello@mytouhfaye.com.au if you'd like to apply for credit terms.
           </p>
         </div>
       ) : (

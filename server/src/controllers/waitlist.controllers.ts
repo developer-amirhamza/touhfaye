@@ -92,10 +92,10 @@ export const joinWaitlist = async (req: Request, res: Response) => {
         if (consented) {
             sendEmail({
                 sendTo: cleanEmail,
-                subject: "You're on the Bestiee waitlist 🎉",
+                subject: "You're on the Touhfaye waitlist 🎉",
                 html: `
                     <h2>Freedom is coming.</h2>
-                    <p>Hi ${entry.name.split(" ")[0]}, thanks for joining the Bestiee waitlist!</p>
+                    <p>Hi ${entry.name.split(" ")[0]}, thanks for joining the Touhfaye waitlist!</p>
                     <p>We'll email you the moment we launch, plus helpful guides along the way.
                     Premium incontinence wear that feels like everyday underwear — dignity, comfort, freedom.</p>
                     <p style="color:#888;font-size:13px">You can unsubscribe anytime. Your details stay private.</p>`,

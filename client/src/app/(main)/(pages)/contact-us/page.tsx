@@ -88,8 +88,8 @@ const ContactUs = () => {
               <ContactRow
                 icon={<IoMail size={18} />}
                 label="Email"
-                value="hello@mybestiee.com.au"
-                href="mailto:hello@mybestiee.com.au"
+                value="hello@mytouhfaye.com.au"
+                href="mailto:hello@mytouhfaye.com.au"
               />
               <ContactRow
                 icon={<IoLocationSharp size={18} />}
@@ -104,19 +104,19 @@ const ContactUs = () => {
 
               <div className="flex items-center gap-3 mt-2 pt-5 border-t border-black/10">
                 <Link
-                  href="https://www.facebook.com/aubestiee/"
+                  href="https://www.facebook.com/autouhfaye/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaFacebookF size={14} />
                 </Link>
                 <Link
-                  href=" https://www.instagram.com/bestieeau/"
+                  href=" https://www.instagram.com/touhfayeau/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaInstagram size={14} />
                 </Link>
                 <Link
-                  href="https://www.linkedin.com/company/bestieeau/"
+                  href="https://www.linkedin.com/company/touhfayeau/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaLinkedinIn size={14} />

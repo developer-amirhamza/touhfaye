@@ -47,7 +47,7 @@ export default function FaqPage() {
             Got questions? We&apos;ve got answers
           </h1>
           <p className="text-text text-sm md:text-base leading-relaxed">
-            Everything you need to know about bladder and bowel leakage, our products, and ordering with Bestiee.
+            Everything you need to know about bladder and bowel leakage, our products, and ordering with Touhfaye.
           </p>
         </div>
 

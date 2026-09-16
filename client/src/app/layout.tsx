@@ -17,7 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
         {/* Loaded as a runtime <link>, not a CSS @import, so the build
-            pipeline never needs to fetch it — matches how the Bestiee
+            pipeline never needs to fetch it — matches how the Touhfaye
             design source itself loads these two fonts. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

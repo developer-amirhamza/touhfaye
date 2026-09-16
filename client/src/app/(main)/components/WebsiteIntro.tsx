@@ -204,7 +204,7 @@ export default function WebsiteIntro({ onComplete }: IntroProps) {
         className="text-6xl font-bold opacity-0 select-none"
         style={{ color: "#C9573F" }}
       >
-        Bestiee
+        Touhfaye
       </div>
     </div>
   );

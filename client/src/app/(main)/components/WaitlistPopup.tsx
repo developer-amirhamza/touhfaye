@@ -9,7 +9,7 @@ const CORAL = "#0e4127";
 const TEAL = "#2E7D71";
 const CREAM = "#FFF7F1";
 
-const STORAGE_KEY = "bestiee_waitlist_done"; // signed up OR dismissed
+const STORAGE_KEY = "touhfaye_waitlist_done"; // signed up OR dismissed
 const AUTO_OPEN_MS = 7000; // gentle delay before first auto-open
 
 const BUYER_TYPES = [
@@ -174,7 +174,7 @@ export default function WaitlistPopup() {
                                 </h2>
                                 <p className="mt-2 text-gray-700">
                                     Our team will be in touch within <b>2 business days</b> to talk about
-                                    supply, pricing and how Bestiee can work for your organisation.
+                                    supply, pricing and how Touhfaye can work for your organisation.
                                 </p>
                             </>
                         ) : (
@@ -183,7 +183,7 @@ export default function WaitlistPopup() {
                                     You're in! 🎉
                                 </h2>
                                 <p className="mt-2 text-gray-700">
-                                    We'll email you the moment we launch. Know someone who'd love Bestiee?
+                                    We'll email you the moment we launch. Know someone who'd love Touhfaye?
                                     Share the freedom.
                                 </p>
                             </>
@@ -278,7 +278,7 @@ export default function WaitlistPopup() {
                                     style={{ accentColor: TEAL }}
                                 />
                                 <span className="text-xs text-gray-600">
-                                    I'd like launch news and helpful guides from Bestiee. Unsubscribe anytime.{" "}
+                                    I'd like launch news and helpful guides from Touhfaye. Unsubscribe anytime.{" "}
                                     <Link href="/privacy-policy" className="underline" style={{ color: TEAL }}>
                                         Privacy Policy →
                                     </Link>
