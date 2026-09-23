@@ -9,7 +9,7 @@ import { SummeryApi } from '@/app/common/SummeryApi';
 import AxiosToastError from '@/utils/AxiosToastError';
 
 import { fetchMyOrders } from '@/redux/slices/orderSlice';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import Link from 'next/link';
 import Image from 'next/image';
 import Loader from '@/app/(main)/components/UI/Loader';
@@ -221,7 +221,7 @@ const ProfilePage = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-green-600">{DisplayPriceInAud(order.total)}</p>
+                      <p className="font-bold text-green-600">{DisplayPriceInBdt(order.total)}</p>
                       <p className="text-sm capitalize">
                         Status: <span className="font-medium">{order.orderStatus}</span>
                       </p>

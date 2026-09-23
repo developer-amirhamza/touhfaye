@@ -23,7 +23,7 @@ interface AuthRequest extends Request {
 const SignUp = async (req: Request, res: Response) => {
     try {
         console.log(req.body, "test user")
-        const { firstName, lastName, email, mobile, password,role } = req.body;
+        const { firstName, lastName, email, mobile, password } = req.body;
 
         const id = uuidv4();
         if (!firstName || !email || !password) {
@@ -46,7 +46,12 @@ const SignUp = async (req: Request, res: Response) => {
                 firstName,
                 lastName,
                 email,
-                role,
+                // Self-service signup always creates a plain consumer account —
+                // never trust a client-supplied role here (it would otherwise let
+                // anyone POST role: "ADMIN"/"OWNER" and grant themselves access).
+                // Business account types (Trade/Retailer/Distributor/NDIS) go
+                // through the authenticated /apply flow + admin approval instead.
+                role: "CONSUMER",
                 password: hashPassword,
                 verify_email: false,
                 status: "ACTIVE",

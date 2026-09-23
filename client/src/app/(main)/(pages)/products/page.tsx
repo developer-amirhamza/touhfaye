@@ -9,7 +9,7 @@ import { SummeryApi } from '@/app/common/SummeryApi';
 import AxiosToastError from '@/utils/AxiosToastError';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Link from 'next/link';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
 import { validURLConvert } from '@/utils/validURLConvart';
 import AddToCartButton from '../../components/UI/AddToCartBtn';
@@ -236,16 +236,16 @@ const ProductsContent = () => {
                 </div>
             </div>
 
-            <div className="rounded-2xl p-5.5 bg-secondary text-background">
-                <div className="font-secondary text-2xl leading-tight">Not sure what to buy?</div>
-                <p className="text-sm text-background/85 leading-relaxed mt-2 mb-3.5">
-                    Answer a few questions and get a product match.
+            <div className="p-5.5 bg-secondary text-background">
+                <div className="font-secondary text-2xl leading-tight">Need a gift idea?</div>
+                <p className="text-sm text-background/85 font-light leading-relaxed mt-2 mb-3.5">
+                    Tell us the occasion on Messenger and we will suggest something.
                 </p>
                 <Link
-                    href="/product-finder"
-                    className="block text-center font-semibold rounded-full py-2.5 text-sm bg-white text-secondary hover:bg-primary transition-colors"
+                    href="/contact-us"
+                    className="block text-center font-medium py-2.5 text-sm bg-background text-secondary hover:bg-accent-light transition-colors"
                 >
-                    Start the finder →
+                    Message us →
                 </Link>
             </div>
         </>
@@ -256,16 +256,16 @@ const ProductsContent = () => {
             {/* Hero */}
             <section className="bg-secondary-light">
                 <div className="max-w-310 mx-auto px-5 sm:px-7 pt-10 pb-9">
-                    <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Shop' }]} />
-                    <h1 className="font-secondary text-4xl md:text-5xl leading-tight text-text-hover mt-3 mb-2">
-                        Buy incontinence products online
+                    <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Shop all' }]} />
+                    <h1 className="font-secondary text-4xl md:text-5xl leading-tight text-title mt-3 mb-2">
+                        The gift collection
                     </h1>
-                    <p className="text-lg text-secondary leading-relaxed max-w-2xl">
-                        Pads, pull up pants, bed pads and skincare. Light through to overnight. Every order ships in plain, unmarked packaging.
+                    <p className="text-lg text-paragraph font-light leading-relaxed max-w-2xl">
+                        Hand-finished scented candles and heirloom-style jewellery, packed to be given. Every order leaves our studio gift-wrapped with a handwritten card at no extra cost.
                     </p>
                     <div className="flex gap-2.5 mt-5 flex-wrap">
-                        {['✓ NDIS and Support at Home claimable', '✓ Free over $99', '✓ Same day dispatch before 2pm'].map((t) => (
-                            <span key={t} className="bg-white text-secondary rounded-full px-4 py-2 text-sm font-semibold">
+                        {['Gift wrap included', 'Free over ৳1500', 'Cash on delivery · bKash · Nagad'].map((t) => (
+                            <span key={t} className="bg-background text-accent rounded-full px-4 py-2 text-sm font-medium">
                                 {t}
                             </span>
                         ))}
@@ -390,10 +390,10 @@ const ProductsContent = () => {
                                                 )}
                                                 <div className="flex justify-between items-end mt-auto pt-3">
                                                     <div>
-                                                        <b className="text-xl text-text-hover">{DisplayPriceInAud(finalPrice)}</b>
+                                                        <b className="text-xl text-text-hover">{DisplayPriceInBdt(finalPrice)}</b>
                                                         {/* {hasDiscount && (
                                                             <div className="text-sm line-through text-text">
-                                                                {DisplayPriceInAud(Number(product.price ?? 0))}
+                                                                {DisplayPriceInBdt(Number(product.price ?? 0))}
                                                             </div>
                                                         )} */}
                                                         {product.pack && (

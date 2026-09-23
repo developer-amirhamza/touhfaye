@@ -4,7 +4,7 @@ import { FaSearch, FaTimes } from "react-icons/fa";
 import { useRouter } from 'next/navigation';
 import Axios from '@/utils/Axios';
 import { SummeryApi } from '@/app/common/SummeryApi';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { validURLConvert } from '@/utils/validURLConvart';
 
 interface SearchHit {
@@ -78,7 +78,7 @@ const Search = () => {
                     id: p.id,
                     kind: 'Product',
                     title: p.title,
-                    sub: [DisplayPriceInAud(p.price), p.sizes?.length ? p.sizes.join(', ') : null]
+                    sub: [DisplayPriceInBdt(p.price), p.sizes?.length ? p.sizes.join(', ') : null]
                         .filter(Boolean)
                         .join(' · '),
                     href: `/product/${validURLConvert(p.title)}_${p.id}`,
@@ -157,7 +157,7 @@ const Search = () => {
 
                             {showIdle && (
                                 <div className="pt-5 text-base text-text">
-                                    Try &ldquo;pull up pants&rdquo;, &ldquo;NDIS&rdquo;, &ldquo;overnight&rdquo; or &ldquo;sizing&rdquo;.
+                                    Try &ldquo;candle&rdquo;, &ldquo;earrings&rdquo;, &ldquo;gift set&rdquo; or &ldquo;necklace&rdquo;.
                                 </div>
                             )}
                             {showEmpty && (

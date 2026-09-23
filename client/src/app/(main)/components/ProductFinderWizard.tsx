@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Axios from '@/utils/Axios'
 import { SummeryApi } from '@/app/common/SummeryApi'
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud'
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt'
 import { getDisplayPrice } from '@/utils/PriceWithDiscount'
 
 const STEPS = [
@@ -105,7 +105,7 @@ const ProductFinderWizard = () => {
                                 <div className="p-4">
                                     <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-[#1a56db] transition-colors">{product.title}</h3>
                                     <div className="flex items-center justify-between mt-3">
-                                        <span className="text-[#1a56db] font-bold text-base">{DisplayPriceInAud(getDisplayPrice(product))}</span>
+                                        <span className="text-[#1a56db] font-bold text-base">{DisplayPriceInBdt(getDisplayPrice(product))}</span>
                                         <span className="text-xs bg-blue-50 text-[#1a56db] px-2.5 py-1 rounded-full font-semibold">View →</span>
                                     </div>
                                 </div>

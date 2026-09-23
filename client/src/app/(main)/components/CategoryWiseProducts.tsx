@@ -45,19 +45,19 @@ const CategoryWiseProductDisplay: React.FC = () => {
 
 
     return (
-        <section className="bg-[#e8ddd4] py-10">
+        <section className="bg-background py-10">
             <div className="container flex flex-col items-center  mx-auto px-6">
 
                 {/* Section header */}
                 <div className="flex flex-col items-center text-center mb-5 gap-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-500">
-                        Shop incontinence products online
+                    <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-accent">
+                        Shop by category
                     </p>
-                    <h2 className="font-serif text-5xl md:text-6xl text-gray-900 tracking-tight leading-none">
+                    <h2 className="font-secondary text-5xl md:text-6xl text-title tracking-tight leading-none">
                         {activeLabel}
                     </h2>
-                    <p className="text-gray-500 text-sm leading-relaxed max-w-[300px] mt-1">
-                        Thoughtfully crafted products for your daily care ritual
+                    <p className="text-foreground text-sm leading-relaxed max-w-[320px] mt-1 font-light">
+                        Hand-finished candles, jewellery and keepsakes, wrapped to be given
                     </p>
                 </div>
 

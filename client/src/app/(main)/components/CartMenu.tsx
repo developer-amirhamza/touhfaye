@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { IoClose } from "react-icons/io5";
 import Link from 'next/link';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { useDispatch, useSelector } from 'react-redux';
 import AddToCartButton from './UI/AddToCartBtn';
@@ -91,7 +91,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                         <div>
                             <div className="flex items-center justify-between px-4 py-2 mt-2 bg-primary-hover rounded-full text-sm text-title font-semibold">
                                 <p>Your total savings</p>
-                                <p>{DisplayPriceInAud(totalDiscount)}</p>
+                                <p>{DisplayPriceInBdt(totalDiscount)}</p>
                             </div>
                             <div className="grid gap-4 overflow-y-auto p-4 flex-1">
                                 {cart?.items?.map((item: any) => (
@@ -107,7 +107,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                                             <p className="text-ellipsis text-title line-clamp-2">{item.product.title}</p>
                                             <p className="text-paragraph">{item.product.unit}</p>
                                             <p className="font-semibold text-paragraph">
-                                                {DisplayPriceInAud(
+                                                {DisplayPriceInBdt(
                                                     (() => {
                                                         const price = (item as any).displayPrice ?? item.product.price;
                                                         const plan = planForDays((item as any).subscriptionIntervalDays);
@@ -148,12 +148,12 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                             <h1 className="font-semibold text-title">Bill Details</h1>
                             <div className="flex items-center justify-between font-semibold">
                                 <p className="text-paragraph text-sm">Sub Total:</p>
-                                <p className="text-paragraph text-sm">{DisplayPriceInAud(subtotal)}</p>
+                                <p className="text-paragraph text-sm">{DisplayPriceInBdt(subtotal)}</p>
                             </div>
                             <div className="flex items-center justify-between font-semibold">
                                 <p className="text-paragraph text-sm">Discount:</p>
                                 <p className="text-paragraph text-sm line-through">
-                                    {DisplayPriceInAud(totalDiscount)}
+                                    {DisplayPriceInBdt(totalDiscount)}
                                 </p>
                             </div>
                             <div className="flex items-center justify-between font-semibold">
@@ -162,7 +162,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                             </div>
                             <div className="flex items-center justify-between font-semibold">
                                 <p className="text-title">Grand Total:</p>
-                                <p className="text-title">{DisplayPriceInAud(grandTotal)}</p>
+                                <p className="text-title">{DisplayPriceInBdt(grandTotal)}</p>
                             </div>
                         </div>
 
@@ -172,7 +172,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                                 className="flex items-center  justify-center gap-2"
                             >
                                 <button className="cursor-pointer">Checkout:</button>
-                                <div>{DisplayPriceInAud(grandTotal)}</div>
+                                <div>{DisplayPriceInBdt(grandTotal)}</div>
                             </div>
 
 

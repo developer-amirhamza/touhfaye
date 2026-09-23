@@ -2,7 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
 import { validURLConvert } from '@/utils/validURLConvart';
 import AddToCartButton from './UI/AddToCartBtn';
@@ -75,11 +75,11 @@ const ProductCard: React.FC<Type> = ({ data }) => {
                 <div className="flex justify-between items-center">
                     <div className="flex items-center gap-2 mt-2">
                         <span className="text-[14px] font-bold text-gray-900">
-                            {DisplayPriceInAud(finalPrice)}
+                            {DisplayPriceInBdt(finalPrice)}
                         </span>
                         {/* {hasDiscount && (
                             <span className="text-[13px] text-gray-400 line-through">
-                                {DisplayPriceInAud(Number(data?.price ?? 0))}
+                                {DisplayPriceInBdt(Number(data?.price ?? 0))}
                             </span>
                         )} */}
                         {data?.pack && (

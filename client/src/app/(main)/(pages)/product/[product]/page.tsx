@@ -7,14 +7,13 @@ import toast from 'react-hot-toast';
 import Axios from '@/utils/Axios';
 import AxiosToastError from '@/utils/AxiosToastError';
 import { SummeryApi } from '@/app/common/SummeryApi';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
 import StarRating from '@/utils/StartRating';
 import { fetchProductReviews, addReview, updateReview, deleteReview } from '@/redux/slices/reviewSlice';
 import { RootState, AppDispatch } from '@/redux/store';
 import AddToCartButton from '@/app/(main)/components/UI/AddToCartBtn';
 import Breadcrumb from '@/app/(main)/components/UI/Breadcrumb';
-import SizeFinder from '@/app/(main)/components/SizeFinder';
 import FaqAccordion, { FaqItem } from '@/app/(main)/components/UI/FaqAccordion';
 
 type Tab = 'details' | 'reviews';
@@ -178,9 +177,11 @@ const ProductDetailsPage = () => {
                                     <div className="text-sm tracking-wide">Photo to come</div>
                                 </div>
                             )}
-                            <span className="absolute top-3.5 left-3.5 bg-secondary text-background text-sm font-semibold rounded-full px-3.5 py-1.5">
-                                {data.discount > 0 ? `Save ${data.discount}%` : 'NDIS claimable'}
-                            </span>
+                            {data.discount > 0 && (
+                                <span className="absolute top-3.5 left-3.5 bg-secondary text-background text-sm font-semibold rounded-full px-3.5 py-1.5">
+                                    Save {data.discount}%
+                                </span>
+                            )}
                         </div>
                         {data.images?.length > 1 && (
                             <div className="grid grid-cols-4 gap-2.5 mt-2.5">
@@ -237,9 +238,9 @@ const ProductDetailsPage = () => {
                                 </div>
 
                                 <div className="flex items-baseline gap-3 mt-4">
-                                    <span className="font-primary text-4xl text-text-hover">{DisplayPriceInAud(finalPrice)}</span>
+                                    <span className="font-primary text-4xl text-text-hover">{DisplayPriceInBdt(finalPrice)}</span>
                                     {/* {data.discount > 0 && (
-                                        <span className="line-through text-text text-xl">{DisplayPriceInAud(data.price)}</span>
+                                        <span className="line-through text-text text-xl">{DisplayPriceInBdt(data.price)}</span>
                                     )} */}
                                     {data.pack && <span className="text-text">{data.pack}</span>}
                                 </div>
@@ -338,12 +339,6 @@ const ProductDetailsPage = () => {
                     </div>
                 )}
 
-                {tab === 'details' && (
-                    <div id="size-guide" className="mt-14 scroll-mt-24">
-                        <SizeFinder product={data} />
-                    </div>
-                )}
-
                 {tab === 'reviews' && (
                     <div className="mt-10 max-w-3xl">
                         {user ? (
@@ -417,7 +412,7 @@ const ProductDetailsPage = () => {
 
             {/* Sticky checkout bar, matching the design's popup footer */}
             <div className="fixed bottom-0 inset-x-0 bg-background border-t border-primary-hover pl-6 pr-24 py-4 flex items-center gap-4 z-30 shadow-[0_-6px_20px_rgba(0,0,0,0.06)]">
-                <span className="font-secondary text-xl text-text-hover">{DisplayPriceInAud(finalPrice)}</span>
+                <span className="font-secondary text-xl text-text-hover">{DisplayPriceInBdt(finalPrice)}</span>
                 <span className="text-sm text-text flex-1 hidden sm:block">
                     {data.pack}{selectedSize ? ` · size ${selectedSize}` : ''}
                 </span>

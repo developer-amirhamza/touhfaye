@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchMyOrders } from "@/redux/slices/orderSlice";
-import { DisplayPriceInAud } from "@/utils/DisplayPriceInAud";
+import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
 import { format } from "date-fns"; // optional, for date formatting
 import { useRouter } from "next/navigation";
 import Loader from "@/app/(main)/components/UI/Loader";
@@ -87,7 +87,7 @@ const MyOrdersPage = () => {
                                 </p>
                             </div>
                             <div className="text-right">
-                                <p className="font-bold text-green-600">{DisplayPriceInAud(order.total)}</p>
+                                <p className="font-bold text-green-600">{DisplayPriceInBdt(order.total)}</p>
                                 <p
                                     className={`text-xs font-medium px-2 py-0.5 rounded-full inline-block ${order.orderStatus === "Delivered"
                                             ? "bg-green-100 text-green-700"
@@ -134,10 +134,10 @@ const MyOrdersPage = () => {
                                                 <div className="flex-1">
                                                     <p className="font-medium">{item.productName}</p>
                                                     <p className="text-sm text-neutral-600">
-                                                        Qty: {item.quantity} × {DisplayPriceInAud(item.price)}
+                                                        Qty: {item.quantity} × {DisplayPriceInBdt(item.price)}
                                                     </p>
                                                     <p className="text-sm font-semibold">
-                                                        Total: {DisplayPriceInAud(item.total)}
+                                                        Total: {DisplayPriceInBdt(item.total)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -146,9 +146,9 @@ const MyOrdersPage = () => {
                                 </div>
                                 <div className="mt-4 pt-2 border-t text-right">
                                     <p className="text-sm text-neutral-600">
-                                        Subtotal: {DisplayPriceInAud(order.subtotal)}
+                                        Subtotal: {DisplayPriceInBdt(order.subtotal)}
                                     </p>
-                                    <p className="text-lg font-bold">Grand Total: {DisplayPriceInAud(order.total)}</p>
+                                    <p className="text-lg font-bold">Grand Total: {DisplayPriceInBdt(order.total)}</p>
                                     <p className="text-xs text-neutral-500">
                                         Payment: {order.paymentMethod} • Status: {order.paymentStatus}
                                     </p>

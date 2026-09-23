@@ -8,7 +8,7 @@ import Axios from '@/utils/Axios';
 import { SummeryApi } from '@/app/common/SummeryApi';
 import AxiosToastError from '@/utils/AxiosToastError';
 import toast from 'react-hot-toast';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 
 interface Product {
   id: string;
@@ -158,7 +158,7 @@ const AdminProductsPage = () => {
                     {product.category?.title || '—'}
                   </td> */}
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                    {DisplayPriceInAud(product.price)}
+                    {DisplayPriceInBdt(product.price)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                     {product.stock}

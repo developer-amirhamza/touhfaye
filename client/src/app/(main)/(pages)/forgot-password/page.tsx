@@ -36,11 +36,11 @@ const ForgotPassword = () => {
     }
 
     return (
-        <section className='w-full min-h-screen h-full bg-no-repeat bg-center'>
-            <div className="container px-5 mx-auto flex w-full justify-center py-6">
-                <div className="bg-primary text-white shadow-2xl p-10 flex justify-center items-center w-full max-w-md h-full flex-col rounded-md gap-5">
-                    <h1 className="text-2xl text-text text-center uppercase font-semibold">Forgot password</h1>
-                    <p className="text-text-hover text-center text-base -mt-3">
+        <section className='w-full min-h-screen bg-background py-14'>
+            <div className="container px-5 mx-auto flex w-full justify-center">
+                <div className="bg-white border border-primary-hover shadow-[0_1px_2px_rgba(18,40,28,.05),0_12px_32px_rgba(18,40,28,.07)] p-10 flex justify-center items-center w-full max-w-md flex-col gap-5">
+                    <h1 className="font-secondary text-3xl text-title text-center">Forgot password</h1>
+                    <p className="text-foreground font-light text-center text-sm -mt-3">
                         Enter the email on your account and we&apos;ll send you a code to reset your password.
                     </p>
                     <form onSubmit={handleSubmit} className="grid gap-5 w-full text-lg">

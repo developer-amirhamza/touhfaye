@@ -2,7 +2,6 @@
 import Image from 'next/image'
 import React, { useEffect, useState, useRef } from 'react'
 import { IoCall } from 'react-icons/io5'
-import { MdVerified } from 'react-icons/md'
 import { FaTruck, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
 import logo from "@/assets/touhfaye-logo.png"
 import { BsCart4 } from 'react-icons/bs'
@@ -13,7 +12,7 @@ import { AppDispatch, RootState } from '@/redux/store'
 import { fetchCart } from '@/redux/slices/cartSlice'
 import { fetchUser } from '@/redux/slices/userSlices'
 import { fetchCategories } from '@/redux/slices/categorySlice'
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud'
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt'
 import CartMenu from './CartMenu'
 import Search from './Search'
 import TrackOrderModal from './TrackOrderModal'
@@ -25,12 +24,9 @@ import AutoScrollSlider from './AutoScrollSlider'
 // Plain (non-dropdown) nav links — "Shop" is rendered separately as the
 // category mega-menu.
 const NAV_LINKS = [
-    { label: 'NDIS & Support', href: '/apply/ndis' },
-    { label: 'Trade', href: '/apply/trade' },
-    { label: 'Blog', href: '/blog' },
-    // { label: 'Community', href: '/#community' },
-    { label: "FAQ", href: "/faq" },
-    { label: 'Contact', href: '/contact-us' },
+    { label: 'Stories', href: '/blog' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Contact us', href: '/contact-us' },
 ]
 
 const Header = () => {
@@ -127,16 +123,15 @@ const Header = () => {
                     className="container mx-auto flex items-center w-full overflow-x-hidden justify-between px-4 h-7 text-sm"
                 >
                     <div className="flex items-center gap-2 whitespace-nowrap">
-                        <FaTruck className="text-primary shrink-0" />
-                        <span className="font-medium">Free, discreet shipping Australia-wide on orders over $99</span>
+                        <FaTruck className="text-accent-light shrink-0" />
+                        <span className="font-medium tracking-wide">FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳1500</span>
                     </div>
-                    <a href="tel:1300243253" className="flex whitespace-nowrap items-center gap-1.5 hover:text-primary transition-colors">
+                    <a href="tel:+8801XXXXXXXXX" className="flex whitespace-nowrap items-center gap-1.5 hover:text-accent-light transition-colors">
                         <IoCall />
-                        <span className="font-semibold">1300 243 253</span>
+                        <span className="font-semibold">+880 1XXX-XXXXXX</span>
                     </a>
                     <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        <MdVerified className="text-primary" />
-                        <span>Registered NDIS provider</span>
+                        <span className="tracking-wide">CASH ON DELIVERY · bKash · Nagad</span>
                     </div>
                 </AutoScrollSlider>
 
@@ -150,7 +145,7 @@ const Header = () => {
                     <Link href="/" className="shrink-0 flex items-center">
                         <Image
                             src={logo}
-                            alt="Health U Shop"
+                            alt="Touhfaye"
                             className="h-10 w-auto object-contain"
                             priority
                         />
@@ -276,7 +271,7 @@ const Header = () => {
                                 </span>
                             )}
                             <span className="hidden sm:inline text-sm font-medium">
-                                {cart?.items?.[0] ? DisplayPriceInAud(subtotal) : 'My Cart'}
+                                {cart?.items?.[0] ? DisplayPriceInBdt(subtotal) : 'My Cart'}
                             </span>
                         </button>
                     </div>

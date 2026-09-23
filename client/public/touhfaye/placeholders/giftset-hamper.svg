@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="#F1EADC"/>
+  <circle cx="250" cy="230" r="150" fill="none" stroke="#8C6A28" stroke-opacity="0.25" stroke-width="1.5"/>
+  <g color="#8C6A28" transform="translate(0,-10)"><g stroke="currentColor" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="150" y="220" width="200" height="150" rx="8" />
+      <path d="M150 270 h200" />
+      <path d="M250 220 v150" />
+      <path d="M250 220 c-10 -50 -90 -50 -90 -10 c0 20 40 20 90 10z" fill="currentColor" stroke="none"/>
+      <path d="M250 220 c10 -50 90 -50 90 -10 c0 20 -40 20 -90 10z" fill="currentColor" stroke="none"/>
+    </g></g>
+  <text x="250" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#8C6A28" letter-spacing="1">Gift Hamper</text>
+</svg>

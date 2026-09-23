@@ -75,7 +75,7 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
 
             return {
                 price_data: {
-                    currency: 'aud',
+                    currency: 'bdt',
                     product_data: {
                         name: item.subscriptionIntervalDays
                             ? `${item.product.title} (Subscribe & Save)`
