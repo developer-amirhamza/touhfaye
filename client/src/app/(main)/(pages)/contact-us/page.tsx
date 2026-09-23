@@ -70,8 +70,8 @@ const ContactUs = () => {
             We&apos;re here to help
           </h1>
           <p className="text-text text-sm md:text-base leading-relaxed">
-            Questions about products, orders, or NDIS funding? Send us a
-            message and our team will get back to you shortly.
+            Order questions, bulk and corporate gifting, or help choosing something.
+            Messenger is the fastest way to reach us; the form below reaches the same inbox.
           </p>
         </div>
 
@@ -81,42 +81,42 @@ const ContactUs = () => {
             <div className="bg-primary rounded-2xl p-6 flex flex-col gap-5">
               <ContactRow
                 icon={<IoCall size={18} />}
-                label="Phone"
-                value="0481 707 758"
-                href="tel:0481707758"
+                label="WhatsApp / Call"
+                value="+880 1XXX-XXXXXX"
+                href="tel:+8801XXXXXXXXX"
               />
               <ContactRow
                 icon={<IoMail size={18} />}
                 label="Email"
-                value="hello@mybestiee.com.au"
-                href="mailto:hello@mybestiee.com.au"
+                value="hello@touhfaye.com"
+                href="mailto:hello@touhfaye.com"
               />
               <ContactRow
                 icon={<IoLocationSharp size={18} />}
-                label="Locations"
-                value="Sydney · Melbourne · Brisbane"
+                label="Pickup point"
+                value="Bashundhara R/A, Dhaka"
               />
               <ContactRow
                 icon={<IoTimeOutline size={18} />}
-                label="Support hours"
-                value="Mon–Fri, 9am–5pm AEST"
+                label="Studio hours"
+                value="Sat–Thu, 11am–8pm"
               />
 
               <div className="flex items-center gap-3 mt-2 pt-5 border-t border-black/10">
                 <Link
-                  href="https://www.facebook.com/aubestiee/"
+                  href="https://www.facebook.com/autouhfaye/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaFacebookF size={14} />
                 </Link>
                 <Link
-                  href=" https://www.instagram.com/bestieeau/"
+                  href=" https://www.instagram.com/touhfayeau/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaInstagram size={14} />
                 </Link>
                 <Link
-                  href="https://www.linkedin.com/company/bestieeau/"
+                  href="https://www.linkedin.com/company/touhfayeau/"
                   className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary-hover text-white flex items-center justify-center transition-colors"
                 >
                   <FaLinkedinIn size={14} />
@@ -126,18 +126,16 @@ const ContactUs = () => {
 
             <div className="bg-primary rounded-2xl p-6">
               <h3 className="playfair-display text-lg text-foreground mb-2">
-                NDIS support coordinator?
+                Corporate gifting
               </h3>
               <p className="text-text text-sm leading-relaxed mb-4">
-                Set up a coordinator account to build quotes and manage
-                participant orders.
+                Twenty pieces and up, with your logo on the card or the box. We
+                send one wrapped sample before the full run so you can approve
+                it in hand.
               </p>
-              <Link
-                href="/apply/ndis"
-                className="inline-block text-sm font-semibold text-secondary underline underline-offset-4"
-              >
-                Apply for coordinator access
-              </Link>
+              <span className="inline-block text-sm font-semibold text-secondary">
+                Minimum 20 pieces · 7–10 day lead time
+              </span>
             </div>
           </div>
 
@@ -194,7 +192,7 @@ const ContactUs = () => {
                   id="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="04xx xxx xxx"
+                  placeholder="01XXXXXXXXX"
                 />
               </Field>
 

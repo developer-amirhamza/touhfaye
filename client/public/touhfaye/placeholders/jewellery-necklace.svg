@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="#F4EDE1"/>
+  <circle cx="250" cy="230" r="150" fill="none" stroke="#173124" stroke-opacity="0.25" stroke-width="1.5"/>
+  <g color="#173124" transform="translate(0,-10)"><g stroke="currentColor" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M140 140 q110 140 220 0" />
+      <circle cx="250" cy="270" r="34" fill="currentColor" stroke="none"/>
+    </g></g>
+  <text x="250" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#173124" letter-spacing="1">Necklace</text>
+</svg>

@@ -27,9 +27,15 @@ const generateOrderNumber = async () => {
 }
 
 
+// Delivery pricing: free over the threshold, otherwise a flat fee that
+// depends on whether the address is inside Dhaka.
+const FREE_DELIVERY_THRESHOLD = 1500;
+const DELIVERY_COST_DHAKA = 60;
+const DELIVERY_COST_OUTSIDE = 120;
+
 export const placeOrder = async (req: AuthRequest, res: Response) => {
     try {
-        const { firstName, lastName, phone, orderNote, shippingAddress, paymentMethod = "COD", fundingDetails } = req.body;
+        const { firstName, lastName, phone, orderNote, shippingAddress, paymentMethod = "COD", fundingDetails, deliveryArea } = req.body;
         const token = await getCartToken(req, res);
         const userId = req.userId;
 
@@ -125,7 +131,10 @@ export const placeOrder = async (req: AuthRequest, res: Response) => {
                 total: itemsTotal,
             })
         };
-        const total = subtotal;
+        const shippingCost = subtotal >= FREE_DELIVERY_THRESHOLD
+            ? 0
+            : (deliveryArea === "OUTSIDE" ? DELIVERY_COST_OUTSIDE : DELIVERY_COST_DHAKA);
+        const total = subtotal + shippingCost;
         const orderNumber = await generateOrderNumber()
 
         // Create the order and decrement stock atomically — if any product's
@@ -152,6 +161,7 @@ export const placeOrder = async (req: AuthRequest, res: Response) => {
                     phone,
                     email,                           // snapshot (user's email or guest's email)
                     subtotal,
+                    shippingCost,
                     total,
                     paymentMethod,
                     // Funding orders are marked awaiting their funding source;

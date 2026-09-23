@@ -218,7 +218,7 @@ export const youarenotalone = {
   "section": "youarenotalone",
   "badge": "Did you know",
   "heading": "You are not the only one. Not even close.",
-  "intro": "Over 7 million Australians live with incontinence, at every age from 40 to 100. Most improve it once they start. Bestiee is a judgement free place to start.",
+  "intro": "Over 7 million Australians live with incontinence, at every age from 40 to 100. Most improve it once they start. Touhfaye is a judgement free place to start.",
   "stats": [
     {
       "value": "1 in 3",
@@ -238,7 +238,7 @@ export const youarenotalone = {
     }
   ],
   "carousel": {
-    "heading": "What makes Bestiee different, at every age",
+    "heading": "What makes Touhfaye different, at every age",
     "subtitle": "Swipe through. Product facts first, then a guide by age group.",
     "cardSuggestLabel": "WE SUGGEST",
     "cardCtaLabel": "View details →",
@@ -246,16 +246,16 @@ export const youarenotalone = {
       {
         "tag": "Built like activewear",
         "title": "The waistband is designed to move, not just sit there",
-        "body": "Bestiee's stretchable waistband is built for squats, sprints and long days on your feet. It flexes with you rather than digging in or sagging, which is why it reads as activewear rather than medical wear.",
-        "suggestedProduct": "Bestiee Active Pull Up Pants",
+        "body": "Touhfaye's stretchable waistband is built for squats, sprints and long days on your feet. It flexes with you rather than digging in or sagging, which is why it reads as activewear rather than medical wear.",
+        "suggestedProduct": "Touhfaye Active Pull Up Pants",
         "productId": "pullup",
         "hasPhoto": true
       },
       {
         "tag": "Up to 17 hours",
         "title": "One pair covers a full day, or a full night",
-        "body": "Bestiee Active offers up to 17 hours of protection in a single pair. That is long enough for a full workday, an overnight flight, or a whole night of sleep without a 2am change.",
-        "suggestedProduct": "Bestiee Active, M, L or XXL",
+        "body": "Touhfaye Active offers up to 17 hours of protection in a single pair. That is long enough for a full workday, an overnight flight, or a whole night of sleep without a 2am change.",
+        "suggestedProduct": "Touhfaye Active, M, L or XXL",
         "productId": "pullup",
         "hasPhoto": true
       },
@@ -263,14 +263,14 @@ export const youarenotalone = {
         "tag": "Dermatologically tested",
         "title": "Gentle enough for daily wear on sensitive skin",
         "body": "Every pair is dermatologically tested. The breathable, soft materials are designed for wearing every day, including on skin that reacts to most things.",
-        "suggestedProduct": "Bestiee Active Pull Up Pants",
+        "suggestedProduct": "Touhfaye Active Pull Up Pants",
         "productId": "pullup",
         "hasPhoto": true
       },
       {
         "tag": "M, L and XXL",
         "title": "A tailored fit, not one size fits most",
-        "body": "Bestiee comes in M, L and XXL, so the fit is actually yours. A closer fit means a slimmer, more discreet profile under everyday clothes, and a better seal at the legs.",
+        "body": "Touhfaye comes in M, L and XXL, so the fit is actually yours. A closer fit means a slimmer, more discreet profile under everyday clothes, and a better seal at the legs.",
         "suggestedProduct": "Check the sizing guide",
         "productId": "pullup",
         "hasPhoto": true
@@ -278,8 +278,8 @@ export const youarenotalone = {
       {
         "tag": "Every age group",
         "title": "This is not only an older person's issue",
-        "body": "Studies suggest incontinence affects people across every age group, not just older adults. Bestiee was designed with that full range in mind, from active twenty somethings to confident eighty somethings.",
-        "suggestedProduct": "Bestiee Active Pull Up Pants",
+        "body": "Studies suggest incontinence affects people across every age group, not just older adults. Touhfaye was designed with that full range in mind, from active twenty somethings to confident eighty somethings.",
+        "suggestedProduct": "Touhfaye Active Pull Up Pants",
         "productId": "pullup",
         "hasPhoto": true
       },

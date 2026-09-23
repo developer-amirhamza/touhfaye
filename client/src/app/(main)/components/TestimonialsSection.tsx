@@ -13,19 +13,20 @@ interface Testimonial {
 }
 
 const TestimonialCard = ({ t }: { t: Testimonial }) => (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7 mb-5">
-        <p className="font-serif text-[19px] leading-relaxed text-gray-800 mb-6">
+    <div className="bg-background rounded-none border border-primary-hover p-7 mb-5">
+        <div className="text-accent-light text-sm tracking-[.12em]">{"★".repeat(Math.max(0, Math.min(5, t.rating || 5)))}</div>
+        <p className="font-serif italic text-[19px] leading-relaxed text-paragraph mt-4 mb-6">
             &ldquo;{t.quote}&rdquo;
         </p>
         <div className="flex items-end justify-between gap-3">
             <div>
-                <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
+                <p className="font-medium text-title text-sm">{t.name}</p>
                 {t.location && (
-                    <p className="text-xs text-gray-400 mt-0.5">{t.location}</p>
+                    <p className="text-xs text-accent mt-0.5 font-light">{t.location}</p>
                 )}
             </div>
             {t.role && (
-                <span className="text-[11px] text-gray-400 bg-gray-50 px-3 py-1 rounded-full whitespace-nowrap">
+                <span className="text-[11px] text-accent bg-primary px-3 py-1 whitespace-nowrap">
                     {t.role}
                 </span>
             )}
@@ -86,7 +87,7 @@ const TestimonialsSection = () => {
     };
 
     return (
-        <section className="bg-[#f5f0eb] py-16 overflow-hidden">
+        <section className="bg-secondary py-16 overflow-hidden">
             <style>{`
                 @keyframes testimonial-scroll-up {
                     0%   { transform: translateY(0); }
@@ -100,15 +101,15 @@ const TestimonialsSection = () => {
 
             <div className="container mx-auto px-6">
                 <div className="flex flex-col items-center text-center mb-12 gap-3">
-                    <p className="text-[18px] font-semibold  uppercase tracking-[0.2em] text-gray-500">
-                        Loved by Families
-                    </p>
-                    <h2 className=" text-5xl lg:text-6xl font-secondary md:text-6xl text-gray-900 tracking-tight leading-none">
-                        Real stories
-                    </h2>
-                    <p className="text-gray-500 text-center leading-relaxed max-w-full mt-1">
-                        Honest reviews from people who rely on us every day.
-                    </p>
+                    <div className="flex items-center gap-4">
+                        <span className="h-px w-14 bg-secondary-hover" />
+                        <span className="w-1.5 h-1.5 bg-accent-light rotate-45" />
+                        <h2 className="text-3xl lg:text-4xl font-secondary text-background tracking-tight">
+                            What our customers say
+                        </h2>
+                        <span className="w-1.5 h-1.5 bg-accent-light rotate-45" />
+                        <span className="h-px w-14 bg-secondary-hover" />
+                    </div>
                 </div>
 
                 <div

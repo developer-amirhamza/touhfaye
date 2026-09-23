@@ -93,14 +93,14 @@ const BlogPageContent = () => {
       </div>
 
       <div className="container mx-auto px-6 pb-6 text-center">
-        <span className="bg-[#d8e8dc] text-secondary font-semibold rounded-full px-4.5 py-2 text-sm">
-          Blog &amp; Care Guides
+        <span className="bg-primary text-accent font-medium rounded-full px-4.5 py-2 text-sm tracking-wide">
+          Product Stories
         </span>
         <h1 className="font-secondary text-4xl md:text-5xl text-text-hover tracking-tight mt-4">
-          Incontinence care guides and advice
+          Candle care, gifting notes and studio stories
         </h1>
-        <p className="text-base md:text-lg text-text max-w-xl mx-auto mt-2">
-          Honest, evidence-based articles to support you and the people you care for.
+        <p className="text-base md:text-lg text-text max-w-xl mx-auto mt-2 font-light">
+          Notes on burning a candle properly, choosing a gift for someone you hardly know, and what happens on our packing table.
         </p>
       </div>
 
@@ -142,9 +142,9 @@ const BlogPageContent = () => {
                 <Link
                   key={blog.id}
                   href={`/blog/${blog.slug}`}
-                  className="bg-white border border-primary-hover rounded-2xl overflow-hidden flex flex-col hover:shadow-lg transition-shadow"
+                  className="bg-background border border-primary-hover overflow-hidden flex flex-col hover:border-accent transition-colors"
                 >
-                  <div className="relative h-48 bg-[#d8e8dc]">
+                  <div className="relative h-48 bg-primary">
                     {blog.featuredImage ? (
                       <img src={blog.featuredImage} alt={blog.title} className="absolute inset-0 w-full h-full object-cover" />
                     ) : (

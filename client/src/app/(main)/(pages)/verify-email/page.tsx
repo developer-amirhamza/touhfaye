@@ -36,9 +36,9 @@ const VerifyEmailContent = () => {
     }, [code]);
 
     return (
-        <section className='w-full min-h-screen h-full bg-no-repeat bg-center'>
-            <div className="container px-5 mx-auto flex w-full justify-center py-6">
-                <div className="bg-primary text-white shadow-2xl p-10 flex justify-center items-center w-full max-w-md h-full flex-col rounded-md gap-5 text-center">
+        <section className='w-full min-h-screen bg-background py-14'>
+            <div className="container px-5 mx-auto flex w-full justify-center">
+                <div className="bg-white border border-primary-hover shadow-[0_1px_2px_rgba(18,40,28,.05),0_12px_32px_rgba(18,40,28,.07)] p-10 flex justify-center items-center w-full max-w-md flex-col gap-5 text-center">
                     {status === "pending" && (
                         <>
                             <h1 className="text-2xl text-text uppercase font-semibold">Check your email</h1>

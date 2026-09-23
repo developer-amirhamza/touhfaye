@@ -8,7 +8,7 @@ interface AuthRequest extends Request {
   userId?: string;
 }
 
-const TEAM_EMAIL = "hello@mybestiee.com.au";
+const TEAM_EMAIL = "hello@mytouhfaye.com.au";
 
 // Submit a funding-support enquiry. If a quoteId is supplied, the quote PDF is
 // attached so the team can offer a payment plan / partial supply / hardship

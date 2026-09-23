@@ -14,28 +14,19 @@ import { fetchCart } from '@/redux/slices/cartSlice';
 import { AppDispatch } from '@/redux/store';
 import AxiosToastError from '@/utils/AxiosToastError';
 import Link from 'next/link';
-import { portalPath } from '@/utils/roles';
 
 const initialFormData = {
     firstName: "",
     lastName: "",
     email: "",
+    mobile: "",
     password: "",
-    role:"",
 }
-
-const ASSIGNABLE_ROLES = [
-    { value: 'USER', label: 'User (Default)' },
-    { value: 'CONSUMER', label: 'Consumer' },
-    { value: 'TRADE', label: 'Trade Partners' },
-    { value: 'RETAILER', label: 'Retailer' },
-    { value: 'DISTRIBUTOR', label: 'Distributor' },
-    { value: 'NDIS_COORDINATOR', label: 'NDIS/Aged Care Provider' },
-];
 
 const SingUp = () => {
     const [formData, setFormData] = useState(initialFormData);
     const [showPassword, setShowPassword] = useState(false);
+    const [agreed, setAgreed] = useState(false);
     const router = useRouter()
     const dispatch = useDispatch<AppDispatch>()
     const handleOnChange = (e: any) => {
@@ -48,6 +39,10 @@ const SingUp = () => {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        if (!agreed) {
+            toast.error("Please agree to the terms and privacy policy");
+            return;
+        }
         try {
             const response = await Axios({
                 ...SummeryApi.signup,
@@ -74,8 +69,7 @@ const SingUp = () => {
                     dispatch(setUserDetails(userDetails?.data))
                     dispatch(fetchCart())
                     setFormData(initialFormData)
-                    const role = response?.data?.data?.user?.role;
-                    router.push(portalPath(role))
+                    router.push("/")
                 }
             } else {
                 toast.error(responseData.message)
@@ -86,66 +80,55 @@ const SingUp = () => {
     }
     // Last name is optional; first name, email and password are required.
     const validInput = Boolean(formData.firstName && formData.email && formData.password);
+    const fieldCls = "border border-primary-hover bg-white px-4 py-3.5 text-sm font-light outline-none focus:border-secondary w-full"
+
     return (
-        <section className=' flex w-full h-full bg-background  '
-         //style={{ backgroundImage: `url(${image})` }}
-         >
-            <div className="container px-5 mx-auto flex w-full justify-center py-10">
-                <div className="bg-primary shadow-2xl p-5 flex justify-center items-center w-full max-w-md h-full flex-col
-            rounded-md gap-5  ">
-                    <h1 className="text-2xl text-text text-center uppercase font-semibold">Create your account</h1>
-                    <form onSubmit={handleSubmit} className="grid gap-5 w-full text-lg">
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="grid gap-2 place-items-start">
-                                <label htmlFor="firstName" className="font-medium text-text">First Name:</label>
-                                <input className='w-full font-medium text-neutral-700 p-2 outline-none border-2 border-secondary-hover rounded focus-within:border-secondary'
-                                    value={formData.firstName} type="text" onChange={handleOnChange} name="firstName" id="firstName" placeholder='First name' />
-                            </div>
-                            <div className="grid gap-2 place-items-start">
-                                <label htmlFor="lastName" className="font-medium text-text">Last Name:</label>
-                                <input className='w-full font-medium text-neutral-700 p-2 outline-none border-2 border-secondary-hover rounded focus-within:border-secondary'
-                                    value={formData.lastName} type="text" onChange={handleOnChange} name="lastName" id="lastName" placeholder='Last name' />
-                            </div>
+        <section className="flex w-full bg-background py-14">
+            <div className="container px-5 mx-auto flex justify-center">
+                <div className="bg-white border border-primary-hover shadow-[0_1px_2px_rgba(18,40,28,.05),0_12px_32px_rgba(18,40,28,.07)] p-11 w-full max-w-md">
+                    <div className="text-[10.5px] tracking-[.24em] text-accent">JOIN TOUHFAYE</div>
+                    <h1 className="font-secondary text-3xl text-title mt-3">Create an account</h1>
+                    <p className="text-sm text-foreground font-light mt-2.5">
+                        Already have one? <Link href="/signin" className="text-secondary border-b border-secondary">Sign in</Link>
+                    </p>
+
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-7">
+                        <div className="grid grid-cols-2 gap-3.5">
+                            <input className={fieldCls} value={formData.firstName} type="text" onChange={handleOnChange} name="firstName" placeholder="First name" required />
+                            <input className={fieldCls} value={formData.lastName} type="text" onChange={handleOnChange} name="lastName" placeholder="Last name" />
                         </div>
-                        <div className="grid gap-2 place-items-start">
-                            <label htmlFor="email" className="font-medium text-text">Email:</label>
-                            <input className='w-full font-medium text-neutral-700 p-2 outline-none border-2 border-secondary-hover rounded focus-within:border-secondary'
-                                value={formData.email} type="email" onChange={handleOnChange} name="email" id="email" placeholder='Enter your email' />
-                        </div>
-                        <div className="grid gap-2 place-items-start">
-                            <label htmlFor="password" className="font-medium text-text">Password:</label>
-                            <div className="relative w-full flex">
-                                <input className='w-full font-medium text-neutral-700 p-2 flex outline-none border-2 border-secondary-hover rounded focus-within:border-secondary'
-                                    placeholder='Enter your password'
-                                    value={formData.password}
-                                    onChange={handleOnChange}
-                                    type={`${showPassword ? "text" : "password"}`}
-                                    name="password"
-                                    id="password"
-                                />
-                                <div className="absolute right-3.5 text-xl text-neutral-700 cursor-pointer top-3.5 ">
-                                    {showPassword ?
-                                        <FaEye onClick={() => setShowPassword(false)} />
-                                        : <FaEyeSlash onClick={() => setShowPassword(true)} />}
-                                </div>
+                        <input className={fieldCls} value={formData.mobile} type="tel" onChange={handleOnChange} name="mobile" placeholder="Mobile number" />
+                        <input className={fieldCls} value={formData.email} type="email" onChange={handleOnChange} name="email" placeholder="Email" required />
+                        <div className="relative">
+                            <input
+                                className={fieldCls}
+                                placeholder="At least 8 characters"
+                                value={formData.password}
+                                onChange={handleOnChange}
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                required
+                                style={{ paddingRight: 48 }}
+                            />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-accent cursor-pointer">
+                                {showPassword
+                                    ? <FaEye onClick={() => setShowPassword(false)} />
+                                    : <FaEyeSlash onClick={() => setShowPassword(true)} />}
                             </div>
                         </div>
-                        <div className="grid gap-2 place-items-start">
-                            <label htmlFor="role" className="font-medium text-text">I am a..*</label>
-                                <select name="role" id="role" value={formData.role} onChange={handleOnChange}
-                                className='w-full font-medium text-neutral-700 p-2 outline-none border-2 border-secondary-hover rounded focus-within:border-secondary' >
-                                    {ASSIGNABLE_ROLES.map((role,idx)=>(
-                                        <option key={idx} value={role.value} >{role.label}</option>
-                                    ))}
-                                </select>
-                        </div>
-                        <button disabled={!validInput} type="submit" value="Submit"
-                            className={`${validInput ? "bg-secondary-hover text-white  cursor-pointer hover:bg-secondary" : "bg-primary-hover   cursor-not-allowed"}  p-2 text-neutral-900
-                            text-xl font-semibold rounded   `} >Signup</button>
-                        <div className="flex justify-between w-full px-1">
-                            <h1 className="text-neutral-600 font-medium">Already have an account?</h1>
-                            <Link href={"/signin"} className='text-xl font-bold text-amber-600'>Login</Link>
-                        </div>
+
+                        <label className="flex items-start gap-2.5 text-[13px] font-light text-paragraph cursor-pointer">
+                            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 accent-accent" />
+                            I agree to the terms and privacy policy, and would like to hear about new arrivals.
+                        </label>
+
+                        <button
+                            disabled={!validInput}
+                            type="submit"
+                            className={`h-13 text-[11.5px] tracking-[.18em] transition-colors ${validInput ? "bg-secondary hover:bg-secondary-hover text-background cursor-pointer" : "bg-primary-hover text-foreground cursor-not-allowed"}`}
+                        >
+                            CREATE ACCOUNT
+                        </button>
                     </form>
                 </div>
             </div>

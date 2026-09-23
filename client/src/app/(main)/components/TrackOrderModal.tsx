@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import Axios from '@/utils/Axios';
 import { SummeryApi } from '@/app/common/SummeryApi';
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud';
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { format } from 'date-fns';
 
 interface TrackedOrder {
@@ -116,7 +116,7 @@ const TrackOrderModal: React.FC<Props> = ({ onClose }) => {
 
                     {!order && !error && (
                         <div className="text-sm text-text leading-relaxed mt-1">
-                            Both are in the confirmation email we sent you. No email? Call 1300 243 253 and we&apos;ll find it.
+                            Both are in the confirmation email we sent you. No email? Message us on Messenger and we&apos;ll find it.
                         </div>
                     )}
                     {error && (
@@ -132,7 +132,7 @@ const TrackOrderModal: React.FC<Props> = ({ onClose }) => {
                             </div>
                             <div className="mt-3 text-sm text-text flex flex-col gap-1">
                                 <span>Placed {format(new Date(order.createdAt), 'd MMM yyyy')}</span>
-                                <span>{order.items?.length || 0} item{(order.items?.length || 0) === 1 ? '' : 's'} · {DisplayPriceInAud(order.total)}</span>
+                                <span>{order.items?.length || 0} item{(order.items?.length || 0) === 1 ? '' : 's'} · {DisplayPriceInBdt(order.total)}</span>
                             </div>
                         </div>
                     )}

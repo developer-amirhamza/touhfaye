@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Axios from '@/utils/Axios'
 import { SummeryApi } from '@/app/common/SummeryApi'
-import { DisplayPriceInAud } from '@/utils/DisplayPriceInAud'
+import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt'
 import { getDisplayPrice } from '@/utils/PriceWithDiscount'
 import { validURLConvert } from '@/utils/validURLConvart'
 import AddToCartButton from './UI/AddToCartBtn'
@@ -101,7 +101,7 @@ const ProductFinderPanel = ({ allProducts }: { allProducts: Product[] }) => {
                                         </div>
                                         <Link href={productUrl(p)} className="flex-1 min-w-0">
                                             <p className="text-sm font-semibold text-text-hover leading-snug line-clamp-1">{p.title}</p>
-                                            <p className="text-xs text-text">{DisplayPriceInAud(getDisplayPrice(p))}</p>
+                                            <p className="text-xs text-text">{DisplayPriceInBdt(getDisplayPrice(p))}</p>
                                         </Link>
                                         <AddToCartButton data={p} />
                                     </div>
@@ -192,20 +192,20 @@ const CostCalculatorPanel = ({ allProducts }: { allProducts: Product[] }) => {
                     <p className="text-xs font-semibold text-text tracking-wide mb-3">YOUR ESTIMATED COST</p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
-                            <p className="text-xl font-medium text-secondary">{DisplayPriceInAud(weekly)}</p>
+                            <p className="text-xl font-medium text-secondary">{DisplayPriceInBdt(weekly)}</p>
                             <p className="text-sm text-text">Weekly</p>
                         </div>
                         <div>
-                            <p className="text-xl font-medium text-secondary">{DisplayPriceInAud(monthly)}</p>
+                            <p className="text-xl font-medium text-secondary">{DisplayPriceInBdt(monthly)}</p>
                             <p className="text-sm text-text">Monthly</p>
                         </div>
                         <div>
-                            <p className="text-xl font-medium text-secondary">{DisplayPriceInAud(yearly)}</p>
+                            <p className="text-xl font-medium text-secondary">{DisplayPriceInBdt(yearly)}</p>
                             <p className="text-sm text-text">Yearly</p>
                         </div>
                     </div>
                     <p className="text-xs text-text mt-3 leading-snug">
-                        {product.title} at {DisplayPriceInAud(unit)} each, about {packsAMonth} pack{packsAMonth === 1 ? '' : 's'} a month. An estimate, not a quote.
+                        {product.title} at {DisplayPriceInBdt(unit)} each, about {packsAMonth} pack{packsAMonth === 1 ? '' : 's'} a month. An estimate, not a quote.
                     </p>
                 </div>
 

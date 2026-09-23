@@ -353,7 +353,7 @@ deleteSubcategory: {
         method: "delete",
     },
 
-    // ── Bestiee portal: account applications ──
+    // ── Touhfaye portal: account applications ──
     applyForAccount: { url: "/api/account-applications/apply", method: "post" },
     getMyApplication: { url: "/api/account-applications/me", method: "get" },
     listApplications: { url: "/api/account-applications", method: "get" },

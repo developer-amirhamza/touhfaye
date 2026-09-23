@@ -1,25 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F7F4EF;
-  --foreground: #5C6A64;
-  --primary: #F3F1E9;
-  --primary-hover: #E4E3D9;
-  --secondary: #0e4127;
-  --secondary-hover: #1f8049;
-  --title: #20302C;
-  --paragraph: #141E1C;
-  --secondary-light: #D8E8DC;
-  --shadow: 0px 4.42184px 107.23px rgb(229, 224, 211);
+  --background: #FBF7F0;
+  --foreground: #6B6257;
+  --primary: #F1EADC;
+  --primary-hover: #E6DCC9;
+  --secondary: #173124;
+  --secondary-hover: #0E2116;
+  --title: #173124;
+  --paragraph: #4A4437;
+  --secondary-light: #F4EDE1;
+  --accent: #8C6A28;
+  --accent-light: #D8BE7E;
+  --shadow: 0px 4.42184px 107.23px rgb(230, 220, 201);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
-  --font-secondary: "Newsreader", serif;
-  --font-primary: "Hanken Grotesk", sans-serif;
-  --font-serif: "Newsreader", serif;
+  --font-secondary: "Marcellus", serif;
+  --font-primary: "Jost", sans-serif;
+  --font-serif: "Cormorant Garamond", serif;
   --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-hover: var(--secondary-hover);
@@ -28,7 +30,9 @@
   --color-text: var(--paragraph);
   --color-title: var(--title);
   --color-paragraph: var(--paragraph);
-  --box-shadow: 0px 4.42184px 107.23px rgb(229, 224, 211);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --box-shadow: 0px 4.42184px 107.23px rgb(230, 220, 201);
 }
 
 @theme {
@@ -87,9 +91,9 @@
 } */
 
 body {
-  background: #F7F4EF;
+  background: #FBF7F0;
   color: var(--foreground);
-  font-family: "Hanken Grotesk", sans-serif;
+  font-family: "Jost", sans-serif;
   overflow-x: hidden;
   scroll-behavior: smooth;
 }

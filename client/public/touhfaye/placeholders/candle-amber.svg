@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="#F1EADC"/>
+  <circle cx="250" cy="230" r="150" fill="none" stroke="#8C6A28" stroke-opacity="0.25" stroke-width="1.5"/>
+  <g color="#8C6A28" transform="translate(0,-10)"><g stroke="currentColor" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="170" y="180" width="160" height="220" rx="14" />
+      <ellipse cx="250" cy="180" rx="80" ry="18" />
+      <path d="M250 100 c0 30 -26 34 -26 62 0 16 12 26 26 26 s26 -10 26 -26 c0 -28 -26 -32 -26 -62z" fill="currentColor" stroke="none"/>
+    </g></g>
+  <text x="250" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#8C6A28" letter-spacing="1">Scented Candle</text>
+</svg>

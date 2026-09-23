@@ -52,12 +52,18 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 
 app.use("/api/enquiries", enquiryRouter);
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/claude/first-pr-workflow-5de81d
 app.use("/api/health", healthRouter);
 app.use("/api/team-tasks", teamTaskRouter);
 app.use("/api/waitlist", waitlistRouter);
 app.use("/api/image", uploadImageRouter);
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/claude/first-pr-workflow-5de81d
 app.use("/api/faqs", faqRouter);
 
 

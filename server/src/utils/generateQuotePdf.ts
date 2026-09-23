@@ -55,7 +55,7 @@ export const generateQuotePdf = (data: QuoteData): Promise<Buffer> => {
     // ── Header ──
     doc.rect(50, 40, pageWidth, 72).fill(teal);
     doc.fillColor("#FFFFFF").fontSize(22).font("Helvetica-Bold").text("QUOTE", 60, 58);
-    doc.fontSize(10).font("Helvetica").text("Bestiee· NDIS Supplies", 60, 86);
+    doc.fontSize(10).font("Helvetica").text("Touhfaye· NDIS Supplies", 60, 86);
     doc.fontSize(10)
       .text(`Quote #${data.quoteNumber}`, 400, 58, { align: "right", width: pageWidth - 350 })
       .text(`Date: ${fmtDate(data.createdAt)}`, 400, 74, { align: "right", width: pageWidth - 350 });
@@ -134,7 +134,7 @@ export const generateQuotePdf = (data: QuoteData): Promise<Buffer> => {
 
     // ── Footer ──
     doc.fillColor(mutedGray).fontSize(8).font("Helvetica").text(
-      "This quote is an estimate of supply based on the usage provided. Continence aids and NDIS supplies may be GST-free. Questions? Contact hello@mybestiee.com.au",
+      "This quote is an estimate of supply based on the usage provided. Continence aids and NDIS supplies may be GST-free. Questions? Contact hello@mytouhfaye.com.au",
       col1X,
       rowY + 24,
       { align: "center", width: pageWidth }

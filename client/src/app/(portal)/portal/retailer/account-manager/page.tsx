@@ -32,7 +32,7 @@ function AccountManagerInner() {
         <p className="text-gray-400">Loading…</p>
       ) : !contact || !contact.name ? (
         <p className="text-gray-400">
-          Your account manager's details haven't been set up yet — email hello@mybestiee.com.au and we'll connect you.
+          Your account manager's details haven't been set up yet — email hello@mytouhfaye.com.au and we'll connect you.
         </p>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col gap-3">

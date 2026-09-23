@@ -58,6 +58,7 @@ export const placeOrder = createAsyncThunk(
             shippingAddress: string;
             paymentMethod: string;
             fundingDetails?: any;
+            deliveryArea?: "DHAKA" | "OUTSIDE";
         },
         { rejectWithValue }
     ) => {

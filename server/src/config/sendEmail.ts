@@ -33,7 +33,7 @@ interface Type {
     attachments?: Attachment[];
 }
 
-const FROM = process.env.EMAIL_FROM || "Bestiee <hello@mybestiee.com.au>";
+const FROM = process.env.EMAIL_FROM || "Touhfaye <hello@mytouhfaye.com.au>";
 const useSmtp = Boolean(process.env.SMTP_HOST);
 
 // Reuse a single pooled SMTP connection across sends.

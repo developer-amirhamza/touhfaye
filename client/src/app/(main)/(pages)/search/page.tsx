@@ -89,33 +89,29 @@ const SearchContent = () => {
     }
 
     return (
-        <section className="bg-white">
-            <div className="container mx-auto p-4">
-                <p className="font-semibold text-neutral-600 mb-4">
-                    Search Results for "{textSearch}": {data.length} products
+        <section className="bg-background min-h-screen">
+            <div className="container mx-auto px-6 py-10">
+                <p className="text-[12.5px] text-accent font-light mb-6">
+                    {data.length} result{data.length === 1 ? '' : 's'} for &ldquo;{textSearch}&rdquo;
                 </p>
                 <InfiniteScroll
                     dataLength={data.length}
                     next={handleFetchMore}
                     hasMore={hasMore}
-                    loader={<div className="text-center py-4">Loading more...</div>}
-                    endMessage={<div className="text-center py-4 text-neutral-500">No more products</div>}
+                    loader={<div className="text-center py-4 text-foreground font-light">Loading more…</div>}
+                    endMessage={data.length > 0 ? <div className="text-center py-4 text-foreground font-light">No more products</div> : null}
                 >
-                    <div className="flex flex-wrap gap-4 justify-center items-center my-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                         {loading && page === 1
                             ? loadingArrayCard.map((_, index) => (
                                 <div
                                     key={index}
-                                    className="border border-blue-200 p-2 grid gap-3 max-w-52 rounded animate-pulse"
+                                    className="bg-white border border-primary-hover p-2 grid gap-3 rounded-[18px] animate-pulse"
                                 >
-                                    <div className="min-h-20 bg-blue-100/80 rounded"></div>
-                                    <div className="p-3 bg-blue-100/80 rounded w-20"></div>
-                                    <div className="p-3 bg-blue-100/80 rounded"></div>
-                                    <div className="p-3 bg-blue-100/80 rounded w-14"></div>
-                                    <div className="flex items-center justify-between gap-3">
-                                        <div className="p-3 bg-blue-100/80 rounded w-20"></div>
-                                        <div className="p-3 bg-blue-100/80 rounded w-20"></div>
-                                    </div>
+                                    <div className="min-h-40 bg-primary rounded"></div>
+                                    <div className="p-3 bg-primary rounded w-20"></div>
+                                    <div className="p-3 bg-primary rounded"></div>
+                                    <div className="p-3 bg-primary rounded w-14"></div>
                                 </div>
                             ))
                             : data.map((product, idx) => (
@@ -125,13 +121,14 @@ const SearchContent = () => {
                     </div>
                 </InfiniteScroll>
                 {!data.length && !loading && (
-                    <div className="flex flex-col w-full items-center justify-center mx-auto">
+                    <div className="flex flex-col w-full items-center justify-center mx-auto py-16">
                         <Image
                             src={nothingImage}
-                            alt="no data"
+                            alt="No products found"
                             className="w-full h-full max-h-xs max-w-xs rounded-md object-scale-down"
                         />
-                        <p className="font-semibold my-4 text-2xl text-neutral-500">No Products Found!</p>
+                        <p className="font-secondary text-2xl text-title mt-4">Nothing matches that search</p>
+                        <p className="text-foreground font-light mt-1">Try a different word, or browse the full collection.</p>
                     </div>
                 )}
             </div>
