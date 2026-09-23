@@ -116,7 +116,7 @@ const TrackOrderModal: React.FC<Props> = ({ onClose }) => {
 
                     {!order && !error && (
                         <div className="text-sm text-text leading-relaxed mt-1">
-                            Both are in the confirmation email we sent you. No email? Call 1300 243 253 and we&apos;ll find it.
+                            Both are in the confirmation email we sent you. No email? Message us on Messenger and we&apos;ll find it.
                         </div>
                     )}
                     {error && (

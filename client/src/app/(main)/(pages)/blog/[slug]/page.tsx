@@ -104,7 +104,7 @@ const BlogDetailPage = () => {
 
         <div className="mt-6">
           {blog.category && (
-            <span className="bg-[#d8e8dc] text-secondary font-semibold rounded-full px-4.5 py-2 text-sm">
+            <span className="bg-primary text-accent font-medium rounded-full px-4.5 py-2 text-sm tracking-wide">
               {blog.category}
             </span>
           )}

@@ -193,7 +193,7 @@ async function main() {
       title: "Projection Pendant Necklace",
       price: 650,
       categoryId: jewellery.id,
-      images: [PLACEHOLDER("jewellery-necklace")],
+      images: [REAL("projection-pendant-necklace.jpg")],
       description:
         "A rose-gold spiral pendant with a stone that projects a line of text when held to the light. Arrives in a drawer box, so it needs no further wrapping.",
       pack: "Rose gold · boxed",
@@ -204,7 +204,7 @@ async function main() {
       price: 790,
       categoryId: jewellery.id,
       subcategoryId: couples.id,
-      images: [PLACEHOLDER("jewellery-necklace")],
+      images: [REAL("name-puzzle-heart-duo.jpg"), REAL("name-puzzle-heart-silver.jpg")],
       description:
         "Two steel halves that lock into one heart, engraved with the names or the date you send us. Polished steel as standard, one half in black on request.",
       pack: "Pair · engraved to order",

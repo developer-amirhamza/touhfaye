@@ -135,7 +135,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                             <Link
                                 href="/"
                                 onClick={close}
-                                className="bg-green-600 py-1 px-2 rounded text-white cursor-pointer font-semibold text-xl"
+                                className="bg-secondary hover:bg-secondary-hover py-2 px-4 rounded text-background cursor-pointer font-semibold text-xl transition-colors"
                             >
                                 Shop Now
                             </Link>
@@ -177,8 +177,8 @@ const CartMenu: React.FC<Type> = ({ close }) => {
 
 
                         </div>
-                        <div className="text-paragraph mx-auto text-base py-2">
-                            📦 Ships discreetly · secure payment
+                        <div className="text-paragraph mx-auto text-sm py-2 font-light">
+                            Gift wrap included · Dhaka in 1–2 days
                         </div>
                     </div>
                 )}
