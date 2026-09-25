@@ -1,11 +1,9 @@
 "use client"
 import Image from 'next/image'
 import React, { useEffect, useState, useRef } from 'react'
-import { IoCall } from 'react-icons/io5'
-import { FaTruck, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
+import { FaBars, FaTimes, FaChevronDown, FaTruck, FaRegUser, FaSearch } from 'react-icons/fa'
 import logo from "@/assets/touhfaye-logo.png"
 import { BsCart4 } from 'react-icons/bs'
-import { GoTriangleDown, GoTriangleUp } from 'react-icons/go'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
@@ -19,10 +17,10 @@ import TrackOrderModal from './TrackOrderModal'
 import Link from 'next/link'
 import UserMenu from './UI/UserMenu';
 import { motion, AnimatePresence } from 'framer-motion';
-import AutoScrollSlider from './AutoScrollSlider'
 
 // Plain (non-dropdown) nav links — "Shop" is rendered separately as the
-// category mega-menu.
+// category mega-menu, matching the design mock's HOME / SHOP / STORIES /
+// CONTACT US row (FAQ kept alongside — a real page the mock doesn't show).
 const NAV_LINKS = [
     { label: 'Stories', href: '/blog' },
     { label: 'FAQ', href: '/faq' },
@@ -113,46 +111,35 @@ const Header = () => {
     }, [cartCount])
 
     return (
-        <div className="sticky top-0 gap-3  z-50 ">
+        <div className="sticky top-0 z-50">
 
+            {/* Top bar — a single static tracked line, matching the design mock */}
             <div
-                className={`bg-secondary text-background transition-all duration-300 overflow-hidden top-bar
-                    ${topbarVisible ? " max-h-10 opacity-100" : " max-h-0 opacity-0"} `}
+                className={`bg-secondary text-secondary-light text-center overflow-hidden transition-all duration-300
+                    ${topbarVisible ? "max-h-10 opacity-100" : "max-h-0 opacity-0"}`}
             >
-                <AutoScrollSlider speed={30} gap={50}
-                    className="container mx-auto flex items-center w-full overflow-x-hidden justify-between px-4 h-7 text-sm"
-                >
-                    <div className="flex items-center gap-2 whitespace-nowrap">
-                        <FaTruck className="text-accent-light shrink-0" />
-                        <span className="font-medium tracking-wide">FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳1500</span>
-                    </div>
-                    <a href="tel:+8801XXXXXXXXX" className="flex whitespace-nowrap items-center gap-1.5 hover:text-accent-light transition-colors">
-                        <IoCall />
-                        <span className="font-semibold">+880 1XXX-XXXXXX</span>
-                    </a>
-                    <div className="flex items-center gap-1.5 whitespace-nowrap">
-                        <span className="tracking-wide">CASH ON DELIVERY · bKash · Nagad</span>
-                    </div>
-                </AutoScrollSlider>
-
+                <div className="px-4 py-2.5 text-[11.5px] tracking-[.16em] whitespace-nowrap overflow-x-auto no-scrollbar">
+                    FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳1500 · CASH ON DELIVERY · bKash · Nagad
+                </div>
             </div>
 
             {/* Main navbar */}
-            <div className="bg-primary-hover/90 w-full backdrop-blur-2xl shadow-xl">
-                <div className="max-w-[1240px] mx-auto w-full flex items-center gap-7 px-4 sm:px-7 h-19">
+            <div className="bg-background/95 w-full backdrop-blur-md border-b border-primary-hover">
+                <div className="max-w-[1240px] mx-auto w-full grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-8 px-4 sm:px-7 py-3">
 
-                    {/* Logo */}
-                    <Link href="/" className="shrink-0 flex items-center">
-                        <Image
-                            src={logo}
-                            alt="Touhfaye"
-                            className="h-10 w-auto object-contain"
-                            priority
-                        />
-                    </Link>
+                    {/* Left — mobile menu toggle + nav links */}
+                    <div className="flex items-center gap-1 justify-self-start">
+                        {/* Mobile menu toggle */}
+                        <button
+                            onClick={() => setMobileMenuOpen(true)}
+                            aria-label="Open menu"
+                            className="lg:hidden p-2 -ml-2 hover:text-secondary transition-colors text-paragraph"
+                        >
+                            <FaBars size={19} />
+                        </button>
 
-                    {/* Nav links */}
-                    <nav className="hidden lg:flex items-center gap-6 flex-1 min-w-0">
+                    <nav className="hidden lg:flex items-center gap-6 text-[12px] tracking-[.13em]">
+                        <Link href="/" className="text-title whitespace-nowrap">HOME</Link>
                         <div
                             ref={shopRef}
                             className="relative"
@@ -162,9 +149,9 @@ const Header = () => {
                             <button
                                 onClick={() => setShopOpen(true)}
                                 onFocus={() => setShopOpen(true)}
-                                className="flex items-center gap-1.5 text-lg font-semibold text-secondary whitespace-nowrap"
+                                className="flex items-center gap-1.5 text-foreground hover:text-title transition-colors whitespace-nowrap"
                             >
-                                Shop <FaChevronDown size={11} className={`transition-transform ${shopOpen ? 'rotate-180' : ''}`} />
+                                SHOP <FaChevronDown size={9} className={`transition-transform ${shopOpen ? 'rotate-180' : ''}`} />
                             </button>
                             <AnimatePresence>
                                 {shopOpen && (
@@ -173,26 +160,35 @@ const Header = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -6 }}
                                         transition={{ duration: 0.15 }}
-                                        className="absolute top-10 left-0 w-140 max-w-[80vw] bg-white border border-primary-hover rounded-2xl shadow-2xl p-6 grid grid-cols-2 gap-x-8 gap-y-3 z-50"
+                                        className="absolute top-full left-1/2 -translate-x-1/2 pt-4.5 z-50"
                                     >
-                                        {categories.length > 0 ? categories.map((cat) => (
-                                            <Link
-                                                key={cat.id}
-                                                href={`/products?category=${cat.id}`}
+                                        <div className="bg-background border border-primary-hover shadow-[0_18px_40px_rgba(18,40,28,.14)] w-130 max-w-[80vw] p-5 grid grid-cols-2 gap-x-8 gap-y-1">
+                                            {categories.length > 0 ? categories.map((cat) => (
+                                                <Link
+                                                    key={cat.id}
+                                                    href={`/products?category=${cat.id}`}
+                                                    onClick={() => setShopOpen(false)}
+                                                    className="p-2.5 hover:bg-primary transition-colors"
+                                                >
+                                                    <div className="font-secondary text-lg text-title tracking-normal normal-case">{cat.title}</div>
+                                                </Link>
+                                            )) : (
+                                                <Link
+                                                    href="/products"
+                                                    onClick={() => setShopOpen(false)}
+                                                    className="p-2.5 hover:bg-primary transition-colors col-span-2"
+                                                >
+                                                    <div className="font-secondary text-lg text-title tracking-normal normal-case">Browse all products</div>
+                                                </Link>
+                                            )}
+                                            <div
                                                 onClick={() => setShopOpen(false)}
-                                                className="p-2 rounded-lg hover:bg-primary transition-colors"
+                                                className="col-span-2 border-t border-primary-hover mt-1.5 pt-3.5 flex justify-between items-center cursor-pointer text-title"
                                             >
-                                                <div className="font-secondary text-xl text-text-hover">{cat.title}</div>
-                                            </Link>
-                                        )) : (
-                                            <Link
-                                                href="/products"
-                                                onClick={() => setShopOpen(false)}
-                                                className="p-2 rounded-lg hover:bg-primary transition-colors col-span-2"
-                                            >
-                                                <div className="font-secondary text-xl text-text-hover">Browse all products</div>
-                                            </Link>
-                                        )}
+                                                <Link href="/products" className="tracking-[.13em]">SHOP ALL PRODUCTS</Link>
+                                                <span>→</span>
+                                            </div>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -201,29 +197,33 @@ const Header = () => {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="text-lg font-medium text-text hover:text-secondary transition-colors whitespace-nowrap"
+                                className="text-foreground hover:text-title transition-colors whitespace-nowrap"
                             >
-                                {link.label}
+                                {link.label.toUpperCase()}
                             </Link>
                         ))}
+                    </nav>
+                    </div>
+
+                    {/* Center — logo */}
+                    <Link href="/" className="shrink-0 flex items-center justify-self-center">
+                        <Image
+                            src={logo}
+                            alt="Touhfaye"
+                            className="h-14 w-auto object-contain"
+                            priority
+                        />
+                    </Link>
+
+                    {/* Right — icon actions */}
+                    <div className="flex items-center gap-1 justify-self-end shrink-0 text-paragraph">
                         <button
                             onClick={() => setTrackOrderOpen(true)}
-                            className="flex items-center gap-1.5 text-lg font-medium text-secondary underline decoration-[1.5px] underline-offset-4 whitespace-nowrap"
+                            title="Track order"
+                            aria-label="Track order"
+                            className="hidden sm:flex p-2 hover:text-secondary transition-colors"
                         >
-                            <FaTruck size={15} /> Track order
-                        </button>
-                    </nav>
-
-                    {/* Right actions */}
-                    <div className="flex items-center gap-2 ml-auto lg:ml-0 shrink-0">
-
-                        {/* Mobile menu toggle */}
-                        <button
-                            onClick={() => setMobileMenuOpen(true)}
-                            aria-label="Open menu"
-                            className="lg:hidden p-2 rounded-full hover:bg-gray-100 text-text transition-colors"
-                        >
-                            <FaBars size={20} />
+                            <FaTruck size={17} />
                         </button>
 
                         <Search />
@@ -233,15 +233,13 @@ const Header = () => {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowUserMenu(!showUserMenu)}
-                                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-text hover:bg-primary rounded-md transition-colors"
+                                    aria-label="Account"
+                                    className="flex items-center p-2 hover:text-secondary transition-colors"
                                 >
-                                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    {showUserMenu ? <GoTriangleUp size={14} /> : <GoTriangleDown size={14} />}
+                                    <FaRegUser size={17} />
                                 </button>
                                 {showUserMenu && (
-                                    <div className="absolute top-11 right-0 bg-background  shadow-lg w-44 rounded-lg border border-primary z-50">
+                                    <div className="absolute top-11 right-0 bg-background shadow-[0_18px_40px_rgba(18,40,28,.14)] w-48 border border-primary-hover z-50">
                                         <UserMenu close={() => setShowUserMenu(false)} />
                                     </div>
                                 )}
@@ -249,30 +247,31 @@ const Header = () => {
                         ) : (
                             <button
                                 onClick={() => router.push('/signin')}
-                                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                                aria-label="Sign in"
+                                className="flex items-center p-2 hover:text-secondary transition-colors"
                             >
-                                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
+                                <FaRegUser size={17} />
                             </button>
                         )}
 
                         {/* Cart */}
                         <button
                             onClick={() => setOpenCartMenu(true)}
-                            className="relative flex items-center gap-2 bg-secondary cursor-pointer hover:bg-secondary-hover  text-background px-3 py-2 rounded-lg transition-colors"
+                            className="relative flex items-center gap-2 p-2 hover:text-secondary transition-colors"
                         >
                             <span className={`relative flex ${cartPulsing ? 'cart-pulse' : ''}`}>
                                 <BsCart4 size={20} />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2.5 min-w-4.5 h-4.5 px-1 bg-secondary text-secondary-light text-[9.5px] font-medium flex items-center justify-center rounded-full border-[1.5px] border-background">
+                                        {cartCount}
+                                    </span>
+                                )}
                             </span>
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                                    {cartCount}
+                            {cart?.items?.[0] && (
+                                <span className="hidden sm:inline text-[11px] tracking-[.1em] text-title">
+                                    {DisplayPriceInBdt(subtotal)}
                                 </span>
                             )}
-                            <span className="hidden sm:inline text-sm font-medium">
-                                {cart?.items?.[0] ? DisplayPriceInBdt(subtotal) : 'My Cart'}
-                            </span>
                         </button>
                     </div>
                 </div>
@@ -287,7 +286,7 @@ const Header = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-black/40 z-60 lg:hidden"
+                            className="fixed inset-0 bg-[#12281C]/40 z-60 lg:hidden"
                         />
                         <motion.div
                             initial={{ x: '-100%' }}
@@ -297,30 +296,37 @@ const Header = () => {
                             className="fixed top-0 left-0 h-full w-[82%] max-w-xs bg-background z-70 p-6 flex flex-col gap-1 overflow-y-auto lg:hidden"
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <span className="text-lg font-semibold text-text-hover">Menu</span>
+                                <span className="font-secondary text-lg text-title">Menu</span>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
                                     aria-label="Close menu"
-                                    className="p-2 rounded-full hover:bg-gray-100 text-text-hover"
+                                    className="p-2 text-title"
                                 >
                                     <FaTimes size={18} />
                                 </button>
                             </div>
                             <Link
+                                href="/"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="px-2 py-3 text-[12px] tracking-[.13em] text-title border-b border-primary-hover"
+                            >
+                                HOME
+                            </Link>
+                            <Link
                                 href="/products"
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="px-2 py-3 text-lg font-semibold text-secondary border-b border-primary-hover"
+                                className="px-2 py-3 text-[12px] tracking-[.13em] text-title border-b border-primary-hover"
                             >
-                                Shop
+                                SHOP
                             </Link>
                             {NAV_LINKS.map((link) => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="px-2 py-3 text-lg font-medium text-text-hover border-b border-primary-hover"
+                                    className="px-2 py-3 text-[12px] tracking-[.13em] text-title border-b border-primary-hover"
                                 >
-                                    {link.label}
+                                    {link.label.toUpperCase()}
                                 </Link>
                             ))}
                             <button
@@ -328,9 +334,9 @@ const Header = () => {
                                     setMobileMenuOpen(false)
                                     setTrackOrderOpen(true)
                                 }}
-                                className="flex items-center gap-2 px-2 py-3 text-lg font-medium text-text-hover border-b border-primary-hover text-left"
+                                className="flex items-center gap-2 px-2 py-3 text-[12px] tracking-[.13em] text-title border-b border-primary-hover text-left"
                             >
-                                <FaTruck size={16} /> Track order
+                                <FaTruck size={14} /> TRACK ORDER
                             </button>
                         </motion.div>
                     </>
