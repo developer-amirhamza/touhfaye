@@ -5,11 +5,13 @@ import Axios from "@/utils/Axios";
 import { SummeryApi } from "@/app/common/SummeryApi";
 import AxiosToastError from "@/utils/AxiosToastError";
 import toast from "react-hot-toast";
+import ImageUploader from "../../components/ImageUploader";
 
 interface Category {
     id: string;
     title: string;
     slug: string;
+    image?: string | null;
     createdAt: string;
     updatedAt: string;
     products: Array<{ id: string }>;
@@ -31,19 +33,29 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [image, setImage] = useState<string | null>(null);
 
     useEffect(() => {
         if (category) {
             setFormData({
                 title: category.title,
             });
+            setImage(category.image ?? null);
         } else {
             setFormData({
                 title: "",
             });
+            setImage(null);
         }
         setErrors({});
     }, [category]);
+
+    const addImage = (url: string) => {
+        setImage(url);
+    };
+    const removeImage = () => {
+        setImage(null);
+    };
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -98,6 +110,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                     data: {
                         id: category.id,
                         title: formData.title,
+                        image,
                     },
                 });
 
@@ -113,6 +126,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                     ...SummeryApi.createCategory,
                     data: {
                         title: formData.title,
+                        image,
                     },
                 });
 
@@ -161,8 +175,8 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                             placeholder="Enter category name"
                             maxLength={50}
                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${errors.title
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 focus:ring-blue-500"
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-blue-500"
                                 }`}
                             disabled={loading}
                         />
@@ -172,6 +186,23 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
                         <p className="text-gray-500 text-xs mt-1">
                             {formData.title.length}/50
                         </p>
+                    </div>
+                    {/* Images */}
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Images</label>
+                        <div className="mb-2">
+                            <ImageUploader onUploaded={addImage} label="Upload image" />
+                        </div>
+                        {image && (
+                            <div className="relative group w-32 mt-2">
+                                <img src={image} alt="Category preview" className="w-32 h-20 object-cover rounded border" />
+                                <button
+                                    type="button"
+                                    onClick={removeImage}
+                                    className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                >✕</button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Slug Display (Read-only) */}

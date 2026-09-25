@@ -250,10 +250,10 @@ const ProductCreatePage = () => {
                     </div>
                 </div>
 
-                <RolePricingFields
+                {/* <RolePricingFields
                     values={priceByRole}
                     onChange={(role, value) => setPriceByRole((prev) => ({ ...prev, [role]: value }))}
-                />
+                /> */}
 
                 {/* Category */}
                 <div>
