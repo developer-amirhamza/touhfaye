@@ -59,7 +59,7 @@ async function main() {
       price: 480,
       categoryId: candles.id,
       subcategoryId: amberVanilla.id,
-      images: [PLACEHOLDER("candle-amber")],
+      images: [REAL("signature-candle.jpg")],
       description:
         "Amber glass with a brushed gold lid, poured with a warm vanilla-amber fragrance that carries across a room without crowding it. Boxed in kraft card, ready to hand over.",
       pack: "180g · burns 30+ hours",
