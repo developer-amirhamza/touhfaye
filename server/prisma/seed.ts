@@ -10,11 +10,11 @@ const prisma = new PrismaClient();
 const PLACEHOLDER = (name: string) => `/touhfaye/placeholders/${name}.svg`;
 const REAL = (name: string) => `/touhfaye/${name}`;
 
-async function upsertCategory(title: string, slug: string) {
+async function upsertCategory(title: string, slug: string, image?: string) {
   return prisma.category.upsert({
     where: { slug },
-    update: { title },
-    create: { title, slug },
+    update: { title, ...(image ? { image } : {}) },
+    create: { title, slug, image },
   });
 }
 
@@ -27,14 +27,18 @@ async function upsertSubcategory(title: string, slug: string, categoryId: string
 }
 
 async function main() {
-  const candles = await upsertCategory("Candles", "candles");
-  const jewellery = await upsertCategory("Jewellery", "jewellery");
-  const giftSets = await upsertCategory("Gift Sets", "gift-sets");
+  const candles = await upsertCategory("Candles", "candles", PLACEHOLDER("category-candles"));
+  const jewellery = await upsertCategory("Jewellery", "jewellery", PLACEHOLDER("category-jewellery"));
+  const giftSets = await upsertCategory("Gift Sets", "gift-sets", PLACEHOLDER("category-giftsets"));
 
   const amberVanilla = await upsertSubcategory("Amber & Vanilla", "amber-vanilla", candles.id);
   const floralFresh = await upsertSubcategory("Floral & Fresh", "floral-fresh", candles.id);
   const oudWoods = await upsertSubcategory("Oud & Woods", "oud-woods", candles.id);
-  const couples = await upsertSubcategory("Couples", "couples", giftSets.id);
+  // "Couples" is a theme that spans two categories — a Subcategory belongs to
+  // exactly one Category, so it needs its own row per category rather than
+  // reusing one id across products with different categoryIds.
+  const couplesGiftSets = await upsertSubcategory("Couples", "couples", giftSets.id);
+  const couplesJewellery = await upsertSubcategory("Couples", "couples", jewellery.id);
 
   type Seed = {
     title: string;
@@ -77,7 +81,6 @@ async function main() {
       title: "Mandala Trio Combo",
       price: 560,
       categoryId: giftSets.id,
-      subcategoryId: floralFresh.id,
       images: [PLACEHOLDER("candle-mandala")],
       description:
         "Three mandala tins in mixed prints with a fourth added free. The set our customers send most often when they are not sure which print someone will love.",
@@ -99,7 +102,6 @@ async function main() {
       title: "Mandala Collection Box",
       price: 1900,
       categoryId: giftSets.id,
-      subcategoryId: floralFresh.id,
       images: [PLACEHOLDER("candle-mandala")],
       description:
         "Twelve tins, twelve prints, one printed keepsake box. Built for corporate gifting and family hampers where one candle will not go far enough.",
@@ -159,7 +161,7 @@ async function main() {
       title: "Eternal Rose Jewellery Box",
       price: 1450,
       categoryId: giftSets.id,
-      subcategoryId: couples.id,
+      subcategoryId: couplesGiftSets.id,
       images: [REAL("rose-box-open-1.jpg"), REAL("rose-box-open-2.jpg")],
       description:
         "A lacquered red case that opens into two halves: a preserved rose under an acrylic dome on top, a lined drawer below holding a heart pendant on a fine chain. The rose needs no water and holds its colour for years.",
@@ -171,7 +173,7 @@ async function main() {
       title: "Eternal Rose Gift Bag Set",
       price: 1750,
       categoryId: giftSets.id,
-      subcategoryId: couples.id,
+      subcategoryId: couplesGiftSets.id,
       images: [REAL("gift-set-flatlay.jpg"), REAL("rose-box-open-1.jpg")],
       description:
         "The rose box packed inside our ivory rope-handled bag with a gold heart clasp and a printed satin ribbon. Nothing left to wrap when it reaches you.",
@@ -182,7 +184,7 @@ async function main() {
       title: "Heart Keepsake Box",
       price: 890,
       categoryId: giftSets.id,
-      subcategoryId: couples.id,
+      subcategoryId: couplesGiftSets.id,
       images: [REAL("rose-box-open-2.jpg")],
       description:
         "The red heart case on its own, for when you already have the piece to put inside. Folds open into three compartments with a pull-out drawer.",
@@ -203,7 +205,7 @@ async function main() {
       title: "Name Puzzle Heart Necklaces",
       price: 790,
       categoryId: jewellery.id,
-      subcategoryId: couples.id,
+      subcategoryId: couplesJewellery.id,
       images: [REAL("name-puzzle-heart-duo.jpg"), REAL("name-puzzle-heart-silver.jpg")],
       description:
         "Two steel halves that lock into one heart, engraved with the names or the date you send us. Polished steel as standard, one half in black on request.",
@@ -214,7 +216,7 @@ async function main() {
       title: "Yin Yang Couple Pendants",
       price: 690,
       categoryId: jewellery.id,
-      subcategoryId: couples.id,
+      subcategoryId: couplesJewellery.id,
       images: [PLACEHOLDER("jewellery-necklace")],
       description: "Black and white enamel halves on matching steel chains. Light, everyday pieces rather than occasion jewellery.",
       pack: "Pair · enamel and steel",

@@ -1,5 +1,6 @@
 import Hero from "./components/Hero";
 import TrustStrip from "./components/TrustStrip";
+import CategoryCircles from "./components/CategoryCircles";
 import CategoryWiseProducts from "./components/CategoryWiseProducts";
 import Spotlight from "./components/Spotlight";
 import TestimonialsSection from "./components/TestimonialsSection";
@@ -10,6 +11,7 @@ export default function Home() {
     <div className="bg-background">
       <Hero />
       <TrustStrip />
+      <CategoryCircles />
       <CategoryWiseProducts />
       <Spotlight />
       <TestimonialsSection />

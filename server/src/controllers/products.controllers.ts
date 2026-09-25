@@ -226,7 +226,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
 export const searchProducts = async (req: AuthRequest, res: Response) => {
   try {
     const {
-      q, category, minPrice, maxPrice, inStock, absorbency,
+      q, category, subcategory, minPrice, maxPrice, inStock, absorbency,
       sort,
       page = "1", limit = "20"
     } = req.query;
@@ -247,6 +247,11 @@ export const searchProducts = async (req: AuthRequest, res: Response) => {
     // Category filter — `category` is the Category id.
     if (category && typeof category === "string") {
       where.categoryId = category;
+    }
+
+    // Subcategory filter — `subcategory` is the Subcategory id.
+    if (subcategory && typeof subcategory === "string") {
+      where.subcategoryId = subcategory;
     }
 
     // Absorbency filter — free-text field on Product, matched exactly.
