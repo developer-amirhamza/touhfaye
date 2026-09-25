@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { fetchCategories } from '@/redux/slices/categorySlice';
+import { fetchSubcategoriesByCategory } from '@/redux/slices/subcategorySlice';
 import Axios from '@/utils/Axios';
 import { SummeryApi } from '@/app/common/SummeryApi';
 import AxiosToastError from '@/utils/AxiosToastError';
@@ -43,13 +44,18 @@ const ProductsContent = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { categories } = useSelector((state: RootState) => state.categorySlice);
+    const { subcategories } = useSelector((state: RootState) => state.subcategorySlice);
 
     // Filter values live in the URL, same as before — shareable/back-button-safe.
     const textSearch = searchParams.get('q') || '';
     const categoryId = searchParams.get('category') || '';
+    const subcategoryId = searchParams.get('subcategory') || '';
     const absorbency = searchParams.get('absorbency') || '';
     const inStockOnly = searchParams.get('inStock') === 'true';
+    const maxPrice = searchParams.get('maxPrice') || '';
     const sort = searchParams.get('sort') || 'newest';
+
+    const PRICE_CEILING = 3000;
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
@@ -79,6 +85,14 @@ const ProductsContent = () => {
         }
     }, [dispatch, categories.length]);
 
+    // The "Collection" (subcategory) filter only makes sense drilled into a
+    // single category — refetch whenever the chosen category changes.
+    useEffect(() => {
+        if (categoryId) {
+            dispatch(fetchSubcategoriesByCategory(categoryId));
+        }
+    }, [dispatch, categoryId]);
+
     useEffect(() => {
         Axios({ ...SummeryApi.searchProduct, params: { page: 1, limit: 200 } })
             .then((res) => {
@@ -99,8 +113,10 @@ const ProductsContent = () => {
             const params: any = { page, limit: 20 };
             if (textSearch) params.q = textSearch;
             if (categoryId) params.category = categoryId;
+            if (subcategoryId) params.subcategory = subcategoryId;
             if (absorbency) params.absorbency = absorbency;
             if (inStockOnly) params.inStock = 'true';
+            if (maxPrice) params.maxPrice = maxPrice;
             if (sort) params.sort = sort;
 
             const response = await Axios({ ...SummeryApi.searchProduct, params });
@@ -127,14 +143,14 @@ const ProductsContent = () => {
         } finally {
             setLoading(false);
         }
-    }, [textSearch, categoryId, absorbency, inStockOnly, sort, page]);
+    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, sort, page]);
 
     // Reset pagination whenever a filter changes.
     useEffect(() => {
         setPage(1);
         setProducts([]);
         setHasMore(true);
-    }, [textSearch, categoryId, absorbency, inStockOnly, sort]);
+    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, sort]);
 
     useEffect(() => {
         fetchProducts();
@@ -167,28 +183,52 @@ const ProductsContent = () => {
     // Shared between the tablet/desktop sidebar and the mobile filter drawer.
     const filterPanel = (
         <>
+            {categoryId && subcategories.length > 0 && (
+                <div>
+                    <div className="text-[11px] tracking-[.2em] text-title mb-3.5">COLLECTION</div>
+                    <div className="flex flex-col gap-1.5">
+                        <button
+                            onClick={() => updateFilters({ subcategory: undefined })}
+                            className={`text-left text-[13.5px] flex items-center gap-2.5 py-1 ${!subcategoryId ? 'text-title font-medium' : 'text-foreground font-light'}`}
+                        >
+                            <span className={`w-3 h-3 border border-accent flex-none ${!subcategoryId ? 'bg-accent' : ''}`} />
+                            All
+                        </button>
+                        {subcategories.map((sub: any) => {
+                            const on = subcategoryId === sub.id;
+                            return (
+                                <button
+                                    key={sub.id}
+                                    onClick={() => updateFilters({ subcategory: sub.id })}
+                                    className={`text-left text-[13.5px] flex items-center gap-2.5 py-1 ${on ? 'text-title font-medium' : 'text-foreground font-light'}`}
+                                >
+                                    <span className={`w-3 h-3 border border-accent flex-none ${on ? 'bg-accent' : ''}`} />
+                                    {sub.title}
+                                    <span className="ml-auto text-accent text-[11px]">{sub.products?.length ?? ''}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
             <div>
-                <div className="font-bold text-lg text-text-hover mb-2.5">Category</div>
-                <div className="flex flex-col gap-1.5">
-                    <button
-                        onClick={() => updateFilters({ category: undefined })}
-                        className={`text-left text-base flex justify-between gap-2.5 py-0.5 ${!categoryId ? 'text-secondary font-bold' : 'text-text-hover'}`}
-                    >
-                        All Categories
-                    </button>
-                    {categories.map((cat: any) => {
-                        const on = categoryId === cat.id;
-                        return (
-                            <button
-                                key={cat.id}
-                                onClick={() => updateFilters({ category: cat.id })}
-                                className={`text-left text-base flex justify-between gap-2.5 py-0.5 ${on ? 'text-secondary font-bold' : 'text-text-hover'}`}
-                            >
-                                {cat.title}
-                                <span className="text-text font-normal">{cat.products?.length ?? ''}</span>
-                            </button>
-                        );
-                    })}
+                <div className="text-[11px] tracking-[.2em] text-title mb-5.5">PRICE</div>
+                <input
+                    type="range"
+                    min={0}
+                    max={PRICE_CEILING}
+                    step={50}
+                    value={maxPrice ? Number(maxPrice) : PRICE_CEILING}
+                    onChange={(e) => {
+                        const v = Number(e.target.value);
+                        updateFilters({ maxPrice: v >= PRICE_CEILING ? undefined : String(v) });
+                    }}
+                    className="w-full accent-accent"
+                />
+                <div className="flex justify-between text-[12px] text-foreground font-light mt-2">
+                    <span>৳0</span>
+                    <span>{maxPrice && Number(maxPrice) < PRICE_CEILING ? `Up to ${DisplayPriceInBdt(Number(maxPrice))}` : `${DisplayPriceInBdt(PRICE_CEILING)}+`}</span>
                 </div>
             </div>
 
@@ -219,7 +259,7 @@ const ProductsContent = () => {
             )}
 
             <div>
-                <div className="font-bold text-lg text-text-hover mb-2.5">Availability</div>
+                <div className="text-[11px] tracking-[.2em] text-title mb-3.5">AVAILABILITY</div>
                 <div className="flex flex-wrap gap-2">
                     {[
                         { label: 'All', on: !inStockOnly, click: () => updateFilters({ inStock: undefined }) },
@@ -272,6 +312,28 @@ const ProductsContent = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Category pills */}
+            <div className="max-w-310 mx-auto px-5 sm:px-7 pt-7 flex gap-2 flex-wrap border-b border-primary-hover pb-6">
+                <button
+                    onClick={() => updateFilters({ category: undefined, subcategory: undefined })}
+                    className={`px-4.5 py-2 text-[12px] tracking-[.05em] border transition-colors ${!categoryId ? 'bg-secondary text-background border-secondary' : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'}`}
+                >
+                    All
+                </button>
+                {categories.map((cat: any) => {
+                    const on = categoryId === cat.id;
+                    return (
+                        <button
+                            key={cat.id}
+                            onClick={() => updateFilters({ category: cat.id, subcategory: undefined })}
+                            className={`px-4.5 py-2 text-[12px] tracking-[.05em] border transition-colors ${on ? 'bg-secondary text-background border-secondary' : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'}`}
+                        >
+                            {cat.title}
+                        </button>
+                    );
+                })}
+            </div>
 
             <section className="max-w-310 mx-auto px-5 sm:px-7 py-9 pb-16 grid grid-cols-1 md:grid-cols-[200px_1fr] lg:grid-cols-[244px_1fr] gap-10 items-start">
                 {/* Sidebar — inline from tablet up; mobile uses the Filters drawer below instead. */}

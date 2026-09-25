@@ -28,7 +28,7 @@ export const fetchSubcategoriesByCategory = createAsyncThunk(
     'subcategories/fetchByCategory',
     async (categoryId: string, { rejectWithValue }) => {
         try {
-            const response = await Axios({ ...SummeryApi.fetchSubcategoriesByCategory, params: { categoryId } });
+            const response = await Axios({ ...SummeryApi.fetchSubcategoriesByCategory, data: { categoryId } });
             return response.data?.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message);

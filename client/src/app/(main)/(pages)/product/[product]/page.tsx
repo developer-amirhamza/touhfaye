@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -9,6 +10,7 @@ import AxiosToastError from '@/utils/AxiosToastError';
 import { SummeryApi } from '@/app/common/SummeryApi';
 import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
+import { validURLConvert } from '@/utils/validURLConvart';
 import StarRating from '@/utils/StartRating';
 import { fetchProductReviews, addReview, updateReview, deleteReview } from '@/redux/slices/reviewSlice';
 import { RootState, AppDispatch } from '@/redux/store';
@@ -17,6 +19,27 @@ import Breadcrumb from '@/app/(main)/components/UI/Breadcrumb';
 import FaqAccordion, { FaqItem } from '@/app/(main)/components/UI/FaqAccordion';
 
 type Tab = 'details' | 'reviews';
+
+// Standing gifting-policy accordion, shown on every product — not fetched,
+// since it's the same store-wide info the mockup's "Shipping" / "Returns" /
+// "Gift wrap" accordion rows describe.
+const INFO_ACCORDION: FaqItem[] = [
+    {
+        id: 'shipping',
+        question: 'Shipping & delivery',
+        answer: 'Dhaka: 1–2 business days, ৳60. Outside Dhaka: 2–4 business days, ৳120. Free delivery on orders over ৳1500.',
+    },
+    {
+        id: 'returns',
+        question: 'Returns & exchanges',
+        answer: 'Unused items can be returned within 7 days of delivery. Send us a photo of the parcel on Messenger and we will arrange a pickup.',
+    },
+    {
+        id: 'giftwrap',
+        question: 'Gift wrap & card',
+        answer: 'Every order is gift-wrapped at no extra cost and leaves our studio with a handwritten card, ready to hand over as it arrives.',
+    },
+];
 
 const ProductDetailsPage = () => {
     const params = useParams();
@@ -38,6 +61,7 @@ const ProductDetailsPage = () => {
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     const [faqs, setFaqs] = useState<FaqItem[]>([]);
+    const [related, setRelated] = useState<any[]>([]);
 
     const [rating, setRating] = useState(0);
     const [reviewComment, setReviewComment] = useState("");
@@ -87,6 +111,17 @@ const ProductDetailsPage = () => {
             })
             .catch(() => { /* embedded FAQs are optional — fail silently */ });
     }, [productId]);
+
+    // "Gifts that go together" — other products in the same category.
+    useEffect(() => {
+        if (!data.categoryId) return;
+        Axios({ ...SummeryApi.searchProduct, params: { category: data.categoryId, limit: 5 } })
+            .then((res) => {
+                const items = (res.data?.data || []).filter((p: any) => p.id !== productId);
+                setRelated(items.slice(0, 4));
+            })
+            .catch(() => setRelated([]));
+    }, [data.categoryId, productId]);
 
     const handleAddReview = async () => {
         if (!user) {
@@ -339,6 +374,12 @@ const ProductDetailsPage = () => {
                     </div>
                 )}
 
+                {tab === 'details' && (
+                    <div className="mt-10 max-w-2xl border-t border-primary-hover pt-6">
+                        <FaqAccordion faqs={INFO_ACCORDION} />
+                    </div>
+                )}
+
                 {tab === 'reviews' && (
                     <div className="mt-10 max-w-3xl">
                         {user ? (
@@ -406,6 +447,35 @@ const ProductDetailsPage = () => {
                     <div className="border-t border-primary-hover mt-12 pt-8 max-w-3xl">
                         <h2 className="font-secondary text-2xl text-text-hover mb-5">Frequently asked questions</h2>
                         <FaqAccordion faqs={faqs} />
+                    </div>
+                )}
+
+                {related.length > 0 && (
+                    <div className="border-t border-primary-hover mt-14 pt-10 pb-8">
+                        <div className="flex justify-between items-baseline gap-5 flex-wrap mb-6">
+                            <h2 className="font-secondary text-2xl text-title">Gifts that go together</h2>
+                            <Link href="/products" className="text-[11px] tracking-[.16em] border-b border-secondary text-secondary pb-1">
+                                VIEW ALL
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {related.map((p: any) => {
+                                const rUrl = `/product/${validURLConvert(p.title)}_${p.id}`;
+                                return (
+                                    <Link key={p.id} href={rUrl} className="group">
+                                        <div className="aspect-square bg-primary overflow-hidden">
+                                            {p.images?.[0] && (
+                                                <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                                            )}
+                                        </div>
+                                        <div className="flex justify-between gap-3 mt-3 items-baseline">
+                                            <span className="font-secondary text-[15px] text-title leading-snug line-clamp-1">{p.title}</span>
+                                            <span className="text-[13px] text-paragraph whitespace-nowrap">{DisplayPriceInBdt(getDisplayPrice(p))}</span>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
             </div>

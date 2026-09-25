@@ -7,6 +7,7 @@ export interface Category {
     id: string;
     title: string;
     slug: string;
+    image?: string | null;
     products?: any[];
     createdAt: string;
     updatedAt: string;
