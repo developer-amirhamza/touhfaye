@@ -226,6 +226,7 @@ model Product {
   id            String       @id @default(dbgenerated("gen_random_uuid()"))
   title         String
   images        String[]
+  videos        String[]     @default([])
   description   String?
   price         Float
   discount      Float?
@@ -244,6 +245,13 @@ model Product {
   pack          String?
   pricingNotes  String?
   more_details  Json?
+  // SEO-friendly URL segment, admin-editable. Purely the human-readable
+  // prefix of the /product/[product] route — lookups there always resolve
+  // by the id suffix, so backfilling/editing this never breaks an existing
+  // shared link (see idFromSlug in product/[product]/page.tsx).
+  slug          String?      @unique
+  metaTitle     String?
+  metaDescription String?
   cartItems     CartItem[]
   category      Category?    @relation(fields: [categoryId], references: [id])
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
