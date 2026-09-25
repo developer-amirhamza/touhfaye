@@ -125,20 +125,20 @@ const Header = () => {
 
             {/* Main navbar */}
             <div className="bg-background/95 w-full backdrop-blur-md border-b border-primary-hover">
-                <div className="max-w-[1240px] mx-auto w-full flex items-center gap-8 px-4 sm:px-7 py-3">
+                <div className="max-w-[1240px] mx-auto w-full grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-8 px-4 sm:px-7 py-3">
 
-                    {/* Logo */}
-                    <Link href="/" className="shrink-0 flex items-center">
-                        <Image
-                            src={logo}
-                            alt="Touhfaye"
-                            className="h-14 w-auto object-contain"
-                            priority
-                        />
-                    </Link>
+                    {/* Left — mobile menu toggle + nav links */}
+                    <div className="flex items-center gap-1 justify-self-start">
+                        {/* Mobile menu toggle */}
+                        <button
+                            onClick={() => setMobileMenuOpen(true)}
+                            aria-label="Open menu"
+                            className="lg:hidden p-2 -ml-2 hover:text-secondary transition-colors text-paragraph"
+                        >
+                            <FaBars size={19} />
+                        </button>
 
-                    {/* Nav links */}
-                    <nav className="hidden lg:flex items-center gap-6 ml-auto text-[12px] tracking-[.13em]">
+                    <nav className="hidden lg:flex items-center gap-6 text-[12px] tracking-[.13em]">
                         <Link href="/" className="text-title whitespace-nowrap">HOME</Link>
                         <div
                             ref={shopRef}
@@ -203,19 +203,20 @@ const Header = () => {
                             </Link>
                         ))}
                     </nav>
+                    </div>
 
-                    {/* Right actions */}
-                    <div className="flex items-center gap-1 ml-auto lg:ml-6 shrink-0 text-paragraph">
+                    {/* Center — logo */}
+                    <Link href="/" className="shrink-0 flex items-center justify-self-center">
+                        <Image
+                            src={logo}
+                            alt="Touhfaye"
+                            className="h-14 w-auto object-contain"
+                            priority
+                        />
+                    </Link>
 
-                        {/* Mobile menu toggle */}
-                        <button
-                            onClick={() => setMobileMenuOpen(true)}
-                            aria-label="Open menu"
-                            className="lg:hidden p-2 hover:text-secondary transition-colors"
-                        >
-                            <FaBars size={19} />
-                        </button>
-
+                    {/* Right — icon actions */}
+                    <div className="flex items-center gap-1 justify-self-end shrink-0 text-paragraph">
                         <button
                             onClick={() => setTrackOrderOpen(true)}
                             title="Track order"
