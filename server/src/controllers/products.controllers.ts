@@ -246,7 +246,8 @@ export const getProductDetails = async (req: AuthRequest, res: Response) => {
         }
 
         const existingProduct = await prisma.product.findFirst({
-            where: { id, isActive: true, deletedAt: null }
+            where: { id, isActive: true, deletedAt: null },
+            include: { category: true, subcategory: true },
         });
 
         if (!existingProduct) {

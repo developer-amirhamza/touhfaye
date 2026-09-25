@@ -10,8 +10,10 @@ import { AppDispatch, RootState } from '@/redux/store'
 import { fetchCart } from '@/redux/slices/cartSlice'
 import { fetchUser } from '@/redux/slices/userSlices'
 import { fetchCategories } from '@/redux/slices/categorySlice'
+import { hydrateFavorites, loadFavoritesFromStorage } from '@/redux/slices/favoriteSlice'
 import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt'
 import CartMenu from './CartMenu'
+import FavoritesDrawer from './FavoritesDrawer'
 import Search from './Search'
 import TrackOrderModal from './TrackOrderModal'
 import Link from 'next/link'
@@ -32,9 +34,11 @@ const Header = () => {
     const { cart, status } = useSelector((state: RootState) => state.cartSlice)
     const user = useSelector((state: RootState) => state.userSlice)
     const { categories } = useSelector((state: RootState) => state.categorySlice)
+    const { items: favoriteItems, hydrated: favoritesHydrated } = useSelector((state: RootState) => state.favoriteSlice)
     const router = useRouter()
 
     const [openCartMenu, setOpenCartMenu] = useState(false)
+    const [openFavorites, setOpenFavorites] = useState(false)
     const [showUserMenu, setShowUserMenu] = useState(false)
     const [topbarVisible, setTopbarVisible] = useState(true)
     const [shopOpen, setShopOpen] = useState(false)
@@ -61,6 +65,10 @@ const Header = () => {
     useEffect(() => {
         if (status === 'idle') dispatch(fetchCart())
     }, [status, dispatch])
+
+    useEffect(() => {
+        if (!favoritesHydrated) dispatch(hydrateFavorites(loadFavoritesFromStorage()))
+    }, [favoritesHydrated, dispatch])
 
     useEffect(() => {
         // Read localStorage live rather than from state — `user.status` is
@@ -228,6 +236,20 @@ const Header = () => {
 
                         <Search />
 
+                        <button
+                            onClick={() => setOpenFavorites(true)}
+                            title="Favourites"
+                            aria-label="Favourites"
+                            className="flex items-center gap-1 p-2 hover:text-secondary transition-colors"
+                        >
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
+                                <path d="M12 20.5s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.6-7.5 10.2-7.5 10.2z" />
+                            </svg>
+                            {favoriteItems.length > 0 && (
+                                <span className="text-[11px] text-accent">{favoriteItems.length}</span>
+                            )}
+                        </button>
+
                         {/* Account */}
                         {user.status === 'succeeded' && user.user ? (
                             <div className="relative">
@@ -345,6 +367,9 @@ const Header = () => {
 
             <AnimatePresence>
                 {openCartMenu && <CartMenu close={() => setOpenCartMenu(false)} />}
+            </AnimatePresence>
+            <AnimatePresence>
+                {openFavorites && <FavoritesDrawer close={() => setOpenFavorites(false)} />}
             </AnimatePresence>
             {trackOrderOpen && <TrackOrderModal onClose={() => setTrackOrderOpen(false)} />}
         </div>
