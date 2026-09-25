@@ -142,7 +142,8 @@ export const getProductDetails = async (req: AuthRequest, res: Response) => {
         }
 
         const existingProduct = await prisma.product.findUnique({
-            where: { id: id }
+            where: { id: id },
+            include: { category: true, subcategory: true },
         });
 
         if (!existingProduct) {

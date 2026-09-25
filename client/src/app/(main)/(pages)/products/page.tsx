@@ -14,6 +14,7 @@ import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
 import { validURLConvert } from '@/utils/validURLConvart';
 import AddToCartButton from '../../components/UI/AddToCartBtn';
+import FavoriteButton from '../../components/UI/FavoriteButton';
 import Loader from '../../components/UI/Loader';
 import Breadcrumb from '../../components/UI/Breadcrumb';
 import FaqAccordion, { FaqItem } from '../../components/UI/FaqAccordion';
@@ -415,24 +416,32 @@ const ProductsContent = () => {
                                             key={product.id}
                                             className="flex flex-col bg-white rounded-2xl overflow-hidden border border-primary-hover transition-transform hover:-translate-y-1 hover:shadow-xl"
                                         >
-                                            {/* Image and title are their own links; AddToCartButton stays
-                                                outside any <a> since it renders its own <button>s and
-                                                interactive content can't nest inside interactive content. */}
-                                            <Link href={url} className="relative w-full h-47.5 flex items-center justify-center overflow-hidden bg-white border-b border-primary-hover">
-                                                <img
-                                                    src={product.images?.[0]}
-                                                    alt={product.title}
-                                                    className="max-w-[86%] max-h-[88%] object-contain"
-                                                />
-                                                {(hasDiscount || product.isFeatured) && (
-                                                    <span className={`absolute top-3 left-3 text-background text-xs font-semibold rounded-full px-3 py-1 ${hasDiscount ? 'bg-[#d9772e]' : 'bg-secondary'}`}>
-                                                        {hasDiscount ? `Save ${discount}%` : 'Bestseller'}
+                                            {/* Image and title are their own links; AddToCartButton and
+                                                FavoriteButton stay outside the <a> since they render their
+                                                own <button>s and interactive content can't nest inside
+                                                interactive content. */}
+                                            <div className="relative w-full h-47.5 border-b border-primary-hover">
+                                                <Link href={url} className="absolute inset-0 flex items-center justify-center overflow-hidden bg-white">
+                                                    <img
+                                                        src={product.images?.[0]}
+                                                        alt={product.title}
+                                                        className="max-w-[86%] max-h-[88%] object-contain"
+                                                    />
+                                                    {(hasDiscount || product.isFeatured) && (
+                                                        <span className={`absolute top-3 left-3 text-background text-xs font-semibold rounded-full px-3 py-1 ${hasDiscount ? 'bg-[#d9772e]' : 'bg-secondary'}`}>
+                                                            {hasDiscount ? `Save ${discount}%` : 'Bestseller'}
+                                                        </span>
+                                                    )}
+                                                    <span className="absolute bottom-2.5 right-3 text-xs font-semibold rounded-full px-3 py-1 bg-white/94 text-secondary">
+                                                        View details →
                                                     </span>
-                                                )}
-                                                <span className="absolute bottom-2.5 right-3 text-xs font-semibold rounded-full px-3 py-1 bg-white/94 text-secondary">
-                                                    View details →
-                                                </span>
-                                            </Link>
+                                                </Link>
+                                                <FavoriteButton
+                                                    product={product}
+                                                    size={16}
+                                                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/94 hover:bg-white flex items-center justify-center text-secondary shadow-sm transition-colors"
+                                                />
+                                            </div>
                                             <div className="p-5 flex flex-col flex-1">
                                                 {chip && (
                                                     <span className="self-start bg-secondary-light text-secondary line-clamp-1 font-semibold rounded-full px-3 py-1 text-sm">

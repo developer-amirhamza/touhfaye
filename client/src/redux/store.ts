@@ -7,6 +7,7 @@ import orderReducer from "./slices/orderSlice";
 import reviewReducer from "./slices/reviewSlice";
 import categoryReducer from "./slices/categorySlice";
 import subcategoryReducer from "./slices/subcategorySlice";
+import favoriteReducer from "./slices/favoriteSlice";
 
 
 
@@ -20,6 +21,7 @@ export const store = configureStore({
         reviewSlice:reviewReducer,
         categorySlice:categoryReducer,
         subcategorySlice:subcategoryReducer,
+        favoriteSlice:favoriteReducer,
     }
 })
 

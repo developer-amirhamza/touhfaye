@@ -6,6 +6,7 @@ import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
 import { getDisplayPrice } from '@/utils/PriceWithDiscount';
 import { validURLConvert } from '@/utils/validURLConvart';
 import AddToCartButton from './UI/AddToCartBtn';
+import FavoriteButton from './UI/FavoriteButton';
 import StarRating from '@/utils/StartRating';
 import { RootState } from '@/redux/store';
 import {useSelector} from "react-redux"
@@ -50,6 +51,12 @@ const ProductCard: React.FC<Type> = ({ data }) => {
                         </span>
                     )}
                 </div>
+
+                <FavoriteButton
+                    product={data}
+                    size={16}
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center text-secondary shadow-sm transition-colors"
+                />
             </div>
 
             {/* Content */}
