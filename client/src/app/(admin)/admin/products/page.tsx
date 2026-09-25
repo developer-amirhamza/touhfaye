@@ -27,6 +27,7 @@ const AdminProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [duplicateLoading, setDuplicateLoading] = useState<string | null>(null);
 
   const fetchProducts = async () => {
     try {
@@ -66,6 +67,26 @@ const AdminProductsPage = () => {
       AxiosToastError(error);
     } finally {
       setDeleteLoading(null);
+    }
+  };
+
+  const handleDuplicate = async (id: string) => {
+    try {
+      setDuplicateLoading(id);
+      const response = await Axios({
+        ...SummeryApi.duplicateProduct,
+        data: { id },
+      });
+      if (response.data?.success) {
+        toast.success('Product duplicated successfully');
+        setProducts(prev => [response.data.data, ...prev]);
+      } else {
+        toast.error(response.data?.message || 'Failed to duplicate product');
+      }
+    } catch (error) {
+      AxiosToastError(error);
+    } finally {
+      setDuplicateLoading(null);
     }
   };
 
@@ -166,7 +187,7 @@ const AdminProductsPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       onClick={() => toggleActiveStatus(product)}
-                      className={`px-2 py-1 rounded text-xs font-medium ${
+                      className={`px-2 py-1 rounded text-xs font-medium cursor-pointer ${
                         product.isActive
                           ? 'bg-green-100 text-green-800 hover:bg-green-200'
                           : 'bg-red-100 text-red-800 hover:bg-red-200'
@@ -183,6 +204,13 @@ const AdminProductsPage = () => {
                       >
                         Edit
                       </Link>
+                      <button
+                        onClick={() => handleDuplicate(product.id)}
+                        disabled={duplicateLoading === product.id}
+                        className="text-gray-600 hover:text-gray-900 disabled:opacity-50 cursor-pointer"
+                      >
+                        {duplicateLoading === product.id ? '...' : 'Duplicate'}
+                      </button>
                       <button
                         onClick={() => handleDelete(product.id)}
                         disabled={deleteLoading === product.id}

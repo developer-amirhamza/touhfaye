@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createProduct, deleteProduct, getAllProductDetails, getProductDetails, getProductsByCategory, getProductsBySubcategory, searchProducts, updateProduct } from "../controllers/products.controllers";
+import { createProduct, deleteProduct, duplicateProduct, getAllProductDetails, getProductDetails, getProductsByCategory, getProductsBySubcategory, searchProducts, updateProduct } from "../controllers/products.controllers";
 import { auth, optionalAuth } from "../middlewares/auth";
 import { admin } from "../middlewares/admin";
 
@@ -18,5 +18,6 @@ router.post("/by-subcategory", optionalAuth, getProductsBySubcategory);
 router.post("/create", auth, admin, createProduct);
 router.put("/update", auth, admin, updateProduct);
 router.delete("/delete", auth, admin, deleteProduct);
+router.post("/duplicate", auth, admin, duplicateProduct);
 
 export default router;
