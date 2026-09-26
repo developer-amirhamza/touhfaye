@@ -65,48 +65,6 @@ export const deleteDeliverySite = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ── Negotiated pricing (admin) ──────────────────────────────────────────────
-export const listNegotiatedPrices = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.query;
-    if (!userId) return errorHandler(res, 400, "userId is required", true);
-    const prices = await prisma.negotiatedPrice.findMany({
-      where: { userId: String(userId) },
-    });
-    return res.status(200).json({ success: true, error: false, data: prices });
-  } catch (error: any) {
-    return errorHandler(res, 500, error.message || "Internal server error!", true);
-  }
-};
-
-export const upsertNegotiatedPrice = async (req: Request, res: Response) => {
-  try {
-    const { userId, productId, price } = req.body;
-    if (!userId || !productId || price == null) {
-      return errorHandler(res, 400, "userId, productId and price are required", true);
-    }
-    const negotiated = await prisma.negotiatedPrice.upsert({
-      where: { userId_productId: { userId, productId } },
-      update: { price: Number(price) },
-      create: { userId, productId, price: Number(price) },
-    });
-    return res.status(200).json({ success: true, error: false, message: "Negotiated price saved", data: negotiated });
-  } catch (error: any) {
-    return errorHandler(res, 500, error.message || "Internal server error!", true);
-  }
-};
-
-export const deleteNegotiatedPrice = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.body;
-    if (!id) return errorHandler(res, 400, "id is required", true);
-    await prisma.negotiatedPrice.delete({ where: { id } });
-    return res.status(200).json({ success: true, error: false, message: "Negotiated price deleted" });
-  } catch (error: any) {
-    return errorHandler(res, 500, error.message || "Internal server error!", true);
-  }
-};
-
 // ── Deeper reporting (admin) ────────────────────────────────────────────────
 // Server-side aggregation: revenue by channel, top products, account activity,
 // and a 6-month revenue trend. More authoritative than the client-side view.

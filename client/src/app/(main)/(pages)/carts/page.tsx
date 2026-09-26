@@ -63,6 +63,9 @@ export default function CartPage() {
                   </div>
                   <div className="min-w-0">
                     <div className="font-secondary text-[16px] text-title truncate">{item.product.title}</div>
+                    {item.variantLabel && (
+                      <div className="text-[12px] text-accent font-light mt-0.5">{item.variantLabel}</div>
+                    )}
                     <div className="text-[13px] text-foreground font-light mt-1">{DisplayPriceInBdt(unitPrice(item))} each</div>
                   </div>
                 </div>

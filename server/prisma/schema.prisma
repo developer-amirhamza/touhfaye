@@ -27,11 +27,9 @@ model User {
   accountApplication     AccountApplication?
   cart                   Cart?
   deliverySites          DeliverySite[]
-  negotiatedPrices       NegotiatedPrice[]
   quotes                 Quote[]
   reviews                Reviews[]
   standingOrders         StandingOrder[]
-  subscriptions          Subscription[]
   order                  Order[]
 }
 
@@ -67,30 +65,6 @@ model Setting {
   updatedAt DateTime @updatedAt
 }
 
-model PricingTier {
-  id           String   @id @default(dbgenerated("gen_random_uuid()"))
-  productId    String?
-  role         String   @default("TRADE")
-  minQuantity  Int
-  pricePerUnit Float
-  label        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([productId, role, minQuantity])
-}
-
-model PriceOverride {
-  id        String   @id @default(dbgenerated("gen_random_uuid()"))
-  productId String
-  role      String
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([productId, role])
-}
-
 model DeliverySite {
   id        String   @id @default(dbgenerated("gen_random_uuid()"))
   userId    String
@@ -104,36 +78,6 @@ model DeliverySite {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-}
-
-model NegotiatedPrice {
-  id        String   @id @default(dbgenerated("gen_random_uuid()"))
-  userId    String
-  productId String
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, productId])
-  @@index([userId])
-}
-
-model Subscription {
-  id              String   @id @default(dbgenerated("gen_random_uuid()"))
-  userId          String
-  status          String   @default("ACTIVE")
-  intervalDays    Int      @default(30)
-  nextRunAt       DateTime
-  shippingAddress String
-  phone           String
-  items           Json
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status, nextRunAt])
 }
 
 model StandingOrder {
@@ -252,6 +196,17 @@ model Product {
   slug          String?      @unique
   metaTitle     String?
   metaDescription String?
+  // Manual placement for the home page's collection strips (New Arrivals /
+  // Best Seller / Combo Package), set from the admin product form.
+  // Independent of isFeatured/discount, which drive other badges elsewhere.
+  // See PRODUCT_COLLECTION_TAGS for the allowed values.
+  collectionTag String?
+  // Priced size/weight/pack options shown on the product page's SIZE picker
+  // (e.g. [{label:"180g",price:250},{label:"120g",price:155},{label:"Set of 3",price:650}]).
+  // Replaces the old per-role wholesale pricing: one product, several
+  // independently-priced variants, no buyer-role math. Null/empty means the
+  // product has a single price (the `price` field above) and no picker.
+  variants      Json?
   cartItems     CartItem[]
   category      Category?    @relation(fields: [categoryId], references: [id])
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
@@ -308,17 +263,23 @@ model Cart {
 }
 
 model CartItem {
-  id                       String   @id @default(dbgenerated("gen_random_uuid()"))
-  cartId                   String
-  productId                String
-  quantity                 Int      @default(1)
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  subscriptionIntervalDays Int?
-  cart                     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product                  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  cartId    String
+  productId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // Which priced variant (Product.variants[].label) this line is for, or ""
+  // for a plain single-price product — never null, so the unique constraint
+  // below can't be defeated by Postgres treating two NULLs as distinct.
+  variantLabel String  @default("")
+  // Snapshot of that variant's (or the product's) unit price at add-to-cart
+  // time, so the bag total doesn't drift if the price changes later.
+  variantPrice Float?
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([cartId, productId])
+  @@unique([cartId, productId, variantLabel])
 }
 
 model Order {
@@ -361,6 +322,10 @@ model OrderItem {
   productId    String
   productName  String
   productImage String?
+  // Which priced variant (Product.variants[].label) was bought, or null for
+  // a plain single-price product — kept as a snapshot since Product.variants
+  // can change or be removed after the order is placed.
+  variantLabel String?
   price        Float
   quantity     Int
   total        Float

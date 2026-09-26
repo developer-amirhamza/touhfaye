@@ -3,6 +3,7 @@ import TrustStrip from "./components/TrustStrip";
 import CategoryCircles from "./components/CategoryCircles";
 import CategoryWiseProducts from "./components/CategoryWiseProducts";
 import Spotlight from "./components/Spotlight";
+import FeaturedCollections from "./components/FeaturedCollections";
 import TestimonialsSection from "./components/TestimonialsSection";
 import JournalPreview from "./components/JournalPreview";
 
@@ -14,6 +15,7 @@ export default function Home() {
       <CategoryCircles />
       <CategoryWiseProducts />
       <Spotlight />
+      <FeaturedCollections />
       <TestimonialsSection />
       <JournalPreview />
     </div>
