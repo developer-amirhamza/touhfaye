@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requireRole = exports.normaliseRole = exports.PRICE_OVERRIDE_ROLES = exports.TRADE_FAMILY = exports.ROLES = void 0;
+exports.requireRole = exports.normaliseRole = exports.TRADE_FAMILY = exports.ROLES = void 0;
 const prisma_1 = require("../lib/prisma");
 // Canonical role values used across the platform.
 // OWNER is the site owner: full admin access, but the account itself is
@@ -22,15 +22,6 @@ exports.ROLES = {
 // Every role that gets the wholesale catalogue, order history, standing
 // orders and delivery-site routes.
 exports.TRADE_FAMILY = [exports.ROLES.TRADE, exports.ROLES.RETAILER, exports.ROLES.DISTRIBUTOR];
-// The roles a product's admin form exposes a dedicated price field for —
-// each becomes a PriceOverride row when set, resolved via resolveUnitPrice.
-exports.PRICE_OVERRIDE_ROLES = [
-    exports.ROLES.TRADE,
-    exports.ROLES.RETAILER,
-    exports.ROLES.DISTRIBUTOR,
-    exports.ROLES.NDIS_COORDINATOR,
-    exports.ROLES.CONSUMER,
-];
 // Normalise legacy values: "USER" was the old consumer role.
 const normaliseRole = (role) => role === "USER" || !role ? exports.ROLES.CONSUMER : role;
 exports.normaliseRole = normaliseRole;

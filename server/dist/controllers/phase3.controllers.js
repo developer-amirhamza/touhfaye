@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReport = exports.deleteNegotiatedPrice = exports.upsertNegotiatedPrice = exports.listNegotiatedPrices = exports.deleteDeliverySite = exports.upsertDeliverySite = exports.listDeliverySites = void 0;
+exports.getReport = exports.deleteDeliverySite = exports.upsertDeliverySite = exports.listDeliverySites = void 0;
 const errorHandler_1 = require("../utils/errorHandler");
 const prisma_1 = require("../lib/prisma");
 // ── Multi-site delivery (trade) ─────────────────────────────────────────────
@@ -70,53 +70,6 @@ const deleteDeliverySite = async (req, res) => {
     }
 };
 exports.deleteDeliverySite = deleteDeliverySite;
-// ── Negotiated pricing (admin) ──────────────────────────────────────────────
-const listNegotiatedPrices = async (req, res) => {
-    try {
-        const { userId } = req.query;
-        if (!userId)
-            return (0, errorHandler_1.errorHandler)(res, 400, "userId is required", true);
-        const prices = await prisma_1.prisma.negotiatedPrice.findMany({
-            where: { userId: String(userId) },
-        });
-        return res.status(200).json({ success: true, error: false, data: prices });
-    }
-    catch (error) {
-        return (0, errorHandler_1.errorHandler)(res, 500, error.message || "Internal server error!", true);
-    }
-};
-exports.listNegotiatedPrices = listNegotiatedPrices;
-const upsertNegotiatedPrice = async (req, res) => {
-    try {
-        const { userId, productId, price } = req.body;
-        if (!userId || !productId || price == null) {
-            return (0, errorHandler_1.errorHandler)(res, 400, "userId, productId and price are required", true);
-        }
-        const negotiated = await prisma_1.prisma.negotiatedPrice.upsert({
-            where: { userId_productId: { userId, productId } },
-            update: { price: Number(price) },
-            create: { userId, productId, price: Number(price) },
-        });
-        return res.status(200).json({ success: true, error: false, message: "Negotiated price saved", data: negotiated });
-    }
-    catch (error) {
-        return (0, errorHandler_1.errorHandler)(res, 500, error.message || "Internal server error!", true);
-    }
-};
-exports.upsertNegotiatedPrice = upsertNegotiatedPrice;
-const deleteNegotiatedPrice = async (req, res) => {
-    try {
-        const { id } = req.body;
-        if (!id)
-            return (0, errorHandler_1.errorHandler)(res, 400, "id is required", true);
-        await prisma_1.prisma.negotiatedPrice.delete({ where: { id } });
-        return res.status(200).json({ success: true, error: false, message: "Negotiated price deleted" });
-    }
-    catch (error) {
-        return (0, errorHandler_1.errorHandler)(res, 500, error.message || "Internal server error!", true);
-    }
-};
-exports.deleteNegotiatedPrice = deleteNegotiatedPrice;
 // ── Deeper reporting (admin) ────────────────────────────────────────────────
 // Server-side aggregation: revenue by channel, top products, account activity,
 // and a 6-month revenue trend. More authoritative than the client-side view.

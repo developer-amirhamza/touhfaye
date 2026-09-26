@@ -84,29 +84,21 @@ const placeOrder = async (req, res) => {
                 return (0, errorHandler_1.errorHandler)(res, 400, `Only ${product.stock} left in stock for "${product.title}".`);
             }
         }
-        // Resolve each line at the buyer's own role (a Trade/Retailer/
-        // Distributor/NDIS coordinator/Consumer-specific price if one is set
-        // for that product, else the main retail price minus its discount —
-        // a guest checkout has no role at all, so it always gets the main
-        // price). This also fixes a pre-existing gap where this path never
-        // applied the product's own retail discount at all.
-        const role = await (0, pricing_1.getViewerRole)(userId);
+        // Resolve each line's current price — its own variant price if it has
+        // one, else the product's main retail price minus its discount. The
+        // same price for every buyer; no per-role/wholesale pricing anymore.
         let subtotal = 0;
         const orderItemsData = [];
         for (const item of cart.items) {
             const product = item.product;
-            const unitPrice = await (0, pricing_1.resolveUnitPrice)({
-                productId: product.id,
-                role,
-                quantity: item.quantity,
-                userId,
-            });
+            const unitPrice = (0, pricing_1.resolveProductPrice)(product, item.variantLabel);
             const itemsTotal = +(unitPrice * item.quantity).toFixed(2);
             subtotal += itemsTotal;
             orderItemsData.push({
                 productName: product.title,
                 productId: product.id,
                 productImage: product.images[0] || null,
+                variantLabel: item.variantLabel || null,
                 price: unitPrice,
                 quantity: item.quantity,
                 total: itemsTotal,

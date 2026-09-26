@@ -9,7 +9,7 @@ const generatedSlug = (title) => {
 };
 const createCategory = async (req, res) => {
     try {
-        const { title } = req.body;
+        const { title, image } = req.body;
         if (!title) {
             return (0, errorHandler_1.errorHandler)(res, 404, "The category title is required!");
         }
@@ -26,7 +26,7 @@ const createCategory = async (req, res) => {
             finalSlug = `${slug}-${counter}`;
             counter++;
         }
-        const category = await prisma_1.prisma.category.create({ data: { title, slug: finalSlug } });
+        const category = await prisma_1.prisma.category.create({ data: { title, slug: finalSlug, image } });
         return (0, errorHandler_1.errorHandler)(res, 200, "The category has been created successfully!", false, category);
     }
     catch (error) {
@@ -36,13 +36,15 @@ const createCategory = async (req, res) => {
 exports.createCategory = createCategory;
 const updateCategory = async (req, res) => {
     try {
-        const { id, title } = req.body;
+        const { id, title, image } = req.body;
         if (!id || !title)
             return (0, errorHandler_1.errorHandler)(res, 404, "The category title is required!");
         const existing = await prisma_1.prisma.category.findUnique({ where: { id: id } });
         if (!existing)
             return (0, errorHandler_1.errorHandler)(res, 404, "The category not found");
         const updateData = {};
+        if (image !== undefined)
+            updateData.image = image;
         if (title) {
             const titleConflict = await prisma_1.prisma.category.findFirst({
                 where: { title: { equals: title, mode: "insensitive" }, NOT: { id } }
