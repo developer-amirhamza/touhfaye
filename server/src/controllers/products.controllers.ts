@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 import { errorHandler } from "../utils/errorHandler";
 import { prisma } from "../lib/prisma";
-import { PRICE_OVERRIDE_ROLES } from "../middlewares/role";
-import { attachDisplayPrices, getViewerRole } from "../services/pricing";
+import { attachDisplayPrices } from "../services/pricing";
 import { parseFiniteNumber, parseNonNegativeInteger, parsePagination } from "../utils/validation";
+import { PRODUCT_COLLECTION_TAGS } from "../constants/productCollections";
 
 interface AuthRequest extends Request {
     userId?: string;
 }
+
+const isValidCollectionTag = (value: unknown): value is (typeof PRODUCT_COLLECTION_TAGS)[number] =>
+    typeof value === "string" && (PRODUCT_COLLECTION_TAGS as readonly string[]).includes(value);
 
 const generateSlug = (title: string): string => {
     return title
@@ -29,33 +33,31 @@ const buildUniqueProductSlug = async (source: string, excludeId?: string) => {
     return finalSlug;
 };
 
-// Writes one PriceOverride row per role present in `priceByRole` with a
-// valid (finite, > 0) value, and removes any override for a role that was
-// sent back as empty/null/0 — so clearing a field in the admin form actually
-// clears the override instead of leaving a stale price behind.
-const savePriceOverrides = async (productId: string, priceByRole: Record<string, unknown> | undefined) => {
-    if (!priceByRole || typeof priceByRole !== "object") return;
-    await Promise.all(
-        PRICE_OVERRIDE_ROLES.map(async (role) => {
-            if (!(role in priceByRole)) return; // omitted entirely: leave existing override untouched
-            const raw = priceByRole[role];
-            const value = raw === "" || raw === null || raw === undefined ? null : parseFiniteNumber(raw);
-            if (value !== null && value > 0) {
-                await prisma.priceOverride.upsert({
-                    where: { productId_role: { productId, role } },
-                    update: { price: value },
-                    create: { productId, role, price: value },
-                });
-            } else {
-                await prisma.priceOverride.deleteMany({ where: { productId, role } });
-            }
-        })
-    );
+// Validates the admin form's variants payload (an array of {label, price}
+// rows for the SIZE picker — different sizes/weights/pack options, each
+// independently priced) before it's ever written to the database. Returns
+// null for "no variants sent" (leave/clear, handled by the caller) or throws
+// a plain string message for the first row that doesn't make sense.
+const parseVariantsInput = (raw: unknown): { label: string; price: number; stock?: number }[] | null => {
+    if (raw === undefined || raw === null) return null;
+    if (!Array.isArray(raw)) throw new Error("Variants must be a list of {label, price} rows");
+    return raw.map((v: any, idx: number) => {
+        const label = typeof v?.label === "string" ? v.label.trim() : "";
+        if (!label) throw new Error(`Variant #${idx + 1} needs a label (e.g. "180g" or "Set of 3")`);
+        const price = parseFiniteNumber(v?.price);
+        if (price === null || price <= 0) throw new Error(`Variant "${label}" needs a price greater than 0`);
+        const hasStock = v?.stock !== undefined && v?.stock !== null && v?.stock !== "";
+        const parsedStock = hasStock ? parseNonNegativeInteger(v.stock) : undefined;
+        if (hasStock && parsedStock === null) {
+            throw new Error(`Variant "${label}"'s stock must be a non-negative whole number`);
+        }
+        return parsedStock !== undefined && parsedStock !== null ? { label, price, stock: parsedStock } : { label, price };
+    });
 };
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, priceByRole, slug: requestedSlug, metaTitle, metaDescription } = req.body;
+        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof title !== "string" || !title.trim() || price === undefined || price === null || price === "") {
             return errorHandler(res, 400, "Please provide the required fields", true)
         }
@@ -73,13 +75,21 @@ export const createProduct = async (req: Request, res: Response) => {
         if (stockNum === null) {
             return errorHandler(res, 400, "Stock must be a non-negative whole number", true)
         }
+        if (collectionTag && !isValidCollectionTag(collectionTag)) {
+            return errorHandler(res, 400, `Collection tag must be one of: ${PRODUCT_COLLECTION_TAGS.join(", ")}`, true)
+        }
+        let variantRows: { label: string; price: number; stock?: number }[] | null;
+        try {
+            variantRows = parseVariantsInput(variants);
+        } catch (e: any) {
+            return errorHandler(res, 400, e.message, true);
+        }
 
         const slug = await buildUniqueProductSlug(typeof requestedSlug === "string" && requestedSlug.trim() ? requestedSlug.trim() : title.trim());
 
         const newProduct = await prisma.product.create({
-            data: { title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [],categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null }
+            data: { title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [],categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null, variants: variantRows && variantRows.length > 0 ? variantRows : undefined }
         });
-        await savePriceOverrides(newProduct.id, priceByRole);
         return errorHandler(res, 200, "Tha product has been created successfully!", false, newProduct)
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error!", true);
@@ -90,8 +100,8 @@ export const createProduct = async (req: Request, res: Response) => {
 export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id, title, price, description, colors, sizes, discount,
-            more_details, categoryId, subcategoryId, stock, images, videos, isActive, priceByRole,
-            slug: requestedSlug, metaTitle, metaDescription } = req.body;
+            more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants,
+            slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
 
     if (typeof id !== "string" || !id.trim()) return errorHandler(res, 400, "Product id is required", true);
     const existing = await prisma.product.findUnique({ where: { id } });
@@ -120,6 +130,17 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (title !== undefined && (typeof title !== "string" || !title.trim())) {
       return errorHandler(res, 400, "Title cannot be blank", true);
     }
+    // Empty string/null clears the tag; anything else must be a known value.
+    if (collectionTag !== undefined && collectionTag && !isValidCollectionTag(collectionTag)) {
+      return errorHandler(res, 400, `Collection tag must be one of: ${PRODUCT_COLLECTION_TAGS.join(", ")}`, true);
+    }
+    // undefined = leave untouched; null/[] = clear; anything else validated below.
+    let variantRows: { label: string; price: number; stock?: number }[] | null | undefined;
+    try {
+      variantRows = variants !== undefined ? parseVariantsInput(variants) : undefined;
+    } catch (e: any) {
+      return errorHandler(res, 400, e.message, true);
+    }
 
     // Slug only changes when the admin explicitly edits it — unlike the
     // title, it's never silently regenerated, since a live product link
@@ -145,11 +166,12 @@ export const updateProduct = async (req: Request, res: Response) => {
         videos,
         isActive,
         slug,
+        collectionTag: collectionTag !== undefined ? (collectionTag || null) : undefined,
+        variants: variantRows !== undefined ? (variantRows && variantRows.length > 0 ? variantRows : Prisma.JsonNull) : undefined,
         metaTitle: metaTitle !== undefined ? (metaTitle || null) : undefined,
         metaDescription: metaDescription !== undefined ? (metaDescription || null) : undefined,
       },
     });
-    await savePriceOverrides(id, priceByRole);
     return errorHandler(res, 200, "Product updated successfully", false, updated);
   } catch (error: any) {
     return errorHandler(res, 500, error.message);
@@ -186,7 +208,6 @@ export const duplicateProduct = async (req: Request, res: Response) => {
 
         const source = await prisma.product.findUnique({ where: { id } });
         if (!source) return errorHandler(res, 404, "Product not found");
-        const sourcePriceOverrides = await prisma.priceOverride.findMany({ where: { productId: id } });
 
         const title = `${source.title} (Copy)`;
         const slug = await buildUniqueProductSlug(title);
@@ -215,18 +236,10 @@ export const duplicateProduct = async (req: Request, res: Response) => {
                 slug,
                 metaTitle: source.metaTitle,
                 metaDescription: source.metaDescription,
+                collectionTag: source.collectionTag,
+                variants: source.variants as any,
             },
         });
-
-        if (sourcePriceOverrides.length > 0) {
-            await prisma.priceOverride.createMany({
-                data: sourcePriceOverrides.map((override) => ({
-                    productId: duplicate.id,
-                    role: override.role,
-                    price: override.price,
-                })),
-            });
-        }
 
         return errorHandler(res, 200, "Product duplicated successfully!", false, duplicate);
     } catch (error: any) {
@@ -254,8 +267,7 @@ export const getProductDetails = async (req: AuthRequest, res: Response) => {
             return errorHandler(res, 404, "Product not found");
         }
 
-        const role = await getViewerRole(req.userId);
-        const [withPrice] = await attachDisplayPrices([existingProduct], role, req.userId);
+        const [withPrice] = attachDisplayPrices([existingProduct]);
         return errorHandler(res, 200, "Product retrieved successfully", false, withPrice);
     } catch (error: any) {
         console.error("Product details error:", error);
@@ -274,8 +286,7 @@ export const getProductsBySubcategory = async (req: AuthRequest, res: Response) 
       orderBy: { createdAt: "desc" },
       include: { category: true, subcategory: true },
     });
-    const role = await getViewerRole(req.userId);
-    const withPrices = await attachDisplayPrices(products, role, req.userId);
+    const withPrices = attachDisplayPrices(products);
     return errorHandler(res, 200, "Products fetched", false, withPrices);
   } catch (error: any) {
     return errorHandler(res, 500, error.message || "internal server error");
@@ -287,8 +298,7 @@ export const getAllProductDetails = async (req: AuthRequest, res: Response) => {
     try {
         const allProducts = await prisma.product.findMany({ where: { isActive: true, deletedAt: null } });
         if (!allProducts) return errorHandler(res, 404, "Products not found!");
-        const role = await getViewerRole(req.userId);
-        const withPrices = await attachDisplayPrices(allProducts, role, req.userId);
+        const withPrices = attachDisplayPrices(allProducts);
         return errorHandler(res, 200, "The product got successfully!", false, withPrices);
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error!", true);
@@ -341,6 +351,7 @@ export const searchProducts = async (req: AuthRequest, res: Response) => {
   try {
     const {
       q, category, subcategory, minPrice, maxPrice, inStock, absorbency,
+      collectionTag,
       sort,
       page = "1", limit = "20"
     } = req.query;
@@ -382,6 +393,12 @@ export const searchProducts = async (req: AuthRequest, res: Response) => {
       where.absorbency = absorbency;
     }
 
+    // Collection tag filter — powers the home page's New Arrivals / Best
+    // Seller / Combo Package strips and their "explore" links.
+    if (collectionTag && typeof collectionTag === "string" && isValidCollectionTag(collectionTag)) {
+      where.collectionTag = collectionTag;
+    }
+
     // Price range
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
@@ -414,8 +431,7 @@ export const searchProducts = async (req: AuthRequest, res: Response) => {
     ]);
 
     const totalNoPage = Math.ceil(totalCount / take);
-    const role = await getViewerRole(req.userId);
-    const withPrices = await attachDisplayPrices(products, role, req.userId);
+    const withPrices = attachDisplayPrices(products);
 
     res.json({
       success: true,
@@ -438,8 +454,7 @@ export const getProductsByCategory = async (req: AuthRequest, res: Response) => 
             where: { categoryId: id, isActive: true, deletedAt: null },
             orderBy: { createdAt: "desc" },
         });
-        const role = await getViewerRole(req.userId);
-        const withPrices = await attachDisplayPrices(products, role, req.userId);
+        const withPrices = attachDisplayPrices(products);
         return errorHandler(res, 200, "Products fetched", false, withPrices);
     } catch (error: any) {
         return errorHandler(res, 500, error.message);

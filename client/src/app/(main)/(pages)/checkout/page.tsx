@@ -6,7 +6,6 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { createCheckoutSession, clearStripeUrl, placeOrder } from "@/redux/slices/orderSlice";
 import { fetchCart } from "@/redux/slices/cartSlice";
 import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
-import { planForDays } from "@/config/subscriptionPlans";
 import toast from "react-hot-toast";
 
 interface FormData {
@@ -149,10 +148,7 @@ const CheckoutPage = () => {
   let subtotal = 0;
   for (const item of cart.items) {
     const price = (item as any).displayPrice ?? item.product.price;
-    const subscriptionPlan = planForDays(item.subscriptionIntervalDays);
-    const effectivePct = subscriptionPlan ? subscriptionPlan.discountPct : 0;
-    const discountedPrice = price - (price * effectivePct) / 100;
-    subtotal += discountedPrice * item.quantity;
+    subtotal += price * item.quantity;
   }
 
   const shippingCost = subtotal >= FREE_DELIVERY_THRESHOLD
@@ -284,7 +280,9 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-[13.5px] text-title truncate">{item.product.title}</div>
-                    <div className="text-[11.5px] text-accent font-light mt-0.5">Qty {item.quantity}</div>
+                    <div className="text-[11.5px] text-accent font-light mt-0.5">
+                      {item.variantLabel ? `${item.variantLabel} · ` : ''}Qty {item.quantity}
+                    </div>
                   </div>
                   <div className="text-[13.5px] whitespace-nowrap">{DisplayPriceInBdt(((item as any).displayPrice ?? item.product.price) * item.quantity)}</div>
                 </div>

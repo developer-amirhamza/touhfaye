@@ -51,6 +51,9 @@ async function main() {
     keyFeatures: string[];
     isFeatured?: boolean;
     stock?: number;
+    // Priced size/weight/pack options for the SIZE picker — omit for a
+    // plain single-price product (see Product.variants).
+    variants?: { label: string; price: number }[];
   };
 
   const products: Seed[] = [
@@ -76,6 +79,11 @@ async function main() {
       pack: "120g tin · burns 18 hours",
       keyFeatures: ["Soy wax blend", "18 hour burn", "Printed steel tin"],
       isFeatured: true,
+      variants: [
+        { label: "180g", price: 250 },
+        { label: "120g", price: 155 },
+        { label: "Set of 3", price: 650 },
+      ],
     },
     {
       title: "Mandala Trio Combo",
@@ -271,6 +279,7 @@ async function main() {
       keyFeatures: p.keyFeatures,
       isFeatured: p.isFeatured ?? false,
       isActive: true,
+      variants: p.variants ?? undefined,
     };
     if (existing) {
       await prisma.product.update({ where: { id: existing.id }, data });

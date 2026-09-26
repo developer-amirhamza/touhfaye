@@ -55,7 +55,8 @@ const ProductDetailsPage = () => {
     });
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(0);
-    const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    // "" = the product's own base price (no variant picked/needed).
+    const [selectedVariantLabel, setSelectedVariantLabel] = useState('');
     const [qty, setQty] = useState(1);
     const [addingToBag, setAddingToBag] = useState(false);
 
@@ -82,7 +83,7 @@ const ProductDetailsPage = () => {
             });
             if (response.data?.success) {
                 setData(response.data?.data);
-                setSelectedSize(response.data?.data?.sizes?.[0] ?? null);
+                setSelectedVariantLabel(response.data?.data?.variants?.[0]?.label ?? '');
             }
         } catch (error) {
             AxiosToastError(error);
@@ -126,7 +127,7 @@ const ProductDetailsPage = () => {
         if (addingToBag) return;
         setAddingToBag(true);
         try {
-            const resultAction = await dispatch(addToCart({ productId: data.id, quantity: qty }));
+            const resultAction = await dispatch(addToCart({ productId: data.id, quantity: qty, variantLabel: selectedVariantLabel || undefined }));
             if (addToCart.fulfilled.match(resultAction)) {
                 toast.success("Added to bag");
             } else {
@@ -190,7 +191,10 @@ const ProductDetailsPage = () => {
         return <div className="container mx-auto p-4">Loading...</div>;
     }
 
-    const finalPrice = getDisplayPrice(data);
+    // The selected variant's own price if the product has one matching the
+    // current selection, else the product's own discount-adjusted price.
+    const activeVariant = data.variants?.find((v: any) => v.label === selectedVariantLabel);
+    const finalPrice = activeVariant ? activeVariant.price : getDisplayPrice(data);
 
     // Specifications are built only from fields that actually have data —
     // nothing here is invented copy, unlike the design mock's fixed rows.
@@ -299,18 +303,32 @@ const ProductDetailsPage = () => {
                         </div>
                     )}
 
-                    {data.sizes?.length > 0 && (
+                    {data.variants?.length > 0 ? (
                         <div className="mt-6">
-                            <div className="text-[11px] tracking-[.2em] text-title">SELECT SIZE</div>
+                            <div className="text-[11px] tracking-[.2em] text-title">SIZE</div>
+                            <div className="flex gap-2.5 mt-3 flex-wrap">
+                                {data.variants.map((variant: any) => (
+                                    <button
+                                        key={variant.label}
+                                        onClick={() => setSelectedVariantLabel(variant.label)}
+                                        className={`border px-4.5 py-3 min-w-23 text-left transition-colors ${selectedVariantLabel === variant.label ? 'bg-secondary text-background border-secondary' : 'bg-transparent text-title border-primary-hover hover:border-secondary'}`}
+                                    >
+                                        <div className="text-[13.5px]">{variant.label}</div>
+                                        <div className={`text-[11px] mt-0.5 ${selectedVariantLabel === variant.label ? 'text-background/70' : 'text-accent'}`}>
+                                            {DisplayPriceInBdt(variant.price)}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    ) : data.sizes?.length > 0 && (
+                        <div className="mt-6">
+                            <div className="text-[11px] tracking-[.2em] text-title">SIZE</div>
                             <div className="flex gap-2.5 mt-3 flex-wrap">
                                 {data.sizes.map((size: string) => (
-                                    <button
-                                        key={size}
-                                        onClick={() => setSelectedSize(size)}
-                                        className={`border px-4.5 py-3 min-w-23 text-left transition-colors ${selectedSize === size ? 'bg-secondary text-background border-secondary' : 'bg-transparent text-title border-primary-hover hover:border-secondary'}`}
-                                    >
+                                    <div key={size} className="border px-4.5 py-3 min-w-23 text-left bg-transparent text-title border-primary-hover">
                                         <div className="text-[13.5px]">{size}</div>
-                                    </button>
+                                    </div>
                                 ))}
                             </div>
                         </div>

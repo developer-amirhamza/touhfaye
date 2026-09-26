@@ -54,6 +54,7 @@ const ProductsContent = () => {
     const absorbency = searchParams.get('absorbency') || '';
     const inStockOnly = searchParams.get('inStock') === 'true';
     const maxPrice = searchParams.get('maxPrice') || '';
+    const collectionTag = searchParams.get('collectionTag') || '';
     const sort = searchParams.get('sort') || 'newest';
 
     const PRICE_CEILING = 3000;
@@ -118,6 +119,7 @@ const ProductsContent = () => {
             if (absorbency) params.absorbency = absorbency;
             if (inStockOnly) params.inStock = 'true';
             if (maxPrice) params.maxPrice = maxPrice;
+            if (collectionTag) params.collectionTag = collectionTag;
             if (sort) params.sort = sort;
 
             const response = await Axios({ ...SummeryApi.searchProduct, params });
@@ -144,14 +146,14 @@ const ProductsContent = () => {
         } finally {
             setLoading(false);
         }
-    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, sort, page]);
+    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, collectionTag, sort, page]);
 
     // Reset pagination whenever a filter changes.
     useEffect(() => {
         setPage(1);
         setProducts([]);
         setHasMore(true);
-    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, sort]);
+    }, [textSearch, categoryId, subcategoryId, absorbency, inStockOnly, maxPrice, collectionTag, sort]);
 
     useEffect(() => {
         fetchProducts();

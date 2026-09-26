@@ -30,16 +30,6 @@ export type Role = (typeof ROLES)[keyof typeof ROLES];
 // orders and delivery-site routes.
 export const TRADE_FAMILY: string[] = [ROLES.TRADE, ROLES.RETAILER, ROLES.DISTRIBUTOR];
 
-// The roles a product's admin form exposes a dedicated price field for —
-// each becomes a PriceOverride row when set, resolved via resolveUnitPrice.
-export const PRICE_OVERRIDE_ROLES: string[] = [
-  ROLES.TRADE,
-  ROLES.RETAILER,
-  ROLES.DISTRIBUTOR,
-  ROLES.NDIS_COORDINATOR,
-  ROLES.CONSUMER,
-];
-
 // Normalise legacy values: "USER" was the old consumer role.
 export const normaliseRole = (role?: string | null): string =>
   role === "USER" || !role ? ROLES.CONSUMER : role;

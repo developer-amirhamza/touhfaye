@@ -9,6 +9,7 @@ import { SummeryApi } from '@/app/common/SummeryApi';
 import AxiosToastError from '@/utils/AxiosToastError';
 import toast from 'react-hot-toast';
 import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt';
+import { collectionTagLabel } from '@/app/common/productCollections';
 
 interface Product {
   id: string;
@@ -19,6 +20,7 @@ interface Product {
   category?: { title: string };
   images: string[];
   createdAt: string;
+  collectionTag?: string | null;
 }
 
 const AdminProductsPage = () => {
@@ -174,6 +176,11 @@ const AdminProductsPage = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap font-medium line-clamp-1 max-w-30 text-gray-900">
                     {product.title}
+                    {product.collectionTag && (
+                      <span className="ml-2 inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-800 align-middle">
+                        {collectionTagLabel(product.collectionTag)}
+                      </span>
+                    )}
                   </td>
                   {/* <td className="px-6 py-4 whitespace-nowrap text-gray-500">
                     {product.category?.title || '—'}

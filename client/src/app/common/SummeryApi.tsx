@@ -364,17 +364,6 @@ deleteSubcategory: {
     approveApplication: { url: "/api/account-applications/approve", method: "put" },
     rejectApplication: { url: "/api/account-applications/reject", method: "put" },
 
-    // ── Pricing engine ──
-    getPricingSettings: { url: "/api/pricing/settings", method: "get" },
-    updatePricingSettings: { url: "/api/pricing/settings", method: "put" },
-    listPricingTiers: { url: "/api/pricing/tiers", method: "get" },
-    upsertPricingTier: { url: "/api/pricing/tiers", method: "put" },
-    deletePricingTier: { url: "/api/pricing/tiers", method: "delete" },
-    listPriceOverrides: { url: "/api/pricing/overrides", method: "get" },
-    upsertPriceOverride: { url: "/api/pricing/overrides", method: "put" },
-    deletePriceOverride: { url: "/api/pricing/overrides", method: "delete" },
-    quoteUnitPrice: { url: "/api/pricing/quote", method: "get" },
-
     // ── NDIS quotes ──
     previewQuote: { url: "/api/quotes/preview", method: "post" },
     createQuote: { url: "/api/quotes", method: "post" },
@@ -402,13 +391,10 @@ deleteSubcategory: {
     upsertSubscription: { url: "/api/subscriptions", method: "put" },
     oneClickReorder: { url: "/api/subscriptions/reorder", method: "post" },
 
-    // ── Phase 3: multi-site, negotiated pricing, deeper reporting ──
+    // ── Phase 3: multi-site delivery, deeper reporting ──
     listDeliverySites: { url: "/api/phase3/delivery-sites", method: "get" },
     upsertDeliverySite: { url: "/api/phase3/delivery-sites", method: "put" },
     deleteDeliverySite: { url: "/api/phase3/delivery-sites", method: "delete" },
-    listNegotiatedPrices: { url: "/api/phase3/negotiated-prices", method: "get" },
-    upsertNegotiatedPrice: { url: "/api/phase3/negotiated-prices", method: "put" },
-    deleteNegotiatedPrice: { url: "/api/phase3/negotiated-prices", method: "delete" },
     getReport: { url: "/api/phase3/report", method: "get" },
 
 };

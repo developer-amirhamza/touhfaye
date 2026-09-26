@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { fetchCategories } from '@/redux/slices/categorySlice';
 import { fetchSubcategoriesByCategory } from '@/redux/slices/subcategorySlice';
 import ImageUploader from '../../../components/ImageUploader';
-import RolePricingFields from '../../RolePricingFields';
+import { PRODUCT_COLLECTION_OPTIONS } from '@/app/common/productCollections';
 
 interface MoreDetails {
   [key: string]: string;
@@ -20,6 +20,11 @@ interface Subcategory {
   id: string;
   title: string;
   slug: string;
+}
+
+interface Variant {
+  label: string;
+  price: string;
 }
 
 const ProductEditPage = () => {
@@ -39,12 +44,15 @@ const ProductEditPage = () => {
   const [sizes, setSizes] = useState<string[]>([]);
   const [sizeInput, setSizeInput] = useState('');
   const [discount, setDiscount] = useState('');
-  const [priceByRole, setPriceByRole] = useState<Record<string, string>>({});
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [variantLabelInput, setVariantLabelInput] = useState('');
+  const [variantPriceInput, setVariantPriceInput] = useState('');
   const [moreDetails, setMoreDetails] = useState<MoreDetails>({});
   const [detailKey, setDetailKey] = useState('');
   const [detailValue, setDetailValue] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [subcategoryId, setSubcategoryId] = useState('');
+  const [collectionTag, setCollectionTag] = useState('');
   const [stock, setStock] = useState('');
   const [images, setImages] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
@@ -87,6 +95,7 @@ const ProductEditPage = () => {
           setMoreDetails(product.more_details || {});
           setCategoryId(product.categoryId || '');
           setSubcategoryId(product.subcategoryId || '');
+          setCollectionTag(product.collectionTag || '');
           setStock(product.stock?.toString() || '');
           setImages(product.images || []);
           setIsActive(product.isActive ?? true);
@@ -94,6 +103,8 @@ const ProductEditPage = () => {
           setAbsorbency(product.absorbency || '');
           setPricingNotes(product.pricingNotes || '');
           setKeyFeatures(product.keyFeatures || []);
+          const productVariants = Array.isArray(product.variants) ? product.variants : [];
+          setVariants(productVariants.map((v: any) => ({ label: v.label, price: String(v.price) })));
         } else {
           toast.error('Failed to load product');
           router.push('/admin/products');
@@ -106,16 +117,6 @@ const ProductEditPage = () => {
       }
     };
     fetchProduct();
-
-    Axios({ ...SummeryApi.listPriceOverrides, params: { productId } })
-      .then((res) => {
-        if (res.data?.success) {
-          const byRole: Record<string, string> = {};
-          for (const o of res.data.data || []) byRole[o.role] = String(o.price);
-          setPriceByRole(byRole);
-        }
-      })
-      .catch(() => { /* role prices are optional — the form just starts blank */ });
   }, [productId, router]);
 
   // Fetch subcategories when category changes
@@ -145,6 +146,19 @@ const ProductEditPage = () => {
   };
   const removeSize = (size: string) => {
     setSizes(sizes.filter(s => s !== size));
+  };
+
+  const addVariant = () => {
+    const label = variantLabelInput.trim();
+    const price = variantPriceInput.trim();
+    if (!label || !price || Number(price) <= 0) return;
+    if (variants.some(v => v.label === label)) return;
+    setVariants([...variants, { label, price }]);
+    setVariantLabelInput('');
+    setVariantPriceInput('');
+  };
+  const removeVariant = (label: string) => {
+    setVariants(variants.filter(v => v.label !== label));
   };
 
   const addMoreDetail = () => {
@@ -205,7 +219,8 @@ const ProductEditPage = () => {
       absorbency: absorbency || undefined,
       pricingNotes: pricingNotes || undefined,
       keyFeatures: keyFeatures.length ? keyFeatures : undefined,
-      priceByRole,
+      variants: variants.map(v => ({ label: v.label, price: parseFloat(v.price) })),
+      collectionTag: collectionTag || null,
     };
 
     try {
@@ -288,10 +303,40 @@ const ProductEditPage = () => {
           </div>
         </div>
 
-        <RolePricingFields
-          values={priceByRole}
-          onChange={(role, value) => setPriceByRole((prev) => ({ ...prev, [role]: value }))}
-        />
+        {/* Priced options — the product page's SIZE picker */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Priced options (optional)</label>
+          <p className="text-xs text-neutral-500 mb-2">
+            Different sizes, weights, or pack/combo/bundle options, each with its own price
+            (e.g. &quot;180g&quot; ৳250, &quot;120g&quot; ৳155, &quot;Set of 3&quot; ৳650). Leave empty for a single-price product.
+          </p>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              value={variantLabelInput}
+              onChange={(e) => setVariantLabelInput(e.target.value)}
+              placeholder="e.g., 180g or Set of 3"
+              className="flex-1 border rounded px-3 py-2"
+            />
+            <input
+              type="number"
+              step="0.01"
+              value={variantPriceInput}
+              onChange={(e) => setVariantPriceInput(e.target.value)}
+              placeholder="Price"
+              className="w-32 border rounded px-3 py-2"
+            />
+            <button type="button" onClick={addVariant} className="bg-blue-600 text-white px-4 rounded">Add</button>
+          </div>
+          <div className="space-y-1">
+            {variants.map((v) => (
+              <div key={v.label} className="bg-gray-50 p-2 rounded flex justify-between items-center">
+                <span><strong>{v.label}</strong> — {v.price}</span>
+                <button type="button" onClick={() => removeVariant(v.label)} className="text-red-500">✕</button>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Category */}
         <div>
@@ -329,6 +374,22 @@ const ProductEditPage = () => {
             )}
           </div>
         )}
+
+        {/* Home page collection strip (optional) */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Home page collection (optional)</label>
+          <select
+            value={collectionTag}
+            onChange={(e) => setCollectionTag(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+          >
+            <option value="">-- Not featured in a collection --</option>
+            {PRODUCT_COLLECTION_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <p className="text-xs text-neutral-500 mt-1">Shows this product in that section on the home page.</p>
+        </div>
 
         {/* Colors */}
         <div>

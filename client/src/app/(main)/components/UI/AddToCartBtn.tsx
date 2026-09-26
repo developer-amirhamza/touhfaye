@@ -9,9 +9,13 @@ import Loader from './Loader';
 
 interface Type {
     data: any;
+    // Which priced option (Product.variants[].label) to add — omit for a
+    // plain single-price product, or to quick-add a product with variants
+    // at its first/default option (matches the server's own default).
+    variantLabel?: string;
 }
 
-const AddToCartButton: React.FC<Type> = ({ data }) => {
+const AddToCartButton: React.FC<Type> = ({ data, variantLabel }) => {
     const [loading, setLoading] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
     const [quantity, setQuantity] = useState(0);
@@ -19,6 +23,10 @@ const AddToCartButton: React.FC<Type> = ({ data }) => {
 
     const dispatch = useDispatch<AppDispatch>();
     const { cart, status } = useSelector((state: RootState) => state.cartSlice);
+
+    // A product with variants always has one selected — default to the
+    // first, mirroring the server's own default when none is passed.
+    const effectiveVariantLabel = variantLabel ?? (data?.variants?.[0]?.label ?? "");
 
     // Fetch cart on mount if idle
     useEffect(() => {
@@ -30,7 +38,9 @@ const AddToCartButton: React.FC<Type> = ({ data }) => {
     // Update local state when cart changes
     useEffect(() => {
         if (cart?.items?.[0]) {
-            const found = cart.items.find((item) => item?.product?.id === data?.id);
+            const found = cart.items.find(
+                (item) => item?.product?.id === data?.id && (item.variantLabel || "") === effectiveVariantLabel
+            );
             setIsAvailable(!!found);
             setQuantity(found?.quantity || 0);
             setCartItemDetails(found);
@@ -39,7 +49,7 @@ const AddToCartButton: React.FC<Type> = ({ data }) => {
             setQuantity(0);
             setCartItemDetails(null);
         }
-    }, [cart, data?.id]);
+    }, [cart, data?.id, effectiveVariantLabel]);
 
     // Add to cart
     const handleAddToCart = async (e: React.MouseEvent) => {
@@ -48,7 +58,7 @@ const AddToCartButton: React.FC<Type> = ({ data }) => {
         if (loading) return;
         setLoading(true);
         try {
-            const resultAction = await dispatch(addToCart({ productId: data?.id, quantity: 1 }));
+            const resultAction = await dispatch(addToCart({ productId: data?.id, quantity: 1, variantLabel: effectiveVariantLabel || undefined }));
             if (addToCart.fulfilled.match(resultAction)) {
                 toast.success("Added to cart");
             } else {

@@ -13,10 +13,15 @@ export interface CartItem {
         images: string[];
         stock: number;
         discount:number,
+        variants?: { label: string; price: number }[];
     };
     quantity: number;
-    // Set when the shopper chose "Subscribe & Save" for this line (days).
-    subscriptionIntervalDays?: number | null;
+    // "" for a plain single-price product, else the picked variant's label
+    // (e.g. "180g", "Set of 3") — see Product.variants.
+    variantLabel: string;
+    // Server-resolved unit price for this line's variant (or the product's
+    // own discount-adjusted price when there's no variant).
+    displayPrice: number;
 }
 
 interface Cart {
@@ -52,13 +57,13 @@ export const fetchCart = createAsyncThunk(
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (
-        { productId, quantity, subscriptionIntervalDays }: { productId: string; quantity: number; subscriptionIntervalDays?: number | null },
+        { productId, quantity, variantLabel }: { productId: string; quantity: number; variantLabel?: string },
         { rejectWithValue }
     ) => {
         try {
             const response = await Axios({
                 ...SummeryApi.addCart,
-                data: { productId, quantity, subscriptionIntervalDays },
+                data: { productId, quantity, variantLabel },
             });
             return response.data?.data; // updated cart
         } catch (error: any) {
@@ -70,13 +75,13 @@ export const addToCart = createAsyncThunk(
 export const updateCartItem = createAsyncThunk(
     "cart/updateCartItem",
     async (
-        { itemId, quantity, subscriptionIntervalDays }: { itemId: string; quantity: number; subscriptionIntervalDays?: number | null },
+        { itemId, quantity }: { itemId: string; quantity: number },
         { rejectWithValue }
     ) => {
         try {
             const response = await Axios({
                 ...SummeryApi.updateCart,
-                data: { itemId, quantity, subscriptionIntervalDays },
+                data: { itemId, quantity },
             });
             return response.data?.data; // updated cart
         } catch (error: any) {

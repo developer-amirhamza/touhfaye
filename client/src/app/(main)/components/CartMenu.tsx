@@ -11,7 +11,6 @@ import Image from 'next/image';
 import { AppDispatch, RootState } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 import { fetchCart } from '@/redux/slices/cartSlice';
-import { planForDays } from '@/config/subscriptionPlans';
 import { motion } from 'framer-motion';
 
 interface Type {
@@ -37,27 +36,17 @@ const CartMenu: React.FC<Type> = ({ close }) => {
         }
     };
 
-    // Calculate totals
-    let subtotal = 0;
+    // Calculate totals — displayPrice is the server-resolved unit price for
+    // each line (its own variant price, or the product's discount-adjusted
+    // main price).
     let totalQty = 0;
-    let totalDiscount = 0;
     let grandTotal = 0;
 
     if (cart?.items?.length) {
         for (const item of cart.items) {
-            // displayPrice is already the buyer's own role price (or the
-            // main price minus its retail discount) — only the "Subscribe &
-            // Save" interval discount still needs applying on top of it here.
             const price = (item as any).displayPrice ?? item.product.price;
-            const subscriptionPlan = planForDays((item as any).subscriptionIntervalDays);
-            const effectivePct = subscriptionPlan ? subscriptionPlan.discountPct : 0;
-            const discountedPrice = price - (price * effectivePct) / 100;
-            const itemTotal = discountedPrice * item.quantity;
-            const itemOriginalTotal = price * item.quantity;
-            subtotal += itemOriginalTotal;
             totalQty += item.quantity;
-            totalDiscount += itemOriginalTotal - itemTotal;
-            grandTotal += itemTotal;
+            grandTotal += price * item.quantity;
         }
     }
 
@@ -89,10 +78,6 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                 <div className="flex-1 overflow-y-scroll flex flex-col px-2">
                     {cart?.items?.[0] ? (
                         <div>
-                            <div className="flex items-center justify-between px-4 py-2 mt-2 bg-primary-hover rounded-full text-sm text-title font-semibold">
-                                <p>Your total savings</p>
-                                <p>{DisplayPriceInBdt(totalDiscount)}</p>
-                            </div>
                             <div className="grid gap-4 overflow-y-auto p-4 flex-1">
                                 {cart?.items?.map((item: any) => (
                                     <div key={item.id} className="flex w-full gap-2 bg-white rounded border-primary-hover items-center px-2 Border border justify-between">
@@ -105,25 +90,15 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                                         </div>
                                         <div className="w-full text-xs max-w-sm">
                                             <p className="text-ellipsis text-title line-clamp-2">{item.product.title}</p>
-                                            <p className="text-paragraph">{item.product.unit}</p>
-                                            <p className="font-semibold text-paragraph">
-                                                {DisplayPriceInBdt(
-                                                    (() => {
-                                                        const price = (item as any).displayPrice ?? item.product.price;
-                                                        const plan = planForDays((item as any).subscriptionIntervalDays);
-                                                        const pct = plan ? plan.discountPct : 0;
-                                                        return price - (price * pct) / 100;
-                                                    })()
-                                                )}
-                                            </p>
-                                            {(item as any).subscriptionIntervalDays && (
-                                                <span className="inline-block mt-1 text-[10px] font-medium text-title bg-blue-100 px-1.5 py-0.5 rounded-full">
-                                                    Subscribed
-                                                </span>
+                                            {item.variantLabel && (
+                                                <p className="text-paragraph">{item.variantLabel}</p>
                                             )}
+                                            <p className="font-semibold text-paragraph">
+                                                {DisplayPriceInBdt((item as any).displayPrice ?? item.product.price)}
+                                            </p>
                                         </div>
                                         <div>
-                                            <AddToCartButton data={item.product} />
+                                            <AddToCartButton data={item.product} variantLabel={item.variantLabel} />
                                         </div>
                                     </div>
                                 ))}
@@ -146,16 +121,6 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                     <div className="flex flex-col bg-primary-hover border-t-2 border-primary-hover  mx-auto mt-auto w-full">
                         <div className="grid px-4 py-1  rounded">
                             <h1 className="font-semibold text-title">Bill Details</h1>
-                            <div className="flex items-center justify-between font-semibold">
-                                <p className="text-paragraph text-sm">Sub Total:</p>
-                                <p className="text-paragraph text-sm">{DisplayPriceInBdt(subtotal)}</p>
-                            </div>
-                            <div className="flex items-center justify-between font-semibold">
-                                <p className="text-paragraph text-sm">Discount:</p>
-                                <p className="text-paragraph text-sm line-through">
-                                    {DisplayPriceInBdt(totalDiscount)}
-                                </p>
-                            </div>
                             <div className="flex items-center justify-between font-semibold">
                                 <p className="text-paragraph text-sm">Total Quantity:</p>
                                 <p className="text-paragraph text-sm">{totalQty} Items</p>

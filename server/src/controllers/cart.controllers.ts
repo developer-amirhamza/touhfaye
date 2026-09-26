@@ -2,31 +2,23 @@ import crypto from "crypto";
 import { errorHandler } from "../utils/errorHandler";
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
-import { getViewerRole, resolveUnitPrice } from "../services/pricing";
+import { resolveProductPrice } from "../services/pricing";
 
 interface AuthRequest extends Request {
     userId?: string
 }
 
-// Attaches a role-resolved `displayPrice` to each cart line (at that line's
-// own quantity, so wholesale volume tiers are reflected), so every client
-// that renders the cart shows the same price the buyer will actually be
-// charged — instead of each page recomputing its own discount math from the
-// raw product row.
-const hydrateCart = async (cart: any, userId?: string | null) => {
+// Attaches each cart line's current unit price — the line's own variant
+// price if it has one, else the product's discount-adjusted retail price —
+// so every client that renders the cart shows the same price the buyer will
+// actually be charged, computed fresh from the product's current price
+// rather than trusting a possibly stale value.
+const hydrateCart = (cart: any) => {
     if (!cart) return cart;
-    const role = await getViewerRole(userId);
-    const items = await Promise.all(
-        cart.items.map(async (item: any) => ({
-            ...item,
-            displayPrice: await resolveUnitPrice({
-                productId: item.productId,
-                role,
-                quantity: item.quantity,
-                userId,
-            }),
-        }))
-    );
+    const items = cart.items.map((item: any) => ({
+        ...item,
+        displayPrice: resolveProductPrice(item.product, item.variantLabel),
+    }));
     return { ...cart, items };
 };
 
@@ -67,7 +59,7 @@ export const getOrCreateCart = async (token: string, userId?: string) => {
 
 export const addToCart = async (req: AuthRequest, res: Response) => {
     try {
-        const { productId, quantity = "1", subscriptionIntervalDays } = req.body;
+        const { productId, quantity = "1", variantLabel } = req.body;
         if (!productId) return errorHandler(res, 404, "Product id is required!");
         const product = await prisma.product.findFirst({
             where: { id: productId, isActive: true }
@@ -75,28 +67,36 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
 
         if (!product) return errorHandler(res, 404, "The product not found!");
 
+        // A product with variants always has one selected — default to the
+        // first (matches the product page's own pre-selected size). An
+        // explicit label must match one of the product's real variants.
+        const variants = Array.isArray(product.variants) ? (product.variants as any[]) : [];
+        let effectiveLabel = "";
+        if (variants.length > 0) {
+            const requested = typeof variantLabel === "string" ? variantLabel.trim() : "";
+            const match = requested ? variants.find((v) => v?.label === requested) : variants[0];
+            if (!match) return errorHandler(res, 400, "That option is no longer available for this product.");
+            effectiveLabel = match.label;
+        }
+        const unitPrice = resolveProductPrice(product, effectiveLabel);
+
         const token = await getCartToken(req, res)
         const userId = req.userId as string | undefined;
 
         let cart: any = await getOrCreateCart(token, userId);
 
-        // null/undefined = one-time purchase; any other value clears any
-        // previous "Subscribe & Save" choice for this line.
-        const intervalDays =
-            subscriptionIntervalDays === undefined ? undefined : (Number(subscriptionIntervalDays) || null);
-
         const existingItem = await prisma.cartItem.findUnique({
-            where: { cartId_productId: { cartId: cart.id, productId } },
+            where: { cartId_productId_variantLabel: { cartId: cart.id, productId, variantLabel: effectiveLabel } },
         });
 
         if (existingItem) {
             await prisma.cartItem.update({
                 where: { id: existingItem.id },
-                data: { quantity: parseInt(quantity), subscriptionIntervalDays: intervalDays }   // parse quantity
+                data: { quantity: parseInt(quantity), variantPrice: unitPrice },
             });
         } else {
             await prisma.cartItem.create({
-                data: { cartId: cart.id, productId, quantity, subscriptionIntervalDays: intervalDays ?? null },
+                data: { cartId: cart.id, productId, quantity, variantLabel: effectiveLabel, variantPrice: unitPrice },
             });
         }
 
@@ -105,7 +105,7 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
             include: { items: { include: { product: true } } }
         })
 
-        return errorHandler(res, 200, "The cart added successfully", false, await hydrateCart(updatedCart, userId));
+        return errorHandler(res, 200, "The cart added successfully", false, hydrateCart(updatedCart));
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error!")
     }
@@ -119,7 +119,7 @@ export const getCart = async (req: AuthRequest, res: Response) => {
         const token = await getCartToken(req, res);
         const userId = req.userId as string | undefined;
         const cart = await getOrCreateCart(token, userId)
-        return errorHandler(res, 200, "The cart got successfully", false, await hydrateCart(cart, userId))
+        return errorHandler(res, 200, "The cart got successfully", false, hydrateCart(cart))
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error!")
     }
@@ -128,7 +128,7 @@ export const getCart = async (req: AuthRequest, res: Response) => {
 
 export const updateCartItem = async (req: AuthRequest, res: Response) => {
     try {
-        const { quantity, itemId, subscriptionIntervalDays } = req.body;
+        const { quantity, itemId } = req.body;
         if (!itemId) return errorHandler(res, 400, "itemId is required");
         if (quantity < 1) return errorHandler(res, 400, "The cart quantity must be at least 1");
 
@@ -145,13 +145,9 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
         const owns = userId ? existing.cart.userId === userId : existing.cart.token === token;
         if (!owns) return errorHandler(res, 403, "Unauthorized");
 
-        const data: any = { quantity };
-        if (subscriptionIntervalDays !== undefined) {
-            data.subscriptionIntervalDays = Number(subscriptionIntervalDays) || null;
-        }
         const item = await prisma.cartItem.update({
             where: { id: itemId },
-            data,
+            data: { quantity },
             include: { cart: true }
         });
 
@@ -160,7 +156,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
             include: { items: { include: { product: true } } }
         })
 
-        return errorHandler(res, 200, "The cart item updated successfully!", false, await hydrateCart(updatedItem, userId));
+        return errorHandler(res, 200, "The cart item updated successfully!", false, hydrateCart(updatedItem));
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "internal server error!")
     }
@@ -189,7 +185,7 @@ export const deleteCartItem = async (req: AuthRequest, res: Response) => {
             where: { id: cartId },
             include: { items: { include: { product: true } } }
         })
-        return errorHandler(res, 200, "The Cart Item has been deleted successfully!", false, await hydrateCart(updatedCartItem, userId));
+        return errorHandler(res, 200, "The Cart Item has been deleted successfully!", false, hydrateCart(updatedCartItem));
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "internal server error!")
     }
@@ -219,7 +215,13 @@ export const mergeCartAfterLogin = async (req: AuthRequest, res: Response) => {
 
         for (const guestItem of guestCart.items) {
             const existingUserItem = await prisma.cartItem.findUnique({
-                where: { cartId_productId: { cartId: userCart.id, productId: guestItem.productId } }
+                where: {
+                    cartId_productId_variantLabel: {
+                        cartId: userCart.id,
+                        productId: guestItem.productId,
+                        variantLabel: guestItem.variantLabel,
+                    },
+                },
             });
 
             if (existingUserItem) {
@@ -234,6 +236,8 @@ export const mergeCartAfterLogin = async (req: AuthRequest, res: Response) => {
                         cartId: userCart.id,
                         productId: guestItem.productId,
                         quantity: guestItem.quantity,
+                        variantLabel: guestItem.variantLabel,
+                        variantPrice: guestItem.variantPrice,
                     }
                 })
             }
@@ -252,7 +256,7 @@ export const mergeCartAfterLogin = async (req: AuthRequest, res: Response) => {
             include: { items: { include: { product: true } } }
         });
 
-        return errorHandler(res, 200, "Guest Cart merged successfully!", false, await hydrateCart(mergedCart, userId));
+        return errorHandler(res, 200, "Guest Cart merged successfully!", false, hydrateCart(mergedCart));
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error")
     }
