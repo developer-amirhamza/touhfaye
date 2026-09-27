@@ -11,7 +11,7 @@ export default function MainLayout({
     <>
       <Header />
       {/* Site-wide GSAP cursor + hover effects (desktop only) */}
-      <CursorEffects />
+      {/* <CursorEffects /> */}
       {children}
       <Footer />
     </>
