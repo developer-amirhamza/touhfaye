@@ -272,12 +272,10 @@ const ProductCreatePage = () => {
                     </div>
                 </div>
 
-<<<<<<< HEAD
                 {/* <RolePricingFields
                     values={priceByRole}
                     onChange={(role, value) => setPriceByRole((prev) => ({ ...prev, [role]: value }))}
                 /> */}
-=======
                 {/* Priced options — the product page's SIZE picker */}
                 <div>
                     <label className="block text-sm font-medium mb-1">Priced options (optional)</label>
@@ -312,7 +310,6 @@ const ProductCreatePage = () => {
                         ))}
                     </div>
                 </div>
->>>>>>> origin/claude/first-pr-workflow-5de81d
 
                 {/* Category */}
                 <div>
