@@ -13,9 +13,13 @@ interface Type {
     // plain single-price product, or to quick-add a product with variants
     // at its first/default option (matches the server's own default).
     variantLabel?: string;
+    // Full-width outlined style used by the product list grid (matches the
+    // design mock's "ADD TO BAG" quick-add strip) instead of the compact
+    // pill/stepper used elsewhere (cart drawer, product detail, etc).
+    fullWidth?: boolean;
 }
 
-const AddToCartButton: React.FC<Type> = ({ data, variantLabel }) => {
+const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
     const [loading, setLoading] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
     const [quantity, setQuantity] = useState(0);
@@ -114,6 +118,38 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel }) => {
             }
         }
     };
+
+    if (fullWidth) {
+        return (
+            <div>
+                {isAvailable ? (
+                    <div className="flex items-center justify-between w-full border border-secondary">
+                        <button
+                            onClick={decreaseQty}
+                            className="w-9 h-9 flex items-center justify-center text-secondary hover:bg-primary transition-colors cursor-pointer"
+                        >
+                            <FaMinus size={11} />
+                        </button>
+                        <p className="text-[13.5px] font-medium text-secondary">{quantity}</p>
+                        <button
+                            onClick={increaseQty}
+                            className="w-9 h-9 flex items-center justify-center text-secondary hover:bg-primary transition-colors cursor-pointer"
+                        >
+                            <FaPlus size={11} />
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={handleAddToCart}
+                        className="w-full border border-secondary text-secondary uppercase text-[11px] tracking-[.16em] py-2.75 hover:bg-secondary hover:text-background transition-colors cursor-pointer disabled:opacity-60"
+                        disabled={loading}
+                    >
+                        {loading ? <Loader className="max-h-5 max-w-5 mx-auto" /> : "Add to bag"}
+                    </button>
+                )}
+            </div>
+        );
+    }
 
     return (
         <div>

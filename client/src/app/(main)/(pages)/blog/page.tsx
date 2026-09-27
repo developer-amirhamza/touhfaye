@@ -20,12 +20,12 @@ interface Blog {
   views: number;
 }
 
-const meta = (blog: Blog) => {
-  const date = blog.publishedAt
+const formatDate = (blog: Blog) =>
+  blog.publishedAt
     ? new Date(blog.publishedAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
-  return [`${blog.readTime ?? 5} min read`, date].filter(Boolean).join(' · ');
-};
+
+const readLabel = (blog: Blog) => `${blog.readTime ?? 5} min read`;
 
 const BlogPage = () => {
   return (
@@ -86,103 +86,152 @@ const BlogPageContent = () => {
     router.replace(c ? `/blog?category=${encodeURIComponent(c)}` : '/blog');
   };
 
+  const lead = blogs[0];
+  const rest = blogs.slice(1);
+
+  const storyCount = blogs.length + (blogs.length === 1 ? ' story' : ' stories');
+
+  const CardImage = ({ blog }: { blog: Blog }) => (
+    <div className="relative bg-primary overflow-hidden" style={{ aspectRatio: '16/10' }}>
+      {blog.featuredImage ? (
+        <img src={blog.featuredImage} alt={blog.title} className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-title/20 text-4xl font-secondary">
+          {blog.title[0]}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="bg-background min-h-screen">
-      <div className="container mx-auto px-6 py-8">
-        <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Blog' }]} />
-      </div>
-
-      <div className="container mx-auto px-6 pb-6 text-center">
-        <span className="bg-primary text-accent font-medium rounded-full px-4.5 py-2 text-sm tracking-wide">
-          Product Stories
-        </span>
-        <h1 className="font-secondary text-4xl md:text-5xl text-text-hover tracking-tight mt-4">
-          Candle care, gifting notes and studio stories
-        </h1>
-        <p className="text-base md:text-lg text-text max-w-xl mx-auto mt-2 font-light">
-          Notes on burning a candle properly, choosing a gift for someone you hardly know, and what happens on our packing table.
+      {/* Hero */}
+      <section className="max-w-310 mx-auto px-5 sm:px-7 pt-10 pb-7.5 grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-8 md:gap-11 items-end">
+        <div>
+          <Breadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Stories' }]} />
+          <h1 className="font-secondary text-4xl md:text-5xl lg:text-[56px] leading-[1.04] text-title mt-3">
+            Product stories
+          </h1>
+        </div>
+        <p className="text-[15px] leading-[1.75] text-foreground font-light max-w-[44ch] mb-1.5">
+          Notes on burning a candle properly, choosing a gift for someone you hardly know, and what happens on our packing table before a parcel leaves.
         </p>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-6 pb-14">
-        <div className="flex gap-2.5 flex-wrap justify-center mb-10">
+      {/* Category tabs + count */}
+      <div className="max-w-310 mx-auto px-5 sm:px-7 pb-6.5 flex justify-between items-center gap-4 flex-wrap border-b border-primary-hover">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => selectCategory(null)}
-            className={`font-semibold rounded-full px-5 py-2 text-sm border transition-colors ${
+            className={`px-4.5 py-2.25 text-[12px] tracking-[.1em] border transition-colors ${
               category === null
-                ? 'bg-secondary text-background border-secondary'
-                : 'bg-white text-text-hover border-primary-hover hover:border-secondary'
+                ? 'bg-secondary text-secondary-light border-secondary'
+                : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'
             }`}
           >
-            All
+            All stories
           </button>
           {categories.map((c) => (
             <button
               key={c}
               onClick={() => selectCategory(c)}
-              className={`font-semibold rounded-full px-5 py-2 text-sm border transition-colors ${
+              className={`px-4.5 py-2.25 text-[12px] tracking-[.1em] border transition-colors ${
                 category === c
-                  ? 'bg-secondary text-background border-secondary'
-                  : 'bg-white text-text-hover border-primary-hover hover:border-secondary'
+                  ? 'bg-secondary text-secondary-light border-secondary'
+                  : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'
               }`}
             >
               {c}
             </button>
           ))}
         </div>
+        <div className="text-[12.5px] text-foreground font-light">{storyCount}</div>
+      </div>
 
+      <div className="max-w-310 mx-auto px-5 sm:px-7 pb-16">
         {loading ? (
           <div className="flex justify-center py-20"><Loader /></div>
         ) : blogs.length === 0 ? (
-          <p className="text-center text-text py-20">No articles here yet — check back soon.</p>
+          <p className="text-center text-foreground py-20">No articles here yet — check back soon.</p>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blogs.map((blog) => (
-                <Link
-                  key={blog.id}
-                  href={`/blog/${blog.slug}`}
-                  className="bg-background border border-primary-hover overflow-hidden flex flex-col hover:border-accent transition-colors"
-                >
-                  <div className="relative h-48 bg-primary">
-                    {blog.featuredImage ? (
-                      <img src={blog.featuredImage} alt={blog.title} className="absolute inset-0 w-full h-full object-cover" />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-secondary/30 text-4xl font-secondary">
-                        {blog.title[0]}
+            {/* Featured lead story */}
+            <Link
+              href={`/blog/${lead.slug}`}
+              className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr] gap-8 md:gap-10 items-center bg-secondary-light p-6 md:p-7.5 mt-9"
+            >
+              <CardImage blog={lead} />
+              <div>
+                <div className="flex gap-3.5 items-center text-[10px] tracking-[.18em] text-accent">
+                  {lead.category && <span>{lead.category}</span>}
+                  <span className="text-[#AEA795] tracking-[.08em]">{formatDate(lead)}</span>
+                </div>
+                <h2 className="font-secondary text-2xl md:text-[32px] leading-[1.18] text-title mt-4">
+                  {lead.title}
+                </h2>
+                {lead.excerpt && (
+                  <p className="text-[14.5px] leading-[1.75] text-foreground font-light mt-3.5 max-w-[44ch]">
+                    {lead.excerpt}
+                  </p>
+                )}
+                <div className="flex items-center gap-4 mt-5.5">
+                  <span className="text-[10.5px] tracking-[.18em] text-title border-b border-title pb-0.75">
+                    READ THE POST
+                  </span>
+                  <span className="text-xs text-[#AEA795] font-light">{readLabel(lead)}</span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Remaining stories grid */}
+            {rest.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6.5 mt-12">
+                {rest.map((blog) => (
+                  <Link
+                    key={blog.id}
+                    href={`/blog/${blog.slug}`}
+                    className="border border-primary-hover bg-background flex flex-col hover:border-[#BDB29A] transition-colors"
+                  >
+                    <CardImage blog={blog} />
+                    <div className="p-5.5 flex flex-col gap-2.5 flex-1">
+                      <div className="flex justify-between gap-3 text-[10px] tracking-[.18em] text-accent">
+                        {blog.category && <span>{blog.category}</span>}
+                        <span className="text-[#AEA795] tracking-[.08em]">{formatDate(blog)}</span>
                       </div>
-                    )}
-                  </div>
-                  <div className="p-6 flex flex-col gap-2 flex-1">
-                    {blog.category && (
-                      <span className="text-secondary font-semibold text-sm">{blog.category}</span>
-                    )}
-                    <h2 className="font-secondary text-2xl leading-tight line-clamp-2">{blog.title}</h2>
-                    {blog.excerpt && <p className="text-text leading-relaxed line-clamp-2 flex-1">{blog.excerpt}</p>}
-                    <span className="text-sm text-text mt-1">
-                      {meta(blog)} · <span className="text-secondary font-semibold">Read →</span>
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                      <div className="font-secondary text-lg leading-snug text-title line-clamp-2">
+                        {blog.title}
+                      </div>
+                      {blog.excerpt && (
+                        <p className="text-[13px] leading-[1.7] text-foreground font-light line-clamp-2">
+                          {blog.excerpt}
+                        </p>
+                      )}
+                      <div className="flex justify-between items-baseline gap-3 mt-auto pt-2.5">
+                        <span className="text-[10.5px] tracking-[.18em] text-title">READ →</span>
+                        <span className="text-[11.5px] text-[#AEA795] font-light">{readLabel(blog)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
 
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-3 mt-12">
+              <div className="flex justify-center items-center gap-3 mt-14">
                 <button
                   disabled={page === 1}
                   onClick={() => setPage((p) => p - 1)}
-                  className="rounded-full border border-primary-hover px-5 py-2.5 font-semibold text-sm text-text-hover hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
+                  className="border border-primary-hover px-5 py-2.5 text-[12px] tracking-[.1em] text-title hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
                 >
-                  ← Prev
+                  ← PREV
                 </button>
-                <span className="text-sm text-text">Page {page} of {totalPages}</span>
+                <span className="text-[12.5px] text-foreground font-light">Page {page} of {totalPages}</span>
                 <button
                   disabled={page === totalPages}
                   onClick={() => setPage((p) => p + 1)}
-                  className="rounded-full border border-primary-hover px-5 py-2.5 font-semibold text-sm text-text-hover hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
+                  className="border border-primary-hover px-5 py-2.5 text-[12px] tracking-[.1em] text-title hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
                 >
-                  Next →
+                  NEXT →
                 </button>
               </div>
             )}
@@ -191,7 +240,7 @@ const BlogPageContent = () => {
 
         {faqs.length > 0 && (
           <div className="border-t border-primary-hover mt-14 pt-10">
-            <h2 className="font-secondary text-2xl text-text-hover mb-5">Frequently asked questions</h2>
+            <h2 className="font-secondary text-2xl text-title mb-5">Frequently asked questions</h2>
             <FaqAccordion faqs={faqs} />
           </div>
         )}

@@ -398,12 +398,11 @@ const ProductsContent = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                             {loading && page === 1
                                 ? loadingArrayCard.map((_, idx) => (
-                                    <div key={idx} className="rounded-2xl overflow-hidden animate-pulse bg-white border border-primary-hover">
-                                        <div className="h-47.5 bg-secondary-light" />
-                                        <div className="p-5 flex flex-col gap-2.5">
-                                            <div className="h-4 rounded w-1/2 bg-secondary-light" />
-                                            <div className="h-5 rounded w-3/4 bg-secondary-light" />
-                                            <div className="h-4 rounded w-1/3 bg-secondary-light" />
+                                    <div key={idx} className="flex flex-col pb-4 bg-white shadow-[0_1px_2px_rgba(18,40,28,0.06),0_8px_24px_rgba(18,40,28,0.08)] animate-pulse">
+                                        <div className="bg-secondary-light" style={{ aspectRatio: '4/5' }} />
+                                        <div className="flex flex-col gap-2.5 px-4 mt-3.75">
+                                            <div className="h-4 rounded w-3/4 bg-secondary-light" />
+                                            <div className="h-3 rounded w-1/3 bg-secondary-light" />
                                         </div>
                                     </div>
                                 ))
@@ -412,69 +411,62 @@ const ProductsContent = () => {
                                     const discount = Number(product.discount ?? 0);
                                     const finalPrice = getDisplayPrice(product);
                                     const hasDiscount = discount > 0;
-                                    const chip = product.absorbency || product.category?.title;
+                                    const sub = product.sizes && product.sizes.length > 0
+                                        ? (product.sizes.length > 1 ? `${product.sizes.length} sizes available` : product.sizes[0])
+                                        : (product.pack || product.absorbency || product.category?.title || '');
                                     return (
                                         <div
                                             key={product.id}
-                                            className="flex flex-col bg-white rounded-2xl overflow-hidden border border-primary-hover transition-transform hover:-translate-y-1 hover:shadow-xl"
+                                            className="flex flex-col pb-4 bg-white shadow-[0_1px_2px_rgba(18,40,28,0.06),0_8px_24px_rgba(18,40,28,0.08)] hover:shadow-[0_2px_4px_rgba(18,40,28,0.08),0_16px_36px_rgba(18,40,28,0.14)] hover:-translate-y-0.5 transition-all duration-200"
                                         >
                                             {/* Image and title are their own links; AddToCartButton and
                                                 FavoriteButton stay outside the <a> since they render their
                                                 own <button>s and interactive content can't nest inside
                                                 interactive content. */}
-                                            <div className="relative w-full h-47.5 border-b border-primary-hover">
-                                                <Link href={url} className="absolute inset-0 flex items-center justify-center overflow-hidden bg-white">
+                                            <div className="relative bg-primary overflow-hidden" style={{ aspectRatio: '4/5' }}>
+                                                <Link href={url} className="absolute inset-0 block">
                                                     <img
                                                         src={product.images?.[0]}
                                                         alt={product.title}
-                                                        className="max-w-[86%] max-h-[88%] object-contain"
+                                                        className="w-full h-full object-cover"
                                                     />
-                                                    {(hasDiscount || product.isFeatured) && (
-                                                        <span className={`absolute top-3 left-3 text-background text-xs font-semibold rounded-full px-3 py-1 ${hasDiscount ? 'bg-[#d9772e]' : 'bg-secondary'}`}>
-                                                            {hasDiscount ? `Save ${discount}%` : 'Bestseller'}
-                                                        </span>
-                                                    )}
-                                                    <span className="absolute bottom-2.5 right-3 text-xs font-semibold rounded-full px-3 py-1 bg-white/94 text-secondary">
-                                                        View details →
-                                                    </span>
                                                 </Link>
+                                                {(hasDiscount || product.isFeatured) && (
+                                                    <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 pointer-events-none">
+                                                        {hasDiscount && (
+                                                            <span className="bg-background text-[9.5px] tracking-[.16em] px-2.25 py-1.5 text-accent">
+                                                                {discount}% OFF
+                                                            </span>
+                                                        )}
+                                                        {product.isFeatured && !hasDiscount && (
+                                                            <span className="bg-background text-[9.5px] tracking-[.16em] px-2.25 py-1.5 text-accent">
+                                                                BESTSELLER
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
                                                 <FavoriteButton
                                                     product={product}
                                                     size={16}
-                                                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/94 hover:bg-white flex items-center justify-center text-secondary shadow-sm transition-colors"
+                                                    className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-background/94 hover:bg-white flex items-center justify-center text-title shadow-sm transition-colors"
                                                 />
                                             </div>
-                                            <div className="p-5 flex flex-col flex-1">
-                                                {chip && (
-                                                    <span className="self-start bg-secondary-light text-secondary line-clamp-1 font-semibold rounded-full px-3 py-1 text-sm">
-                                                        {chip}
-                                                    </span>
-                                                )}
-                                                <Link href={url} className="font-secondary text-xl line-clamp-1 leading-tight text-text-hover mt-2.5 mb-1">
+
+                                            <div className="flex justify-between items-baseline gap-2.5 mt-3.75 px-4">
+                                                <Link href={url} className="font-secondary text-[16.5px] leading-tight text-title line-clamp-1">
                                                     {product.title}
                                                 </Link>
-                                                {product.sizes && product.sizes.length > 0 && (
-                                                    <span className="text-sm text-text mb-1">
-                                                        {product.sizes.length > 1 ? `Sizes ${product.sizes.join(', ')}` : product.sizes[0]}
-                                                    </span>
-                                                )}
-                                                {product.stock === 0 && (
-                                                    <span className="text-sm font-semibold text-red-600">Out of stock</span>
-                                                )}
-                                                <div className="flex justify-between items-end mt-auto pt-3">
-                                                    <div>
-                                                        <b className="text-xl text-text-hover">{DisplayPriceInBdt(finalPrice)}</b>
-                                                        {/* {hasDiscount && (
-                                                            <div className="text-sm line-through text-text">
-                                                                {DisplayPriceInBdt(Number(product.price ?? 0))}
-                                                            </div>
-                                                        )} */}
-                                                        {product.pack && (
-                                                            <div className="text-sm text-text">{product.pack}</div>
-                                                        )}
-                                                    </div>
-                                                    <AddToCartButton data={product} />
-                                                </div>
+                                                <span className="text-sm text-paragraph whitespace-nowrap">{DisplayPriceInBdt(finalPrice)}</span>
+                                            </div>
+
+                                            <div className="text-xs text-accent mt-1.25 font-light px-4 min-h-4">
+                                                {product.stock === 0 ? (
+                                                    <span className="text-red-600 font-medium">Out of stock</span>
+                                                ) : sub}
+                                            </div>
+
+                                            <div className="px-4 mt-3.5">
+                                                <AddToCartButton data={product} fullWidth />
                                             </div>
                                         </div>
                                     );
