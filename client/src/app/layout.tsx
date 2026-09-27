@@ -15,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <head>
-        <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+        <link rel="shortcut icon" href="favicon.jpeg" type="image/x-icon" />
         {/* Loaded as a runtime <link>, not a CSS @import, so the build
             pipeline never needs to fetch it — matches how the Touhfaye
             design source itself loads these two fonts. */}
