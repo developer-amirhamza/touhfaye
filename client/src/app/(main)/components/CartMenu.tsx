@@ -63,7 +63,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                 transition={{ type: "spring", stiffness: 320, damping: 34 }}
                 className="bg-primary w-full max-w-sm h-screen ml-auto flex flex-col">
                 <div className="px-3 py-2 shadow-md flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-title">Your Cart</h2>
+                    <h2 className="text-xl font-semibold text-title">Your Bag</h2>
                     {/* <Link href="/" className="text-2xl lg:hidden hover:bg-orange-600 border p-0.5 rounded hover:text-white text-neutral-700">
                         <IoClose />
                     </Link> */}
@@ -106,7 +106,7 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                         </div>
                     ) : (
                         <div className="flex w-full flex-col items-center justify-center h-full">
-                            <Image src={emptyCart} className="object-scale-down" alt="empty-cart" />
+                            <Image src={emptyCart} className="object-scale-down" alt="empty bag" />
                             <Link
                                 href="/"
                                 onClick={close}

@@ -3,7 +3,7 @@ import Image from 'next/image'
 import React, { useEffect, useState, useRef } from 'react'
 import { FaBars, FaTimes, FaChevronDown, FaTruck, FaRegUser, FaSearch } from 'react-icons/fa'
 import logo from "@/assets/touhfaye-logo.png"
-import { BsCart4 } from 'react-icons/bs'
+import { BsBagFill } from 'react-icons/bs'
 import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/redux/store'
@@ -11,7 +11,6 @@ import { fetchCart } from '@/redux/slices/cartSlice'
 import { fetchUser } from '@/redux/slices/userSlices'
 import { fetchCategories } from '@/redux/slices/categorySlice'
 import { hydrateFavorites, loadFavoritesFromStorage } from '@/redux/slices/favoriteSlice'
-import { DisplayPriceInBdt } from '@/utils/DisplayPriceInBdt'
 import CartMenu from './CartMenu'
 import FavoritesDrawer from './FavoritesDrawer'
 import Search from './Search'
@@ -40,27 +39,12 @@ const Header = () => {
     const [openCartMenu, setOpenCartMenu] = useState(false)
     const [openFavorites, setOpenFavorites] = useState(false)
     const [showUserMenu, setShowUserMenu] = useState(false)
-    const [topbarVisible, setTopbarVisible] = useState(true)
     const [shopOpen, setShopOpen] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [trackOrderOpen, setTrackOrderOpen] = useState(false)
     const [cartPulsing, setCartPulsing] = useState(false)
     const shopRef = useRef<HTMLDivElement>(null)
     const prevCartCount = useRef<number | null>(null)
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY === 0) {
-                setTopbarVisible(true)
-            } else {
-                setTopbarVisible(false)
-            }
-        }
-        window.addEventListener("scroll", handleScroll)
-        return () => {
-            window.removeEventListener("scroll", handleScroll)
-        }
-    }, [])
 
     useEffect(() => {
         if (status === 'idle') dispatch(fetchCart())
@@ -100,10 +84,6 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClick)
     }, [shopOpen])
 
-    const subtotal = cart?.items?.reduce(
-        (sum, item) => sum + ((item as any).displayPrice ?? item.product.price) * item.quantity, 0
-    ) ?? 0
-
     const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
 
     // Pulse the cart icon when an item is added — but not on first load, when
@@ -122,10 +102,7 @@ const Header = () => {
         <div className="sticky top-0 z-50">
 
             {/* Top bar — a single static tracked line, matching the design mock */}
-            <div
-                className={`bg-secondary text-secondary-light text-center overflow-hidden transition-all duration-300
-                    ${topbarVisible ? "max-h-10 opacity-100" : "max-h-0 opacity-0"}`}
-            >
+            <div className="bg-secondary text-secondary-light text-center">
                 <div className="px-4 py-2.5 text-[11.5px] tracking-[.16em] whitespace-nowrap overflow-x-auto no-scrollbar">
                     FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳1500 · CASH ON DELIVERY · bKash · Nagad
                 </div>
@@ -276,24 +253,21 @@ const Header = () => {
                             </button>
                         )}
 
-                        {/* Cart */}
+                        {/* Bag */}
                         <button
                             onClick={() => setOpenCartMenu(true)}
+                            title="Bag"
+                            aria-label="Bag"
                             className="relative flex items-center gap-2 p-2 hover:text-secondary transition-colors"
                         >
                             <span className={`relative flex ${cartPulsing ? 'cart-pulse' : ''}`}>
-                                <BsCart4 size={20} />
+                                <BsBagFill size={19} />
                                 {cartCount > 0 && (
                                     <span className="absolute -top-2 -right-2.5 min-w-4.5 h-4.5 px-1 bg-secondary text-secondary-light text-[9.5px] font-medium flex items-center justify-center rounded-full border-[1.5px] border-background">
                                         {cartCount}
                                     </span>
                                 )}
                             </span>
-                            {cart?.items?.[0] && (
-                                <span className="hidden sm:inline text-[11px] tracking-[.1em] text-title">
-                                    {DisplayPriceInBdt(subtotal)}
-                                </span>
-                            )}
                         </button>
                     </div>
                 </div>
