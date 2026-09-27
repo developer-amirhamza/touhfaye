@@ -52,10 +52,12 @@ app.use("/api/blogs", blogRouter);
 app.use("/api/testimonials", testimonialRouter);
 
 app.use("/api/enquiries", enquiryRouter);
+
 app.use("/api/health", healthRouter);
 app.use("/api/team-tasks", teamTaskRouter);
 app.use("/api/waitlist", waitlistRouter);
 app.use("/api/image", uploadImageRouter);
+
 app.use("/api/faqs", faqRouter);
 
 

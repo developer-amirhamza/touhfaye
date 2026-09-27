@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { adminNavItems } from "@/config/page";
 import Link from "next/link";
+import user_placeholder from "./user.webp"
+import Image from "next/image";
 
 interface Props {
     activeSidebar: boolean;
@@ -28,10 +30,10 @@ const AdminSidebar: React.FC<Props> = ({ activeSidebar }) => {
 
             {/* User */}
             <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10">
-                <img
+                <Image
                     className="w-10 h-10 rounded-full object-cover shrink-0"
-                    src={user?.avatar || `https://themewagon.github.io/pluto/images/layout_img/user_img.jpg`}
-                    alt=""
+                    src={user?.avatar || user_placeholder}
+                    alt="user"
                 />
                 <div className={`${activeSidebar ? "flex flex-col" : "hidden"} min-w-0`}>
                     <span className="text-white text-sm font-medium capitalize flex gap-2 truncate">{`${user?.firstName} ${user?.lastName} `  || "N/A"}</span>

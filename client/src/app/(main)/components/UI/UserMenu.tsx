@@ -17,13 +17,7 @@ interface Type {
     close: any
 }
 
-const portalPaths = [
-    {label:"Trade Portal", path:"/portal/trade"},
-    {label:"Retailer Portal", path:"/portal/retailer"},
-    {label:"Distributor Portal", path:"/portal/distributor"},
-    {label:"NDIS Portal", path:"/portal/ndis"},
-    {label:"Consumer Portal", path:"/portal/consumer"},
-];
+
 
 const UserMenu: React.FC<Type> = ({ close }) => {
     const dispatch = useDispatch();
@@ -86,17 +80,7 @@ const UserMenu: React.FC<Type> = ({ close }) => {
                             {role === ROLES.TRADE ? "Trade Portal" : "NDIS Portal"}
                         </Link>
                     )}
-                    {teamPortal && portalPaths.map((item,idx)=>(
-                        <Link
-                            key={idx}
-                            onClick={handleCloseMenu}
-                            href={item.path}
-                            className="text-text-hover hover:text-text px-2 font-medium text-sm cursor-pointer hover:bg-primary flex items-center gap-2"
-                        >
-                            <FaStore size={16} />
-                            {item.label}
-                        </Link>
-                    ))}
+                    
 
                     <Link
                         onClick={handleCloseMenu}
