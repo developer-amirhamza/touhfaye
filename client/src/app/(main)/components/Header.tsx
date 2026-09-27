@@ -109,7 +109,7 @@ const Header = () => {
             </div>
 
             {/* Main navbar */}
-            <div className="bg-background/95 w-full backdrop-blur-md border-b border-primary-hover">
+            <div className="bg-background/85  w-full backdrop-blur-lg border-b border-primary-hover">
                 <div className="max-w-[1240px] mx-auto w-full grid grid-cols-[auto_1fr_auto] lg:grid-cols-[1fr_auto_1fr] items-center gap-8 px-4 sm:px-7 py-3">
 
                     {/* Left — mobile menu toggle + nav links */}

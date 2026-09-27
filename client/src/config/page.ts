@@ -1,8 +1,7 @@
 
 import { basket, discreet, doctor, drop, home_post, home_post1, home_post2, repeat, return_box, speedy } from "@/assets"
-import { FaHome, FaNewspaper } from "react-icons/fa"
+import { FaNewspaper } from "react-icons/fa"
 import { FaCartFlatbedSuitcase, FaUsersGear } from "react-icons/fa6";
-import { RiArticleFill, RiPriceTag2Fill } from "react-icons/ri"
 import { AiFillDashboard, AiFillProduct } from "react-icons/ai";
 import { GrArticle } from "react-icons/gr";
 import { MdCategory, MdReviews, MdTaskAlt, MdOutlinePendingActions, MdSchool, MdForum, MdHelp, MdReceiptLong, MdInventory } from "react-icons/md"
@@ -51,7 +50,7 @@ export const adminNavItems = [
     },
 
     {
-        label: "Blogs",
+        label: "Stories",
         icon: GrArticle,
         path: "/admin/blogs"
         // ]
@@ -85,11 +84,6 @@ export const adminNavItems = [
         label: "Contact",
         icon: FaNewspaper,
         path: "/admin/admin-contact",
-    },
-    {
-        label: "Reddit Feed",
-        icon: MdForum,
-        path: "/admin/reddit-posts",
     },
     {
         label: "FAQs",
