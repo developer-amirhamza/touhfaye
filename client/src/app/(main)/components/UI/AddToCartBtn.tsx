@@ -60,7 +60,7 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel }) => {
         try {
             const resultAction = await dispatch(addToCart({ productId: data?.id, quantity: 1, variantLabel: effectiveVariantLabel || undefined }));
             if (addToCart.fulfilled.match(resultAction)) {
-                toast.success("Added to cart");
+                toast.success("Added to bag");
             } else {
                 toast.error(resultAction.payload as string || "Failed to add");
             }
