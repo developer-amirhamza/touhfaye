@@ -11,7 +11,7 @@ const FEATURES = [
 const Spotlight = () => {
     return (
         <section className="container mx-auto px-6 py-14">
-            <div className="grid md:grid-cols-2 gap-10 items-center bg-primary p-9">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-primary p-9">
                 <div className="aspect-square bg-[url('/touhfaye/signature-candle.jpg')] bg-cover bg-center" />
                 <div>
                     <div className="text-[10.5px] tracking-[.24em] text-accent">SIGNATURE CANDLE</div>

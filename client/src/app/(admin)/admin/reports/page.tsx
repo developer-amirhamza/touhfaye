@@ -209,7 +209,7 @@ export default function AdminReportsPage() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <Kpi label="Total revenue" value={money(stats.totalRevenue)} />
         <Kpi label="Orders" value={String(stats.orderCount)} />
         <Kpi
@@ -224,7 +224,7 @@ export default function AdminReportsPage() {
         {Object.keys(stats.byChannel).length === 0 ? (
           <p className="text-sm text-gray-400">No orders in this period.</p>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {Object.entries(stats.byChannel).map(([ch, v]) => (
               <div key={ch} className="border border-gray-100 rounded-lg p-4">
                 <p className="text-xs uppercase tracking-wide text-gray-400">{ch}</p>

@@ -48,13 +48,13 @@ export default function CartPage() {
           <span className="text-[13px] text-accent font-light">{cartCount} item{cartCount === 1 ? "" : "s"}</span>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_330px] gap-10 mt-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-10 mt-8 items-start">
           <div className="min-w-0">
-            <div className="grid grid-cols-[1fr_110px_90px_24px] gap-3.5 pb-3 border-b border-secondary text-[10.5px] tracking-[.18em] text-accent">
+            <div className="hidden sm:grid grid-cols-[1fr_110px_90px_24px] gap-3.5 pb-3 border-b border-secondary text-[10.5px] tracking-[.18em] text-accent">
               <span>ITEM</span><span>QUANTITY</span><span className="text-right">TOTAL</span><span />
             </div>
             {cart.items.map((item) => (
-              <div key={item.id} className="grid grid-cols-[1fr_110px_90px_24px] gap-3.5 items-center py-5 border-b border-primary-hover">
+              <div key={item.id} className="flex flex-col gap-3.5 sm:grid sm:grid-cols-[1fr_110px_90px_24px] sm:items-center py-5 border-b border-primary-hover">
                 <div className="flex gap-4 items-center min-w-0">
                   <div className="w-16 aspect-[4/5] flex-none bg-primary overflow-hidden">
                     {item.product.images?.[0] && (
@@ -69,13 +69,17 @@ export default function CartPage() {
                     <div className="text-[13px] text-foreground font-light mt-1">{DisplayPriceInBdt(unitPrice(item))} each</div>
                   </div>
                 </div>
-                <div className="flex items-center border border-primary-hover w-fit">
-                  <button onClick={() => handleQuantityChange(item.id, item.quantity - 1)} className="w-8 h-9 flex items-center justify-center text-foreground">−</button>
-                  <span className="w-7 text-center text-sm">{item.quantity}</span>
-                  <button onClick={() => handleQuantityChange(item.id, item.quantity + 1)} className="w-8 h-9 flex items-center justify-center text-foreground">+</button>
+                <div className="flex items-center justify-between sm:contents">
+                  <div className="flex items-center border border-primary-hover w-fit">
+                    <button onClick={() => handleQuantityChange(item.id, item.quantity - 1)} className="w-8 h-9 flex items-center justify-center text-foreground">−</button>
+                    <span className="w-7 text-center text-sm">{item.quantity}</span>
+                    <button onClick={() => handleQuantityChange(item.id, item.quantity + 1)} className="w-8 h-9 flex items-center justify-center text-foreground">+</button>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right text-[15px]">{DisplayPriceInBdt(unitPrice(item) * item.quantity)}</div>
+                    <button onClick={() => handleRemove(item.id)} aria-label="Remove" className="text-accent hover:text-secondary text-lg sm:justify-self-end">×</button>
+                  </div>
                 </div>
-                <div className="text-right text-[15px]">{DisplayPriceInBdt(unitPrice(item) * item.quantity)}</div>
-                <button onClick={() => handleRemove(item.id)} aria-label="Remove" className="text-accent hover:text-secondary text-lg justify-self-end">×</button>
               </div>
             ))}
 

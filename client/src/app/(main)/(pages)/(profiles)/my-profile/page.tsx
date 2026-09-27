@@ -169,7 +169,7 @@ const ProfilePage = () => {
       <div className="container mx-auto px-6">
         <h1 className="font-secondary text-4xl text-title mb-8">Your account</h1>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Profile Sidebar */}
           <div className="bg-white border border-primary-hover p-7 text-center h-fit">
             <div className="relative mx-auto w-28 h-28 mb-4">
