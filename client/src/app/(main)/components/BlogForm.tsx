@@ -95,40 +95,43 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData, isEdit = false, blogId
     }
   };
 
+  const inputClass = "w-full border border-primary-hover rounded-lg px-3 py-2 text-title focus:outline-none focus:ring-2 focus:ring-accent-light focus:border-accent-light";
+  const labelClass = "block font-medium mb-1 text-title";
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">{isEdit ? 'Edit Blog' : 'Create New Blog'}</h1>
+      <h1 className="font-secondary text-2xl text-title mb-6">{isEdit ? 'Edit story' : 'Create new story'}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium mb-1">Title *</label>
+          <label className={labelClass}>Title *</label>
           <input
             type="text"
             name="title"
             value={form.title}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className={inputClass}
             required
           />
         </div>
         <div>
-          <label className="block font-medium mb-1">Excerpt (short description)</label>
+          <label className={labelClass}>Excerpt (short description)</label>
           <textarea
             name="excerpt"
             rows={2}
             value={form.excerpt}
             onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
+            className={inputClass}
           />
         </div>
         <div>
-          <label className="block font-medium mb-1">Content *</label>
+          <label className={labelClass}>Content *</label>
           <RichTextEditor value={form.content} onChange={(html) => setForm(prev => ({ ...prev, content: html }))} />
         </div>
         <div>
-          <label className="block font-medium mb-1">Featured Image</label>
+          <label className={labelClass}>Featured Image</label>
           <div className="flex items-center gap-3">
             {form.featuredImage && (
-              <img src={form.featuredImage} alt="Featured" className="w-20 h-20 object-cover rounded border" />
+              <img src={form.featuredImage} alt="Featured" className="w-20 h-20 object-cover rounded-lg border border-primary-hover" />
             )}
             <ImageUploader
               onUploaded={(url) => setForm(prev => ({ ...prev, featuredImage: url }))}
@@ -138,7 +141,7 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData, isEdit = false, blogId
               <button
                 type="button"
                 onClick={() => setForm(prev => ({ ...prev, featuredImage: '' }))}
-                className="text-red-500 text-sm"
+                className="text-red-600 text-sm font-medium"
               >
                 Remove
               </button>
@@ -147,25 +150,25 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData, isEdit = false, blogId
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block font-medium mb-1">Category</label>
+            <label className={labelClass}>Category</label>
             <input
               type="text"
               name="category"
               value={form.category}
               onChange={handleChange}
-              placeholder="e.g., Health, Wellness"
-              className="w-full border rounded px-3 py-2"
+              placeholder="e.g., Candle care, Gifting"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="block font-medium mb-1">Tags (comma separated)</label>
+            <label className={labelClass}>Tags (comma separated)</label>
             <input
               type="text"
               name="tags"
               value={form.tags}
               onChange={handleChange}
-              placeholder="product, review, guide"
-              className="w-full border rounded px-3 py-2"
+              placeholder="candles, gifting, studio"
+              className={inputClass}
             />
           </div>
         </div>
@@ -176,18 +179,23 @@ const BlogForm: React.FC<BlogFormProps> = ({ initialData, isEdit = false, blogId
             id="isPublished"
             checked={form.isPublished}
             onChange={handleChange}
+            className="accent-secondary"
           />
-          <label htmlFor="isPublished">Publish immediately</label>
+          <label htmlFor="isPublished" className="text-title">Publish immediately</label>
         </div>
         <div className="flex gap-3">
           <button
             type="submit"
             disabled={loading}
-            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 disabled:bg-gray-400"
+            className="bg-secondary text-secondary-light px-6 py-2 rounded-lg font-medium hover:bg-secondary-hover transition-colors disabled:opacity-60"
           >
-            {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Blog' : 'Create Blog')}
+            {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update story' : 'Create story')}
           </button>
-          <button type="button" onClick={() => router.back()} className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="border border-primary-hover text-title px-6 py-2 rounded-lg font-medium hover:bg-primary transition-colors"
+          >
             Cancel
           </button>
         </div>

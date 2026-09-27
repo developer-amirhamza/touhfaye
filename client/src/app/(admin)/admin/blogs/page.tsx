@@ -28,7 +28,7 @@ const AdminBlogsPage = () => {
     const [loading, setLoading] = useState(true);
     const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
     const [publishLoading, setPublishLoading] = useState<string | null>(null);
-    console.log(blogs,"blogs")
+
     const fetchBlogs = async () => {
         try {
             setLoading(true);
@@ -112,72 +112,72 @@ const AdminBlogsPage = () => {
     }
 
     return (
-        <div className="container mx-auto  p-4  ">
-      <div className="flex justify-between  items-center my-5 mb-6">
-        <h1 className="text-2xl font-bold">Blogs</h1>
+        <div className="container mx-auto p-4">
+            <div className="flex justify-between items-center my-5 mb-6">
+                <h1 className="font-secondary text-2xl text-title">Stories</h1>
                 <Link
                     href="/admin/blogs/create"
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                    className="bg-secondary text-secondary-light px-4 py-2 rounded-lg font-medium hover:bg-secondary-hover transition-colors"
                 >
-                    + Create New Blog
+                    + New story
                 </Link>
             </div>
 
-             <div className="overflow-x-auto bg-white rounded-lg shadow">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+            <div className="overflow-x-auto bg-white rounded-lg border border-primary-hover">
+                <table className="min-w-full divide-y divide-primary-hover">
+                    <thead className="bg-primary">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Views</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Title</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Author</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Status</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Views</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Date</th>
+                            <th className="px-6 py-3 text-left text-[11px] font-medium text-accent tracking-wider uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white divide-y divide-primary-hover">
                         {blogs.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                                    No blog posts found.
+                                <td colSpan={6} className="px-6 py-4 text-center text-foreground">
+                                    No stories found.
                                 </td>
                             </tr>
                         ) : (
                             blogs.map((blog) => (
-                                <tr key={blog.id} className="hover:bg-gray-50">
+                                <tr key={blog.id} className="hover:bg-primary/30 transition-colors">
                                     <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{blog.title}</div>
-                                        <div className="text-sm text-gray-500 line-clamp-1">{blog.excerpt || 'No excerpt'}</div>
+                                        <div className="font-secondary text-title">{blog.title}</div>
+                                        <div className="text-sm text-foreground line-clamp-1">{blog.excerpt || 'No excerpt'}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{blog.author?.name || 'Unknown'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-foreground">{blog.author?.name || 'Unknown'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <button
                                             onClick={() => togglePublish(blog)}
                                             disabled={publishLoading === blog.id}
-                                            className={`px-2 py-1 rounded text-xs font-medium ${blog.isPublished
-                                                    ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                                                    : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                                            className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${blog.isPublished
+                                                    ? 'bg-secondary/10 text-secondary hover:bg-secondary/20'
+                                                    : 'bg-accent-light/30 text-accent hover:bg-accent-light/50'
                                                 }`}
                                         >
                                             {publishLoading === blog.id ? '...' : blog.isPublished ? 'Published' : 'Draft'}
                                         </button>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">{blog.views}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-foreground">{blog.views}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-foreground">
                                         {format(new Date(blog.publishedAt || blog.createdAt), 'MMM dd, yyyy')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-3">
                                             <Link
                                                 href={`/admin/blogs/edit/${blog.id}`}
-                                                className="text-blue-600 hover:text-blue-900"
+                                                className="text-secondary hover:text-secondary-hover"
                                             >
                                                 Edit
                                             </Link>
                                             <button
                                                 onClick={() => handleDelete(blog.id)}
                                                 disabled={deleteLoading === blog.id}
-                                                className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                                                className="text-red-600 hover:text-red-800 disabled:opacity-50"
                                             >
                                                 {deleteLoading === blog.id ? '...' : 'Delete'}
                                             </button>
