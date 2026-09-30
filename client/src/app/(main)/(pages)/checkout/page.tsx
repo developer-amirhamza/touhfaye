@@ -165,11 +165,11 @@ const CheckoutPage = () => {
       <div className="container mx-auto px-6">
         <h1 className="font-secondary text-4xl text-title">Checkout</h1>
 
-        <form onSubmit={handleSubmit} className="grid lg:grid-cols-[1fr_330px] gap-10 mt-8 items-start">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-10 mt-8 items-start">
           <div className="min-w-0 flex flex-col gap-9">
             <div>
               <div className="text-[11px] tracking-[.2em] text-title border-b border-secondary pb-2.5">CONTACT</div>
-              <div className="grid sm:grid-cols-2 gap-3.5 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-4">
                 <input name="firstName" placeholder="Full name" value={form.firstName} onChange={handleInputChange} required className={`${fieldCls} sm:col-span-2`} />
                 <input name="phone" placeholder="Mobile number" value={form.phone} onChange={handleInputChange} required className={fieldCls} />
                 <input name="email" type="email" placeholder="Email" value={form.email} onChange={handleInputChange} required className={fieldCls} />
@@ -178,7 +178,7 @@ const CheckoutPage = () => {
 
             <div>
               <div className="text-[11px] tracking-[.2em] text-title border-b border-secondary pb-2.5">DELIVERY ADDRESS</div>
-              <div className="grid sm:grid-cols-3 gap-3.5 mt-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
                 <input name="addressLine" placeholder="House, road, area" value={form.addressLine} onChange={handleInputChange} required className={`${fieldCls} sm:col-span-3`} />
                 <input name="city" placeholder="City" value={form.city} onChange={handleInputChange} required className={fieldCls} />
                 <input name="district" placeholder="District" value={form.district} onChange={handleInputChange} required className={fieldCls} />
@@ -236,7 +236,7 @@ const CheckoutPage = () => {
                 })}
               </div>
               {(payMethod === "BKASH" || payMethod === "NAGAD") && (
-                <div className="grid sm:grid-cols-2 gap-3.5 mt-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-3.5">
                   <input
                     placeholder={`${payMethod === "BKASH" ? "bKash" : "Nagad"} number you paid from`}
                     value={mfsNumber}

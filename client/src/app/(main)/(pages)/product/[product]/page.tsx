@@ -223,7 +223,7 @@ const ProductDetailsPage = () => {
                 {categoryLabel && <> / {categoryLabel.toUpperCase()}</>} / {(data.title || '').toUpperCase()}
             </div>
 
-            <section className="max-w-[1240px] mx-auto px-7 pt-6.5 pb-19 grid lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-12 items-start">
+            <section className="max-w-[1240px] mx-auto px-7 pt-6.5 pb-19 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-12 items-start">
                 {/* Gallery */}
                 <div className={`grid ${data.images?.length > 1 ? 'grid-cols-[62px_minmax(0,1fr)]' : 'grid-cols-1'} gap-3`}>
                     {data.images?.length > 1 && (
