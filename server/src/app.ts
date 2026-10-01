@@ -21,13 +21,20 @@ import waitlistRouter from "./routes/waitlist.routes"
 import uploadImageRouter from "./routes/uploadImage.route"
 
 import faqRouter from "./routes/faq.routes"
+import { clientOrigins } from "./config/clientUrl";
+import { AppError } from "./middlewares/error";
 
 
 config();
 const app = express();
 app.use(cors({
-    credentials:true,
-    origin:process.env.CLIENT_URL,
+    credentials: true,
+    origin(origin, callback) {
+        if (!origin || clientOrigins.includes(origin.replace(/\/$/, ""))) {
+            return callback(null, true);
+        }
+        return callback(new AppError(403, "Origin is not allowed by CORS"));
+    },
 }))
 
 app.use(express.json());
