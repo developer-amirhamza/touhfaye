@@ -19,7 +19,7 @@ const Hero = () => {
             />
 
             <div className="relative z-10 container mx-auto px-6 py-18 w-full">
-                <div className="px-9 py-10 max-w-[460px]">
+                <div className="px-9 py-10 max-w-[460px] bg-black/10 ">
                     <span className="inline-block border border-accent-light text-accent-light text-[10px] tracking-[.2em] px-3 py-1.5">
                         NEW STOCK
                     </span>
