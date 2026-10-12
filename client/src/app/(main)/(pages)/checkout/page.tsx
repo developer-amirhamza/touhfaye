@@ -86,6 +86,13 @@ const CheckoutPage = () => {
     }
   }, [stripeUrl, dispatch]);
 
+  // Delivery method follows the selected address — "Dhaka" district means
+  // the metro delivery rate/window, anything else is "Outside Dhaka".
+  useEffect(() => {
+    if (!form.district) return;
+    setDeliveryArea(form.district.trim().toLowerCase() === "dhaka" ? "DHAKA" : "OUTSIDE");
+  }, [form.district]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
