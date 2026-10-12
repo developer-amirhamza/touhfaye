@@ -43,7 +43,7 @@ const FavoriteButton: React.FC<Props> = ({ product, className = '', size = 17 })
                 viewBox="0 0 24 24"
                 width={size}
                 height={size}
-                fill={active ? '#173124' : 'none'}
+                fill={active ? '#B01E28' : 'none'}
                 stroke="currentColor"
                 strokeWidth="1.6"
                 strokeLinejoin="round"

@@ -7,6 +7,7 @@ import { createCheckoutSession, clearStripeUrl, placeOrder } from "@/redux/slice
 import { fetchCart } from "@/redux/slices/cartSlice";
 import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
 import toast from "react-hot-toast";
+import LocationSelect from "../../components/UI/LocationSelect";
 
 interface FormData {
   firstName: string;
@@ -16,6 +17,7 @@ interface FormData {
   addressLine: string;
   city: string;
   district: string;
+  union: string;
   pincode: string;
 }
 
@@ -48,6 +50,7 @@ const CheckoutPage = () => {
     addressLine: "",
     city: "",
     district: "",
+    union: "",
     pincode: "",
   });
 
@@ -83,6 +86,13 @@ const CheckoutPage = () => {
     }
   }, [stripeUrl, dispatch]);
 
+  // Delivery method follows the selected address — "Dhaka" district means
+  // the metro delivery rate/window, anything else is "Outside Dhaka".
+  useEffect(() => {
+    if (!form.district) return;
+    setDeliveryArea(form.district.trim().toLowerCase() === "dhaka" ? "DHAKA" : "OUTSIDE");
+  }, [form.district]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -90,7 +100,7 @@ const CheckoutPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { firstName, email, phone, addressLine, city, district, pincode } = form;
+    const { firstName, email, phone, addressLine, city, district, union, pincode } = form;
     if (!firstName || !email || !phone || !addressLine || !city || !district) {
       toast.error("Please fill in your contact and delivery details");
       return;
@@ -99,7 +109,7 @@ const CheckoutPage = () => {
       toast.error("Please enter the number you paid from and the transaction ID");
       return;
     }
-    const shippingAddress = `${addressLine}, ${city}, ${district}${pincode ? `, ${pincode}` : ""}, Bangladesh`;
+    const shippingAddress = `${addressLine}${union ? `, ${union}` : ""}, ${city}, ${district}${pincode ? `, ${pincode}` : ""}, Bangladesh`;
 
     setIsSubmitting(true);
     try {
@@ -178,10 +188,12 @@ const CheckoutPage = () => {
 
             <div>
               <div className="text-[11px] tracking-[.2em] text-title border-b border-secondary pb-2.5">DELIVERY ADDRESS</div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
-                <input name="addressLine" placeholder="House, road, area" value={form.addressLine} onChange={handleInputChange} required className={`${fieldCls} sm:col-span-3`} />
-                <input name="city" placeholder="City" value={form.city} onChange={handleInputChange} required className={fieldCls} />
-                <input name="district" placeholder="District" value={form.district} onChange={handleInputChange} required className={fieldCls} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-4">
+                <input name="addressLine" placeholder="House, road, area" value={form.addressLine} onChange={handleInputChange} required className={`${fieldCls} sm:col-span-2`} />
+                <LocationSelect
+                  fieldClassName={fieldCls}
+                  onChange={(loc) => setForm((prev) => ({ ...prev, district: loc.district, city: loc.upazila, union: loc.union }))}
+                />
                 <input name="pincode" placeholder="Postcode (optional)" value={form.pincode} onChange={handleInputChange} className={fieldCls} />
               </div>
             </div>
