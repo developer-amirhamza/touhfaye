@@ -15,11 +15,11 @@ const Hero = () => {
             />
             <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(90deg, rgba(10,20,14,.62) 0%, rgba(10,20,14,.4) 45%, rgba(10,20,14,.15) 100%)" }}
+                style={{ background: "linear-gradient(90deg, rgba(10,20,14,.62) 0%, rgba(10,20,14,.4) 35%, rgba(10,20,14,.15) 100%)" }}
             />
 
             <div className="relative z-10 container mx-auto px-6 py-18 w-full">
-                <div className="px-9 py-10 max-w-[460px] bg-black/10 ">
+                <div className="px-9 py-10 max-w-[460px] bg-black/10 rounded-xl  border border-primary">
                     <span className="inline-block border border-accent-light text-accent-light text-[10px] tracking-[.2em] px-3 py-1.5">
                         NEW STOCK
                     </span>

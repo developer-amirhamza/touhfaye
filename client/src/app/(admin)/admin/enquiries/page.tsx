@@ -51,7 +51,7 @@ export default function AdminEnquiriesPage() {
       <p className="text-sm text-gray-500 mb-5">Funding support and trade enquiries.</p>
 
       <div className="flex gap-2 mb-4">
-        {["ALL", "FUNDING_SUPPORT", "TRADE", "GENERAL"].map((t) => (
+        {["ALL", "GENERAL"].map((t) => (
           <button
             key={t}
             onClick={() => setTypeFilter(t)}

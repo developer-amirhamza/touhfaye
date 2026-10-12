@@ -20,20 +20,16 @@ const normalise = (role: string) => (role === 'USER' || !role ? 'CONSUMER' : rol
 // Roles an admin can assign. OWNER is deliberately absent — it's set once,
 // directly in the database, and can never be granted or changed via the UI.
 const ASSIGNABLE_ROLES = [
-    { value: 'CONSUMER', label: 'Consumer' },
+    { value: 'CUSTOMER', label: 'Customer' },
     { value: 'ADMIN', label: 'Admin' },
-    { value: 'TRADE', label: 'Trade Partners' },
-    { value: 'RETAILER', label: 'Retailer' },
-    { value: 'DISTRIBUTOR', label: 'Distributor' },
-    { value: 'NDIS_COORDINATOR', label: 'NDIS/Aged Care Provider' },
+    { value: 'MODERATOR', label: 'Moderator' },
 ];
 
 const ROLE_BADGE: Record<string, string> = {
     OWNER: 'bg-amber-100 text-amber-800 border-amber-300',
     ADMIN: 'bg-purple-100 text-purple-800 border-purple-300',
-    TRADE: 'bg-blue-100 text-blue-800 border-blue-300',
-    NDIS_COORDINATOR: 'bg-teal-100 text-teal-800 border-teal-300',
-    CONSUMER: 'bg-gray-100 text-gray-700 border-gray-300',
+    MODERATOR: 'bg-blue-100 text-blue-800 border-blue-300',
+    CUSTOMER: 'bg-gray-100 text-gray-700 border-gray-300',
 };
 
 const AdminUsersPage = () => {
@@ -149,9 +145,8 @@ const AdminUsersPage = () => {
                 <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)}
                     className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="ALL">All Roles</option>
-                    <option value="CONSUMER">Consumer</option>
-                    <option value="TRADE">Trade</option>
-                    <option value="NDIS_COORDINATOR">NDIS Coordinator</option>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="MODERATOR">Moderator</option>
                     <option value="ADMIN">Admin</option>
                     <option value="OWNER">Owner</option>
                 </select>

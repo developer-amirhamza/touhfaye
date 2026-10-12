@@ -70,13 +70,13 @@ const Footer = () => {
                 <div className="flex flex-col gap-4">
                     <h3 className="text-[10.5px] font-medium uppercase tracking-[.2em] text-secondary-light/60 mb-1">Get in touch</h3>
                     <div className="flex flex-col gap-3 text-sm font-light text-secondary-light">
-                        <a href="tel:+8801XXXXXXXXX" className="flex items-center gap-2 hover:text-accent-light transition-colors">
+                        <a href="tel:+8801730298472" className="flex items-center gap-2 hover:text-accent-light transition-colors">
                             <IoCall className="shrink-0" size={16} />
-                            +880 1XXX-XXXXXX
+                            +880 1730 298 472
                         </a>
                         <a href="mailto:hello@touhfaye.com" className="flex items-center gap-2 hover:text-accent-light transition-colors">
                             <IoMail className="shrink-0" size={16} />
-                            hello@touhfaye.com
+                            touhfaye@gmail.com
                         </a>
                         <div className="flex items-center gap-2">
                             <IoLocationSharp className="shrink-0" size={16} />
