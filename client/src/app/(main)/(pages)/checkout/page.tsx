@@ -21,18 +21,18 @@ interface FormData {
   pincode: string;
 }
 
-type PayMethod = "COD" | "BKASH" | "NAGAD" | "CARD";
+type PayMethod = "COD" | "BKASH" | "NAGAD";
 type DeliveryArea = "DHAKA" | "OUTSIDE";
 
 const FREE_DELIVERY_THRESHOLD = 1500;
-const DELIVERY_COST_DHAKA = 60;
-const DELIVERY_COST_OUTSIDE = 120;
+const DELIVERY_COST_DHAKA = 70;
+const DELIVERY_COST_OUTSIDE = 130;
 
 const PAY_METHODS: { value: PayMethod; label: string; note: string }[] = [
   { value: "COD", label: "Cash on delivery", note: "Pay the courier when your parcel arrives." },
   { value: "BKASH", label: "bKash", note: "Send payment, then enter the transaction ID." },
   { value: "NAGAD", label: "Nagad", note: "Send payment, then enter the transaction ID." },
-  { value: "CARD", label: "Pay by card", note: "Secure card payment via Stripe." },
+  // { value: "CARD", label: "Pay by card", note: "Secure card payment via Stripe." },
 ];
 
 const CheckoutPage = () => {
@@ -113,12 +113,12 @@ const CheckoutPage = () => {
 
     setIsSubmitting(true);
     try {
-      if (payMethod === "CARD") {
-        await dispatch(
-          createCheckoutSession({ firstName, lastName: form.lastName, email, phone, shippingAddress, orderNote } as any)
-        ).unwrap();
-        // The stripeUrl effect handles the redirect.
-      } else {
+      // if (payMethod === "CARD") {
+      //   await dispatch(
+      //     createCheckoutSession({ firstName, lastName: form.lastName, email, phone, shippingAddress, orderNote } as any)
+      //   ).unwrap();
+      //   // The stripeUrl effect handles the redirect.
+      // } else {
         await dispatch(
           placeOrder({
             firstName,
@@ -138,7 +138,7 @@ const CheckoutPage = () => {
         toast.success("Your order has been placed!");
         dispatch(fetchCart());
         router.push("/order/success");
-      }
+      // }
     } catch (err: any) {
       toast.error(err?.message || err || "Failed to place order");
     } finally {
@@ -168,7 +168,7 @@ const CheckoutPage = () => {
 
   const fieldCls = "border border-primary-hover bg-white px-4 py-3.5 text-sm font-light outline-none focus:border-secondary w-full";
   const busy = isSubmitting || orderStatus === "loading";
-  const ctaLabel = busy ? "Processing…" : payMethod === "CARD" ? "PROCEED TO PAYMENT" : `PLACE ORDER — ${DisplayPriceInBdt(grandTotal)}`;
+  const ctaLabel = busy ? "Processing…" :  `PLACE ORDER — ${DisplayPriceInBdt(grandTotal)}`;
 
   return (
     <section className="bg-background min-h-screen py-10">
