@@ -10,6 +10,7 @@ const cart_controllers_1 = require("./cart.controllers");
 const prisma_1 = require("../lib/prisma");
 const errorHandler_1 = require("../utils/errorHandler");
 const pricing_1 = require("../services/pricing");
+const clientUrl_1 = require("../config/clientUrl");
 dotenv_1.default.config();
 // Initialize Stripe with your secret key
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
@@ -91,8 +92,8 @@ const createCheckoutSession = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: successUrl || `${process.env.CLIENT_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: cancelUrl || `${process.env.CLIENT_URL}/cart`,
+            success_url: successUrl || `${clientUrl_1.primaryClientUrl}/order/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: cancelUrl || `${clientUrl_1.primaryClientUrl}/cart`,
             metadata: {
                 orderId: order.id,
             },

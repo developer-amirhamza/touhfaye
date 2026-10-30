@@ -5,6 +5,7 @@ import { getCartToken, getOrCreateCart } from './cart.controllers';
 import { prisma } from '../lib/prisma';
 import { errorHandler } from '../utils/errorHandler';
 import { resolveProductPrice } from '../services/pricing';
+import { primaryClientUrl } from '../config/clientUrl';
 
 dotenv.config();
 
@@ -118,8 +119,8 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: successUrl || `${process.env.CLIENT_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: cancelUrl || `${process.env.CLIENT_URL}/cart`,
+            success_url: successUrl || `${primaryClientUrl}/order/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: cancelUrl || `${primaryClientUrl}/cart`,
             metadata: {
                 orderId: order.id,
             },

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.primaryClientUrl = exports.clientOrigins = void 0;
+require("dotenv/config");
 // CLIENT_URL can hold multiple comma-separated origins (e.g. the apex and www
 // domains). Nothing splits that string automatically, so callers that need a
 // single URL (redirect links, emails) must use primaryClientUrl, and CORS

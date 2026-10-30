@@ -12,6 +12,7 @@ import forgotPasswordTemplate from "../utils/forgotPasswordTemplate";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
 import { uploadImageCloudinary } from "../config/cloudinary";
+import { primaryClientUrl } from "../config/clientUrl";
 import dotenv from "dotenv";
 
 
@@ -58,7 +59,7 @@ const SignUp = async (req: Request, res: Response) => {
                 mobile: mobile?.toString(),
             },
         });
-        const verifyEmailUrl = `${process.env.CLIENT_URL}/verify-email?code=${user.id}`;
+        const verifyEmailUrl = `${primaryClientUrl}/verify-email?code=${user.id}`;
         // Email failure shouldn't fail the signup — the account is already created.
         const emailResult = await sendEmail({
             sendTo: email,

@@ -16,6 +16,7 @@ const forgotPasswordTemplate_1 = __importDefault(require("../utils/forgotPasswor
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const uuid_1 = require("uuid");
 const cloudinary_1 = require("../config/cloudinary");
+const clientUrl_1 = require("../config/clientUrl");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const SignUp = async (req, res) => {
@@ -55,7 +56,7 @@ const SignUp = async (req, res) => {
                 mobile: mobile?.toString(),
             },
         });
-        const verifyEmailUrl = `${process.env.CLIENT_URL}/verify-email?code=${user.id}`;
+        const verifyEmailUrl = `${clientUrl_1.primaryClientUrl}/verify-email?code=${user.id}`;
         // Email failure shouldn't fail the signup — the account is already created.
         const emailResult = await (0, sendEmail_1.sendEmail)({
             sendTo: email,
