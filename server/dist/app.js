@@ -25,11 +25,18 @@ const teamTask_routes_1 = __importDefault(require("./routes/teamTask.routes"));
 const waitlist_routes_1 = __importDefault(require("./routes/waitlist.routes"));
 const uploadImage_route_1 = __importDefault(require("./routes/uploadImage.route"));
 const faq_routes_1 = __importDefault(require("./routes/faq.routes"));
+const clientUrl_1 = require("./config/clientUrl");
+const error_1 = require("./middlewares/error");
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin(origin, callback) {
+        if (!origin || clientUrl_1.clientOrigins.includes(origin.replace(/\/$/, ""))) {
+            return callback(null, true);
+        }
+        return callback(new error_1.AppError(403, "Origin is not allowed by CORS"));
+    },
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({
