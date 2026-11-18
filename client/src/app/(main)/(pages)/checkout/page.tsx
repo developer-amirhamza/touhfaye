@@ -285,7 +285,7 @@ const CheckoutPage = () => {
             <div className="flex flex-col gap-3 mt-4">
               {cart.items.map((item) => (
                 <div key={item.id} className="flex gap-3 items-center">
-                  <div className="w-12 aspect-[4/5] flex-none bg-primary overflow-hidden">
+                  <div className="w-12 aspect-4/5 flex-none bg-primary overflow-hidden">
                     {item.product.images?.[0] && (
                       <img src={item.product.images[0]} alt={item.product.title} className="w-full h-full object-cover" />
                     )}
