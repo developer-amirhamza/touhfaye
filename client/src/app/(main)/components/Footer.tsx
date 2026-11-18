@@ -10,7 +10,7 @@ const SHOP_LINKS = [
     { label: 'Scented candles', href: '/products?category=candles' },
     { label: 'Jewellery', href: '/products?category=jewellery' },
     { label: 'Gift sets', href: '/products?category=gift-sets' },
-    { label: 'Corporate gifting', href: '/contact-us' },
+    { label: 'Corporate gifting', href: '/events' },
 ]
 
 const HELP_LINKS = [
