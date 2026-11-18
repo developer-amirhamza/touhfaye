@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 // CONTACT US row (FAQ kept alongside — a real page the mock doesn't show).
 const NAV_LINKS = [
     { label: 'Stories', href: '/blog' },
+    { label: 'Events', href: '/events' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Contact us', href: '/contact-us' },
 ]

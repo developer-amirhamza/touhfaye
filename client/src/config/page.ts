@@ -4,7 +4,7 @@ import { FaNewspaper } from "react-icons/fa"
 import { FaCartFlatbedSuitcase, FaUsersGear } from "react-icons/fa6";
 import { AiFillDashboard, AiFillProduct } from "react-icons/ai";
 import { GrArticle } from "react-icons/gr";
-import { MdCategory, MdReviews, MdTaskAlt, MdOutlinePendingActions, MdSchool, MdForum, MdHelp, MdReceiptLong, MdInventory } from "react-icons/md"
+import { MdCategory, MdReviews, MdTaskAlt, MdOutlinePendingActions, MdSchool, MdForum, MdHelp, MdReceiptLong, MdInventory, MdEvent } from "react-icons/md"
 
 
 
@@ -54,6 +54,11 @@ export const adminNavItems = [
         icon: GrArticle,
         path: "/admin/blogs"
         // ]
+    },
+    {
+        label: "Events",
+        icon: MdEvent,
+        path: "/admin/events"
     },
     {
         label: "Categories",

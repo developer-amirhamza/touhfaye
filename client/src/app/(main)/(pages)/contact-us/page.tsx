@@ -94,7 +94,7 @@ const ContactUs = () => {
               <ContactRow
                 icon={<IoLocationSharp size={18} />}
                 label="Pickup point"
-                value="Bashundhara R/A, Dhaka"
+                value="Avenue 5, Block C, Section 6, Mirpur, Dhaka 1216"
               />
               <ContactRow
                 icon={<IoTimeOutline size={18} />}

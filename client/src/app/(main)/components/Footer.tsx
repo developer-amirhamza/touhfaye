@@ -10,7 +10,7 @@ const SHOP_LINKS = [
     { label: 'Scented candles', href: '/products?category=candles' },
     { label: 'Jewellery', href: '/products?category=jewellery' },
     { label: 'Gift sets', href: '/products?category=gift-sets' },
-    { label: 'Corporate gifting', href: '/contact-us' },
+    { label: 'Corporate gifting', href: '/events' },
 ]
 
 const HELP_LINKS = [
@@ -80,7 +80,7 @@ const Footer = () => {
                         </a>
                         <div className="flex items-center gap-2">
                             <IoLocationSharp className="shrink-0" size={16} />
-                            Bashundhara R/A, Dhaka
+                            Avenue 5, Block C, Section 6, Mirpur, Dhaka 1216
                         </div>
                     </div>
                     {/* Social icons */}
