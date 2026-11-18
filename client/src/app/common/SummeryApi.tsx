@@ -357,6 +357,35 @@ deleteSubcategory: {
         method: "delete",
     },
 
+    getAllEvents: {
+        url: "/api/events/all",
+        method: "get",
+    },
+    getAdminAllEvents: {
+        url: "/api/events/admin/all",
+        method: "get",
+    },
+    getEventById: {
+        url: "/api/events/by-id",
+        method: "post",
+    },
+    getEventBySlug: {
+        url: "/api/events/by-slug",
+        method: "post",
+    },
+    createEvent: {
+        url: "/api/events/create",
+        method: "post",
+    },
+    updateEvent: {
+        url: "/api/events/update",
+        method: "put",
+    },
+    deleteEvent: {
+        url: "/api/events/delete",
+        method: "delete",
+    },
+
     // ── Touhfaye portal: account applications ──
     applyForAccount: { url: "/api/account-applications/apply", method: "post" },
     getMyApplication: { url: "/api/account-applications/me", method: "get" },

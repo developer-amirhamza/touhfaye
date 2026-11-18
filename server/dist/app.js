@@ -18,6 +18,7 @@ const category_route_1 = __importDefault(require("./routes/category.route"));
 const review_routes_1 = __importDefault(require("./routes/review.routes"));
 const subcategory_routes_1 = __importDefault(require("./routes/subcategory.routes"));
 const blog_routes_1 = __importDefault(require("./routes/blog.routes"));
+const event_routes_1 = __importDefault(require("./routes/event.routes"));
 const testimonial_routes_1 = __importDefault(require("./routes/testimonial.routes"));
 const enquiry_routes_1 = __importDefault(require("./routes/enquiry.routes"));
 const health_routes_1 = __importDefault(require("./routes/health.routes"));
@@ -25,11 +26,18 @@ const teamTask_routes_1 = __importDefault(require("./routes/teamTask.routes"));
 const waitlist_routes_1 = __importDefault(require("./routes/waitlist.routes"));
 const uploadImage_route_1 = __importDefault(require("./routes/uploadImage.route"));
 const faq_routes_1 = __importDefault(require("./routes/faq.routes"));
+const clientUrl_1 = require("./config/clientUrl");
+const error_1 = require("./middlewares/error");
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: process.env.CLIENT_URL,
+    origin(origin, callback) {
+        if (!origin || clientUrl_1.clientOrigins.includes(origin.replace(/\/$/, ""))) {
+            return callback(null, true);
+        }
+        return callback(new error_1.AppError(403, "Origin is not allowed by CORS"));
+    },
 }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({
@@ -49,6 +57,7 @@ app.use("/api/orders", order_routes_1.default);
 app.use("/api/payment", payment_route_1.default);
 app.use("/api/subcategories", subcategory_routes_1.default);
 app.use("/api/blogs", blog_routes_1.default);
+app.use("/api/events", event_routes_1.default);
 app.use("/api/testimonials", testimonial_routes_1.default);
 app.use("/api/enquiries", enquiry_routes_1.default);
 app.use("/api/health", health_routes_1.default);

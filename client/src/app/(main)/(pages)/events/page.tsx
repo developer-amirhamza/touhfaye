@@ -1,66 +1,93 @@
-import Link from "next/link";
-import Breadcrumb from "../../components/UI/Breadcrumb";
+"use client";
+import React, { Suspense, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Axios from '@/utils/Axios';
+import { SummeryApi } from '@/app/common/SummeryApi';
+import Loader from '../../components/UI/Loader';
+import Breadcrumb from '../../components/UI/Breadcrumb';
 
-export const metadata = {
-  title: "Events & Corporate Gifting — Touhfaye",
-  description:
-    "Touhfaye plans and packs gifting for weddings, corporate milestones, Eid hampers and birthdays — sample designs, client feedback and a gallery from past events.",
-};
+interface EventItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  category: string;
+  location: string;
+  eventDate: string;
+  coverImage: string;
+  views: number;
+}
 
-const OFFERS = [
-  {
-    title: "Corporate gifting",
-    desc: "Branded boxes for clients, staff and partners — your logo on the card or the box, one approved sample before the full run.",
-  },
-  {
-    title: "Weddings & engagements",
-    desc: "Matching jewellery and candle favours for the bridal party, wrapped in a shared theme and colour palette.",
-  },
-  {
-    title: "Festive & Eid hampers",
-    desc: "Bulk hampers for staff or family circles, ready for same-week dispatch during the festive rush.",
-  },
-  {
-    title: "Birthdays & anniversaries",
-    desc: "A single statement gift box or a small set for close family — built around what the occasion calls for.",
-  },
-];
-
-const DESIGNS = [
-  { src: "/touhfaye/rose-box-open-1.jpg", caption: "Preserved rose + pendant, wedding favour box" },
-  { src: "/touhfaye/gift-set-flatlay.jpg", caption: "Branded hamper flatlay for a corporate order" },
-  { src: "/touhfaye/name-puzzle-heart-duo.jpg", caption: "Matching pendant set, engagement gifting" },
-  { src: "/touhfaye/projection-pendant-necklace.jpg", caption: "Rose-gold pendant in a branded gift box" },
-];
-
-const GALLERY = [
-  "/touhfaye/rose-box-open-2.jpg",
-  "/touhfaye/name-puzzle-heart-silver.jpg",
-  "/touhfaye/gift-set-flatlay.jpg",
-  "/touhfaye/projection-pendant-necklace.jpg",
-  "/touhfaye/name-puzzle-heart-duo.jpg",
-  "/touhfaye/rose-box-open-1.jpg",
-];
-
-const FEEDBACK = [
-  {
-    quote: "Forty identical boxes for our office Eid gifting, every one wrapped the same and delivered a day early. Made our HR team look very good.",
-    name: "Rubaiya H.",
-    role: "Corporate order, Dhanmondi",
-  },
-  {
-    quote: "We used Touhfaye for all six bridesmaid gifts. They matched the ribbon colour to our wedding theme without being asked twice.",
-    name: "Nafisa K.",
-    role: "Wedding order, Sylhet",
-  },
-  {
-    quote: "Sent a sample box before committing to 25 pieces for a client event — exactly what we needed to sign off with confidence.",
-    name: "Imran T.",
-    role: "Corporate order, Gulshan",
-  },
-];
+const formatDate = (date?: string) =>
+  date
+    ? new Date(date).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
 
 const EventsPage = () => {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><Loader /></div>}>
+      <EventsPageContent />
+    </Suspense>
+  );
+};
+
+const EventsPageContent = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [events, setEvents] = useState<EventItem[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [category, setCategory] = useState<string | null>(searchParams.get('category'));
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    Axios({ ...SummeryApi.getAllEvents, params: { page: 1, limit: 100 } })
+      .then((res) => {
+        if (res.data?.success) {
+          const distinct = Array.from(new Set(res.data.data.map((e: EventItem) => e.category).filter(Boolean))) as string[];
+          setCategories(distinct);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    Axios({ ...SummeryApi.getAllEvents, params: { page, limit: 9, ...(category ? { category } : {}) } })
+      .then((res) => {
+        if (res.data?.success) {
+          setEvents(res.data.data);
+          setTotalPages(res.data.pagination.totalPages || 1);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [page, category]);
+
+  const selectCategory = (c: string | null) => {
+    setCategory(c);
+    setPage(1);
+    router.replace(c ? `/events?category=${encodeURIComponent(c)}` : '/events');
+  };
+
+  const lead = events[0];
+  const rest = events.slice(1);
+  const eventCount = events.length + (events.length === 1 ? ' event' : ' events');
+
+  const CardImage = ({ event }: { event: EventItem }) => (
+    <div className="relative bg-primary overflow-hidden" style={{ aspectRatio: '4/5' }}>
+      {event.coverImage ? (
+        <img src={event.coverImage} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-title/20 text-4xl font-secondary">
+          {event.title[0]}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="bg-background min-h-screen">
       {/* Hero */}
@@ -71,8 +98,8 @@ const EventsPage = () => {
             Gifting for your events
           </h1>
           <p className="text-lg text-paragraph font-light leading-relaxed max-w-2xl">
-            Weddings, corporate milestones, Eid hampers and birthdays — we design, pack and deliver
-            as one box or two hundred, wrapped the same way every time.
+            Weddings, corporate milestones, Eid hampers and birthdays — browse what we&apos;ve put
+            together before, with the design, feedback and photos from each one.
           </p>
           <div className="flex gap-2.5 mt-5 flex-wrap">
             {["Sample before full run", "Logo on card or box", "20+ pieces · 7–10 day lead time"].map((t) => (
@@ -84,87 +111,135 @@ const EventsPage = () => {
         </div>
       </section>
 
-      {/* What we offer */}
-      <section className="max-w-310 mx-auto px-5 sm:px-7 py-14">
-        <h2 className="font-secondary text-3xl text-title mb-7">What we put together</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {OFFERS.map((o) => (
-            <div key={o.title} className="border border-primary-hover p-6 bg-white">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-accent font-secondary text-lg mb-4">
-                {o.title.charAt(0)}
-              </div>
-              <h3 className="font-secondary text-xl text-title mb-2">{o.title}</h3>
-              <p className="text-sm text-foreground font-light leading-relaxed">{o.desc}</p>
-            </div>
+      {/* Category tabs + count */}
+      <div className="max-w-310 mx-auto px-5 sm:px-7 py-6.5 flex justify-between items-center gap-4 flex-wrap border-b border-primary-hover">
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => selectCategory(null)}
+            className={`px-4.5 py-2.25 text-[12px] tracking-[.1em] border transition-colors ${
+              category === null
+                ? 'bg-secondary text-secondary-light border-secondary'
+                : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'
+            }`}
+          >
+            All events
+          </button>
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => selectCategory(c)}
+              className={`px-4.5 py-2.25 text-[12px] tracking-[.1em] border transition-colors ${
+                category === c
+                  ? 'bg-secondary text-secondary-light border-secondary'
+                  : 'bg-transparent text-paragraph border-primary-hover hover:border-secondary'
+              }`}
+            >
+              {c}
+            </button>
           ))}
         </div>
-      </section>
+        {!loading && <div className="text-[12.5px] text-foreground font-light">{eventCount}</div>}
+      </div>
 
-      {/* Design showcase */}
-      <section className="bg-secondary-light py-14">
-        <div className="max-w-310 mx-auto px-5 sm:px-7">
-          <div className="flex items-end justify-between gap-4 flex-wrap mb-7">
-            <div>
-              <div className="text-[11px] tracking-[.2em] text-accent mb-2">DESIGN</div>
-              <h2 className="font-secondary text-3xl text-title">Packaging built around your event</h2>
-            </div>
-            <p className="text-sm text-foreground font-light max-w-sm">
-              Ribbon colour, card wording and box finish are all adjustable — tell us the theme and
-              we&apos;ll send a mock-up before anything is made.
-            </p>
+      <div className="max-w-310 mx-auto px-5 sm:px-7 pb-16">
+        {loading ? (
+          <div className="flex justify-center py-20"><Loader /></div>
+        ) : events.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-foreground mb-6">No events posted yet — check back soon.</p>
+            <Link
+              href="/contact-us"
+              className="inline-block text-center bg-accent-light text-secondary hover:bg-accent px-7 py-3.5 text-[11.5px] tracking-[.18em] transition-colors"
+            >
+              PLAN AN EVENT WITH US
+            </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {DESIGNS.map((d) => (
-              <div key={d.src} className="bg-white shadow-[0_1px_2px_rgba(18,40,28,0.06),0_8px_24px_rgba(18,40,28,0.08)]">
-                <div className="relative bg-primary overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                  <img src={d.src} alt={d.caption} className="w-full h-full object-cover" />
+        ) : (
+          <>
+            {/* Featured lead event */}
+            <Link
+              href={`/events/${lead.slug}`}
+              className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr] gap-8 md:gap-10 items-center bg-secondary-light p-6 md:p-7.5 mt-2"
+            >
+              <CardImage event={lead} />
+              <div>
+                <div className="flex gap-3.5 items-center text-[10px] tracking-[.18em] text-accent flex-wrap">
+                  {lead.category && <span>{lead.category}</span>}
+                  {lead.location && <span className="text-[#AEA795] tracking-[.08em]">{lead.location}</span>}
+                  {lead.eventDate && <span className="text-[#AEA795] tracking-[.08em]">{formatDate(lead.eventDate)}</span>}
                 </div>
-                <p className="text-[13px] text-foreground font-light p-3.5">{d.caption}</p>
+                <h2 className="font-secondary text-2xl md:text-[32px] leading-[1.18] text-title mt-4">
+                  {lead.title}
+                </h2>
+                {lead.excerpt && (
+                  <p className="text-[14.5px] leading-[1.75] text-foreground font-light mt-3.5 max-w-[44ch]">
+                    {lead.excerpt}
+                  </p>
+                )}
+                <span className="inline-block text-[10.5px] tracking-[.18em] text-title border-b border-title pb-0.75 mt-5.5">
+                  VIEW THE EVENT
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </Link>
 
-      {/* Feedback */}
-      <section className="max-w-310 mx-auto px-5 sm:px-7 py-14">
-        <h2 className="font-secondary text-3xl text-title mb-7">What event clients say</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {FEEDBACK.map((f) => (
-            <div key={f.name} className="border border-primary-hover bg-white p-6 flex flex-col h-full">
-              <p className="text-[14.5px] text-paragraph font-light leading-relaxed flex-1">
-                &ldquo;{f.quote}&rdquo;
-              </p>
-              <div className="mt-5 pt-4 border-t border-primary-hover">
-                <div className="text-sm text-title">{f.name}</div>
-                <div className="text-[12px] text-accent font-light mt-0.5">{f.role}</div>
+            {/* Remaining events grid */}
+            {rest.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6.5 mt-12">
+                {rest.map((event) => (
+                  <Link
+                    key={event.id}
+                    href={`/events/${event.slug}`}
+                    className="border border-primary-hover bg-background flex flex-col hover:border-[#BDB29A] transition-colors"
+                  >
+                    <CardImage event={event} />
+                    <div className="p-5.5 flex flex-col gap-2.5 flex-1">
+                      <div className="flex justify-between gap-3 text-[10px] tracking-[.18em] text-accent flex-wrap">
+                        {event.category && <span>{event.category}</span>}
+                        {event.eventDate && <span className="text-[#AEA795] tracking-[.08em]">{formatDate(event.eventDate)}</span>}
+                      </div>
+                      <div className="font-secondary text-lg leading-snug text-title line-clamp-2">
+                        {event.title}
+                      </div>
+                      {event.excerpt && (
+                        <p className="text-[13px] leading-[1.7] text-foreground font-light line-clamp-2">
+                          {event.excerpt}
+                        </p>
+                      )}
+                      <div className="flex justify-between items-baseline gap-3 mt-auto pt-2.5">
+                        <span className="text-[10.5px] tracking-[.18em] text-title">VIEW →</span>
+                        {event.location && <span className="text-[11.5px] text-[#AEA795] font-light">{event.location}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            )}
 
-      {/* Gallery */}
-      <section className="bg-secondary-light py-14">
-        <div className="max-w-310 mx-auto px-5 sm:px-7">
-          <div className="text-[11px] tracking-[.2em] text-accent mb-2">GALLERY</div>
-          <h2 className="font-secondary text-3xl text-title mb-7">From past events</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {GALLERY.map((src, i) => (
-              <div
-                key={src + i}
-                className="relative bg-primary overflow-hidden"
-                style={{ aspectRatio: i % 3 === 0 ? "4/5" : "1/1" }}
-              >
-                <img src={src} alt="Touhfaye event gifting" className="w-full h-full object-cover" />
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-3 mt-14">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="border border-primary-hover px-5 py-2.5 text-[12px] tracking-[.1em] text-title hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
+                >
+                  ← PREV
+                </button>
+                <span className="text-[12.5px] text-foreground font-light">Page {page} of {totalPages}</span>
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="border border-primary-hover px-5 py-2.5 text-[12px] tracking-[.1em] text-title hover:border-secondary transition-colors disabled:opacity-40 disabled:hover:border-primary-hover"
+                >
+                  NEXT →
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            )}
+          </>
+        )}
+      </div>
 
       {/* CTA */}
-      <section className="max-w-310 mx-auto px-5 sm:px-7 py-14">
+      <section className="max-w-310 mx-auto px-5 sm:px-7 pb-16">
         <div className="bg-secondary text-secondary-light p-9 md:p-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <h2 className="font-secondary text-2xl md:text-3xl text-background mb-2">

@@ -369,6 +369,32 @@ model Blog {
   @@index([authorId])
 }
 
+// Touhfaye-hosted events (weddings, corporate gifting, Eid hampers, etc).
+// `feedback` holds an array of { name, role, quote } objects — a dedicated
+// per-event quote list rather than a relation, since quotes never need to
+// be queried or reused outside the event they belong to.
+model Event {
+  id            String    @id @default(dbgenerated("gen_random_uuid()"))
+  title         String
+  slug          String    @unique
+  excerpt       String?
+  description   String
+  category      String?
+  location      String?
+  eventDate     DateTime?
+  coverImage    String?
+  designImages  String[]  @default([])
+  galleryImages String[]  @default([])
+  feedback      Json?
+  views         Int       @default(0)
+  isPublished   Boolean   @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([slug])
+}
+
 // A single FAQ entry. `surface` says which page type it shows on; the
 // matching target field is only meaningful for its own surface (blogId for
 // BLOG_POST, productId for PRODUCT_PAGE, category for FAQ_PAGE) — every
