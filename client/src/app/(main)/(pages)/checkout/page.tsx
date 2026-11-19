@@ -24,11 +24,7 @@ interface FormData {
 type PayMethod = "COD" | "BKASH" | "NAGAD";
 type DeliveryArea = "DHAKA" | "OUTSIDE";
 
-<<<<<<< HEAD
-const FREE_DELIVERY_THRESHOLD = 1500;
-=======
 const FREE_DELIVERY_THRESHOLD = 3000;
->>>>>>> origin/claude/first-pr-workflow-5de81d
 const DELIVERY_COST_DHAKA = 70;
 const DELIVERY_COST_OUTSIDE = 130;
 
