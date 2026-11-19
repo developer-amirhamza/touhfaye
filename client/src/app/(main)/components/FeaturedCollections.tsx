@@ -48,13 +48,22 @@ const variantLine = (p: any): string | null => {
     return null;
 };
 
-const FeaturedCollections: React.FC = () => {
+interface FeaturedCollectionsProps {
+    // Restricts which collection strips this instance renders — lets the
+    // home page place New Arrivals ahead of Shop-by-category while keeping
+    // Bestsellers/Combo Packages in their original spot, without fetching
+    // or rendering the same tag twice.
+    tags?: Array<(typeof SECTIONS)[number]['tag']>;
+}
+
+const FeaturedCollections: React.FC<FeaturedCollectionsProps> = ({ tags }) => {
     const [byTag, setByTag] = useState<Record<string, any[]>>({});
+    const sections = tags ? SECTIONS.filter((s) => tags.includes(s.tag)) : SECTIONS;
 
     useEffect(() => {
         let cancelled = false;
         Promise.all(
-            SECTIONS.map((s) =>
+            sections.map((s) =>
                 Axios({ ...SummeryApi.searchProduct, params: { collectionTag: s.tag, limit: 8 } })
                     .then((res) => [s.tag, res.data?.success ? res.data.data : []] as const)
                     .catch(() => [s.tag, []] as const)
@@ -64,9 +73,10 @@ const FeaturedCollections: React.FC = () => {
             setByTag(Object.fromEntries(results));
         });
         return () => { cancelled = true; };
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tags?.join(',')]);
 
-    const sectionsWithProducts = SECTIONS.filter((s) => (byTag[s.tag]?.length ?? 0) > 0);
+    const sectionsWithProducts = sections.filter((s) => (byTag[s.tag]?.length ?? 0) > 0);
     if (sectionsWithProducts.length === 0) return null;
 
     return (

@@ -13,9 +13,10 @@ export default function Home() {
       <Hero />
       <TrustStrip />
       <CategoryCircles />
+      <FeaturedCollections tags={['NEW_ARRIVAL']} />
       <CategoryWiseProducts />
       <Spotlight />
-      <FeaturedCollections />
+      <FeaturedCollections tags={['BEST_SELLER', 'COMBO_PACKAGE']} />
       <TestimonialsSection />
       <JournalPreview />
     </div>
