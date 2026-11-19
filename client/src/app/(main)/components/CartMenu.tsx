@@ -90,15 +90,17 @@ const CartMenu: React.FC<Type> = ({ close }) => {
                                         </div>
                                         <div className="w-full text-xs max-w-sm">
                                             <p className="text-ellipsis text-title line-clamp-2">{item.product.title}</p>
-                                            {item.variantLabel && (
-                                                <p className="text-paragraph">{item.variantLabel}</p>
+                                            {(item.variantLabel || item.swatchLabel) && (
+                                                <p className="text-paragraph">
+                                                    {[item.swatchLabel, item.variantLabel].filter(Boolean).join(' · ')}
+                                                </p>
                                             )}
                                             <p className="font-semibold text-paragraph">
                                                 {DisplayPriceInBdt((item as any).displayPrice ?? item.product.price)}
                                             </p>
                                         </div>
                                         <div>
-                                            <AddToCartButton data={item.product} variantLabel={item.variantLabel} />
+                                            <AddToCartButton data={item.product} variantLabel={item.variantLabel} swatchLabel={item.swatchLabel} />
                                         </div>
                                     </div>
                                 ))}

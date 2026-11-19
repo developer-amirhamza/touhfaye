@@ -82,8 +82,8 @@ const ContactUs = () => {
               <ContactRow
                 icon={<IoCall size={18} />}
                 label="WhatsApp / Call"
-                value="+880 1XXX-XXXXXX"
-                href="tel:+8801XXXXXXXXX"
+                value="+880 1613-696715"
+                href="tel:+8801613696715"
               />
               <ContactRow
                 icon={<IoMail size={18} />}

@@ -19,6 +19,9 @@ export interface CartItem {
     // "" for a plain single-price product, else the picked variant's label
     // (e.g. "180g", "Set of 3") — see Product.variants.
     variantLabel: string;
+    // "" when the product has no Color/Flavor picker, else the picked
+    // swatch's name (e.g. "Red", "Vanilla") — see Product.swatches.
+    swatchLabel: string;
     // Server-resolved unit price for this line's variant (or the product's
     // own discount-adjusted price when there's no variant).
     displayPrice: number;
@@ -57,13 +60,13 @@ export const fetchCart = createAsyncThunk(
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (
-        { productId, quantity, variantLabel }: { productId: string; quantity: number; variantLabel?: string },
+        { productId, quantity, variantLabel, swatchLabel }: { productId: string; quantity: number; variantLabel?: string; swatchLabel?: string },
         { rejectWithValue }
     ) => {
         try {
             const response = await Axios({
                 ...SummeryApi.addCart,
-                data: { productId, quantity, variantLabel },
+                data: { productId, quantity, variantLabel, swatchLabel },
             });
             return response.data?.data; // updated cart
         } catch (error: any) {

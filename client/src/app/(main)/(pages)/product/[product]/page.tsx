@@ -25,7 +25,7 @@ const INFO_ACCORDION: FaqItem[] = [
     {
         id: 'shipping',
         question: 'Shipping & delivery',
-        answer: 'Dhaka: 1–2 business days, ৳60. Outside Dhaka: 2–4 business days, ৳120. Free delivery on orders over ৳1500.',
+        answer: 'Dhaka: 1–2 business days, ৳70. Outside Dhaka: 2–4 business days, ৳130. Free delivery on orders over ৳3000.',
     },
     {
         id: 'returns',
@@ -54,7 +54,12 @@ const ProductDetailsPage = () => {
         stock: 0,
     });
     const [loading, setLoading] = useState(false);
-    const [image, setImage] = useState(0);
+    // Index into the combined images+videos gallery (see `media` below).
+    const [mediaIndex, setMediaIndex] = useState(0);
+    // Which Color/Flavor swatch is selected, or null for none/not applicable.
+    // Pre-selecting the first swatch (like the SIZE variant below) also
+    // swaps the main gallery photo to that swatch's own image.
+    const [swatchIndex, setSwatchIndex] = useState<number | null>(null);
     // "" = the product's own base price (no variant picked/needed).
     const [selectedVariantLabel, setSelectedVariantLabel] = useState('');
     const [qty, setQty] = useState(1);
@@ -84,6 +89,7 @@ const ProductDetailsPage = () => {
             if (response.data?.success) {
                 setData(response.data?.data);
                 setSelectedVariantLabel(response.data?.data?.variants?.[0]?.label ?? '');
+                setSwatchIndex(response.data?.data?.swatches?.length ? 0 : null);
             }
         } catch (error) {
             AxiosToastError(error);
@@ -127,7 +133,8 @@ const ProductDetailsPage = () => {
         if (addingToBag) return;
         setAddingToBag(true);
         try {
-            const resultAction = await dispatch(addToCart({ productId: data.id, quantity: qty, variantLabel: selectedVariantLabel || undefined }));
+            const swatchName = swatchIndex !== null ? data.swatches?.[swatchIndex]?.name : undefined;
+            const resultAction = await dispatch(addToCart({ productId: data.id, quantity: qty, variantLabel: selectedVariantLabel || undefined, swatchLabel: swatchName || undefined }));
             if (addToCart.fulfilled.match(resultAction)) {
                 toast.success("Added to bag");
             } else {
@@ -196,6 +203,19 @@ const ProductDetailsPage = () => {
     const activeVariant = data.variants?.find((v: any) => v.label === selectedVariantLabel);
     const finalPrice = activeVariant ? activeVariant.price : getDisplayPrice(data);
 
+    // Gallery combines photos and videos into one thumbnail rail. A chosen
+    // swatch's own photo takes over the main viewer regardless of which
+    // thumbnail was last clicked — that's the whole point of giving each
+    // Color/Flavor option its own image.
+    const media: { type: 'image' | 'video'; src: string }[] = [
+        ...(data.images || []).map((src: string) => ({ type: 'image' as const, src })),
+        ...(data.videos || []).map((src: string) => ({ type: 'video' as const, src })),
+    ];
+    const selectedSwatch = swatchIndex !== null ? data.swatches?.[swatchIndex] : null;
+    const activeMedia = selectedSwatch?.image
+        ? { type: 'image' as const, src: selectedSwatch.image }
+        : (media[mediaIndex] || media[0] || { type: 'image' as const, src: '' });
+
     // Specifications are built only from fields that actually have data —
     // nothing here is invented copy, unlike the design mock's fixed rows.
     const specs: { k: string; v: string }[] = [];
@@ -225,23 +245,35 @@ const ProductDetailsPage = () => {
 
             <section className="max-w-[1240px] mx-auto px-7 pt-6.5 pb-19 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-12 items-start">
                 {/* Gallery */}
-                <div className={`grid ${data.images?.length > 1 ? 'grid-cols-[62px_minmax(0,1fr)]' : 'grid-cols-1'} gap-3`}>
-                    {data.images?.length > 1 && (
+                <div className={`grid ${media.length > 1 ? 'grid-cols-[62px_minmax(0,1fr)]' : 'grid-cols-1'} gap-3`}>
+                    {media.length > 1 && (
                         <div className="flex flex-col gap-2.5">
-                            {data.images.map((img: string, idx: number) => (
+                            {media.map((item, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={() => setImage(idx)}
-                                    aria-label={`Show image ${idx + 1}`}
-                                    className={`aspect-square bg-primary bg-cover bg-center overflow-hidden outline-offset-2 ${idx === image ? 'outline outline-2 outline-secondary' : ''}`}
-                                    style={{ backgroundImage: `url(${img})` }}
-                                />
+                                    onClick={() => { setMediaIndex(idx); setSwatchIndex(null); }}
+                                    aria-label={item.type === 'video' ? `Play video ${idx + 1}` : `Show image ${idx + 1}`}
+                                    className={`relative aspect-square bg-primary bg-cover bg-center overflow-hidden outline-offset-2 ${!selectedSwatch && idx === mediaIndex ? 'outline outline-2 outline-secondary' : ''}`}
+                                    style={item.type === 'image' ? { backgroundImage: `url(${item.src})` } : undefined}
+                                >
+                                    {item.type === 'video' && (
+                                        <>
+                                            <video src={item.src} className="absolute inset-0 w-full h-full object-cover" muted playsInline />
+                                            <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                                                <span className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[8px] text-secondary">▶</span>
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
                             ))}
                         </div>
                     )}
                     <div className="relative aspect-[4/5] bg-primary bg-cover bg-center overflow-hidden">
-                        {data.images?.[image] && (
-                            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${data.images[image]})` }} />
+                        {activeMedia.src && activeMedia.type === 'image' && (
+                            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${activeMedia.src})` }} />
+                        )}
+                        {activeMedia.src && activeMedia.type === 'video' && (
+                            <video src={activeMedia.src} controls playsInline className="absolute inset-0 w-full h-full object-cover" />
                         )}
                         {data.discount > 0 && (
                             <span className="absolute top-3.5 left-3.5 bg-secondary text-background text-sm font-semibold px-3.5 py-1.5">
@@ -300,6 +332,27 @@ const ProductDetailsPage = () => {
                                     <div className="text-sm mt-1.5 font-light text-title">{row.v}</div>
                                 </div>
                             ))}
+                        </div>
+                    )}
+
+                    {data.swatches?.length > 0 && (
+                        <div className="mt-6">
+                            <div className="text-[11px] tracking-[.2em] text-title">
+                                {(data.swatchLabel || 'OPTION').toUpperCase()}
+                                {selectedSwatch && <span className="text-accent font-light normal-case tracking-normal"> — {selectedSwatch.name}</span>}
+                            </div>
+                            <div className="flex gap-2.5 mt-3 flex-wrap">
+                                {data.swatches.map((swatch: { name: string; image: string }, idx: number) => (
+                                    <button
+                                        key={swatch.name + idx}
+                                        onClick={() => setSwatchIndex(idx)}
+                                        aria-label={swatch.name}
+                                        title={swatch.name}
+                                        className={`w-14 h-14 rounded-full overflow-hidden bg-primary bg-cover bg-center outline-offset-2 transition-shadow ${swatchIndex === idx ? 'outline outline-2 outline-secondary' : 'outline outline-1 outline-primary-hover'}`}
+                                        style={{ backgroundImage: `url(${swatch.image})` }}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     )}
 

@@ -29,9 +29,9 @@ const generateOrderNumber = async () => {
 
 // Delivery pricing: free over the threshold, otherwise a flat fee that
 // depends on whether the address is inside Dhaka.
-const FREE_DELIVERY_THRESHOLD = 1500;
-const DELIVERY_COST_DHAKA = 60;
-const DELIVERY_COST_OUTSIDE = 120;
+const FREE_DELIVERY_THRESHOLD = 3000;
+const DELIVERY_COST_DHAKA = 70;
+const DELIVERY_COST_OUTSIDE = 130;
 
 export const placeOrder = async (req: AuthRequest, res: Response) => {
     try {
@@ -105,6 +105,7 @@ export const placeOrder = async (req: AuthRequest, res: Response) => {
             productId: string;
             productImage: string | null;
             variantLabel: string | null;
+            swatchLabel: string | null;
             price: number;
             quantity: number;
             total: number;
@@ -119,6 +120,7 @@ export const placeOrder = async (req: AuthRequest, res: Response) => {
                 productId: product.id,
                 productImage: product.images[0] || null,
                 variantLabel: item.variantLabel || null,
+                swatchLabel: item.swatchLabel || null,
                 price: unitPrice,
                 quantity: item.quantity,
                 total: itemsTotal,

@@ -18,4 +18,5 @@ router.post("/create", auth_1.auth, admin_1.admin, products_controllers_1.create
 router.put("/update", auth_1.auth, admin_1.admin, products_controllers_1.updateProduct);
 router.delete("/delete", auth_1.auth, admin_1.admin, products_controllers_1.deleteProduct);
 router.post("/duplicate", auth_1.auth, admin_1.admin, products_controllers_1.duplicateProduct);
+router.put("/reorder", auth_1.auth, admin_1.admin, products_controllers_1.reorderProducts);
 exports.default = router;

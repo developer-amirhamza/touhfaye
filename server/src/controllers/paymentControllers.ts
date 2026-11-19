@@ -30,6 +30,7 @@ type CartItemWithProduct = {
         images: string[];
     };
     variantLabel?: string | null;
+    swatchLabel?: string | null;
     quantity: number;
 };
 
@@ -70,7 +71,10 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
                 price_data: {
                     currency: 'bdt',
                     product_data: {
-                        name: item.variantLabel ? `${item.product.title} (${item.variantLabel})` : item.product.title,
+                        name: (() => {
+                            const options = [item.variantLabel, item.swatchLabel].filter(Boolean).join(', ');
+                            return options ? `${item.product.title} (${options})` : item.product.title;
+                        })(),
                         ...(isValidImageUrl && { images: [imageUrl] }),
                     },
                     unit_amount: Math.round(unitPrice * 100),
@@ -105,6 +109,7 @@ export const createCheckoutSession = async (req: AuthRequest, res: Response) => 
                         productName: item.product.title,
                         productImage: item.product.images[0] || null,
                         variantLabel: item.variantLabel || null,
+                        swatchLabel: item.swatchLabel || null,
                         price: unitPrice,
                         quantity: item.quantity,
                         total: +(unitPrice * item.quantity).toFixed(2),

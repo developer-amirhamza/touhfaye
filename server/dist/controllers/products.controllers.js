@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsByCategory = exports.searchProducts = exports.getAllProducts = exports.getAllProductDetails = exports.getProductsBySubcategory = exports.getProductDetails = exports.duplicateProduct = exports.deleteProduct = exports.updateProduct = exports.createProduct = void 0;
+exports.reorderProducts = exports.getProductsByCategory = exports.searchProducts = exports.getAllProducts = exports.getAllProductDetails = exports.getProductsBySubcategory = exports.getProductDetails = exports.duplicateProduct = exports.deleteProduct = exports.updateProduct = exports.createProduct = void 0;
 const client_1 = require("@prisma/client");
 const errorHandler_1 = require("../utils/errorHandler");
 const prisma_1 = require("../lib/prisma");
@@ -51,9 +51,28 @@ const parseVariantsInput = (raw) => {
         return parsedStock !== undefined && parsedStock !== null ? { label, price, stock: parsedStock } : { label, price };
     });
 };
+// Validates the admin form's swatches payload (an array of {name, image}
+// rows for the image-based COLOR/FLAVOR picker) before it's ever written to
+// the database. Same null-means-"not sent" / throws-a-message-on-bad-row
+// contract as parseVariantsInput above.
+const parseSwatchesInput = (raw) => {
+    if (raw === undefined || raw === null)
+        return null;
+    if (!Array.isArray(raw))
+        throw new Error("Swatches must be a list of {name, image} rows");
+    return raw.map((s, idx) => {
+        const name = typeof s?.name === "string" ? s.name.trim() : "";
+        if (!name)
+            throw new Error(`Swatch #${idx + 1} needs a name (e.g. "Red" or "Vanilla")`);
+        const image = typeof s?.image === "string" ? s.image.trim() : "";
+        if (!image)
+            throw new Error(`Swatch "${name}" needs an image`);
+        return { name, image };
+    });
+};
 const createProduct = async (req, res) => {
     try {
-        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
+        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof title !== "string" || !title.trim() || price === undefined || price === null || price === "") {
             return (0, errorHandler_1.errorHandler)(res, 400, "Please provide the required fields", true);
         }
@@ -81,9 +100,33 @@ const createProduct = async (req, res) => {
         catch (e) {
             return (0, errorHandler_1.errorHandler)(res, 400, e.message, true);
         }
+        let swatchRows;
+        try {
+            swatchRows = parseSwatchesInput(swatches);
+        }
+        catch (e) {
+            return (0, errorHandler_1.errorHandler)(res, 400, e.message, true);
+        }
+        const swatchLabelTrimmed = typeof swatchLabel === "string" ? swatchLabel.trim() : "";
+        if (swatchLabelTrimmed && (!swatchRows || swatchRows.length === 0)) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Add at least one swatch, or clear the Color/Flavor label", true);
+        }
+        if (!swatchLabelTrimmed && swatchRows && swatchRows.length > 0) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Name this picker (e.g. Color or Flavor) before adding swatches", true);
+        }
         const slug = await buildUniqueProductSlug(typeof requestedSlug === "string" && requestedSlug.trim() ? requestedSlug.trim() : title.trim());
+        // New products append to the end of the manual sort order rather than
+        // all defaulting to 0, so they don't jump to the front of every list.
+        const { _max } = await prisma_1.prisma.product.aggregate({ _max: { position: true } });
+        const position = (_max.position ?? -1) + 1;
         const newProduct = await prisma_1.prisma.product.create({
-            data: { title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null, variants: variantRows && variantRows.length > 0 ? variantRows : undefined }
+            data: {
+                title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null,
+                variants: variantRows && variantRows.length > 0 ? variantRows : undefined,
+                swatchLabel: swatchLabelTrimmed || null,
+                swatches: swatchRows && swatchRows.length > 0 ? swatchRows : undefined,
+                position,
+            }
         });
         return (0, errorHandler_1.errorHandler)(res, 200, "Tha product has been created successfully!", false, newProduct);
     }
@@ -94,7 +137,7 @@ const createProduct = async (req, res) => {
 exports.createProduct = createProduct;
 const updateProduct = async (req, res) => {
     try {
-        const { id, title, price, description, colors, sizes, discount, more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
+        const { id, title, price, description, colors, sizes, discount, more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof id !== "string" || !id.trim())
             return (0, errorHandler_1.errorHandler)(res, 400, "Product id is required", true);
         const existing = await prisma_1.prisma.product.findUnique({ where: { id } });
@@ -135,6 +178,25 @@ const updateProduct = async (req, res) => {
         catch (e) {
             return (0, errorHandler_1.errorHandler)(res, 400, e.message, true);
         }
+        let swatchRows;
+        try {
+            swatchRows = swatches !== undefined ? parseSwatchesInput(swatches) : undefined;
+        }
+        catch (e) {
+            return (0, errorHandler_1.errorHandler)(res, 400, e.message, true);
+        }
+        // Validate the label+swatches pair stays consistent, accounting for
+        // whichever half of the pair this request actually touches.
+        const swatchLabelProvided = swatchLabel !== undefined;
+        const newSwatchLabelTrimmed = swatchLabelProvided ? (typeof swatchLabel === "string" ? swatchLabel.trim() : "") : undefined;
+        const effectiveSwatchLabel = swatchLabelProvided ? newSwatchLabelTrimmed : (existing.swatchLabel || "");
+        const effectiveSwatches = swatchRows !== undefined ? swatchRows : (Array.isArray(existing.swatches) ? existing.swatches : null);
+        if (effectiveSwatchLabel && (!effectiveSwatches || effectiveSwatches.length === 0)) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Add at least one swatch, or clear the Color/Flavor label", true);
+        }
+        if (!effectiveSwatchLabel && effectiveSwatches && effectiveSwatches.length > 0) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Name this picker (e.g. Color or Flavor) before adding swatches", true);
+        }
         // Slug only changes when the admin explicitly edits it — unlike the
         // title, it's never silently regenerated, since a live product link
         // may already be shared/indexed with the current text.
@@ -160,6 +222,8 @@ const updateProduct = async (req, res) => {
                 slug,
                 collectionTag: collectionTag !== undefined ? (collectionTag || null) : undefined,
                 variants: variantRows !== undefined ? (variantRows && variantRows.length > 0 ? variantRows : client_1.Prisma.JsonNull) : undefined,
+                swatchLabel: swatchLabelProvided ? (newSwatchLabelTrimmed || null) : undefined,
+                swatches: swatchRows !== undefined ? (swatchRows && swatchRows.length > 0 ? swatchRows : client_1.Prisma.JsonNull) : undefined,
                 metaTitle: metaTitle !== undefined ? (metaTitle || null) : undefined,
                 metaDescription: metaDescription !== undefined ? (metaDescription || null) : undefined,
             },
@@ -205,6 +269,8 @@ const duplicateProduct = async (req, res) => {
             return (0, errorHandler_1.errorHandler)(res, 404, "Product not found");
         const title = `${source.title} (Copy)`;
         const slug = await buildUniqueProductSlug(title);
+        const { _max } = await prisma_1.prisma.product.aggregate({ _max: { position: true } });
+        const position = (_max.position ?? -1) + 1;
         const duplicate = await prisma_1.prisma.product.create({
             data: {
                 title,
@@ -231,6 +297,9 @@ const duplicateProduct = async (req, res) => {
                 metaDescription: source.metaDescription,
                 collectionTag: source.collectionTag,
                 variants: source.variants,
+                swatchLabel: source.swatchLabel,
+                swatches: source.swatches,
+                position,
             },
         });
         return (0, errorHandler_1.errorHandler)(res, 200, "Product duplicated successfully!", false, duplicate);
@@ -271,7 +340,7 @@ const getProductsBySubcategory = async (req, res) => {
             return (0, errorHandler_1.errorHandler)(res, 400, "Subcategory ID required");
         const products = await prisma_1.prisma.product.findMany({
             where: { subcategoryId, isActive: true, deletedAt: null },
-            orderBy: { createdAt: "desc" },
+            orderBy: [{ position: "asc" }, { createdAt: "desc" }],
             include: { category: true, subcategory: true },
         });
         const withPrices = (0, pricing_1.attachDisplayPrices)(products);
@@ -284,7 +353,10 @@ const getProductsBySubcategory = async (req, res) => {
 exports.getProductsBySubcategory = getProductsBySubcategory;
 const getAllProductDetails = async (req, res) => {
     try {
-        const allProducts = await prisma_1.prisma.product.findMany({ where: { isActive: true, deletedAt: null } });
+        const allProducts = await prisma_1.prisma.product.findMany({
+            where: { isActive: true, deletedAt: null },
+            orderBy: [{ position: "asc" }, { createdAt: "desc" }],
+        });
         if (!allProducts)
             return (0, errorHandler_1.errorHandler)(res, 404, "Products not found!");
         const withPrices = (0, pricing_1.attachDisplayPrices)(allProducts);
@@ -323,7 +395,7 @@ const getAllProducts = async (req, res) => {
         if (parsedMax !== null)
             where.price.lte = parsedMax;
     }
-    let orderBy = { createdAt: 'desc' };
+    let orderBy = [{ position: 'asc' }, { createdAt: 'desc' }];
     if (sort === 'price_asc')
         orderBy = { price: 'asc' };
     if (sort === 'price_desc')
@@ -393,7 +465,7 @@ const searchProducts = async (req, res) => {
             where.stock = { gt: 0 };
         }
         // Sorting
-        let orderBy = { createdAt: "desc" };
+        let orderBy = [{ position: "asc" }, { createdAt: "desc" }];
         const sortValue = sort;
         if (sortValue === "price_asc")
             orderBy = { price: "asc" };
@@ -435,7 +507,7 @@ const getProductsByCategory = async (req, res) => {
             return (0, errorHandler_1.errorHandler)(res, 400, "Category ID required");
         const products = await prisma_1.prisma.product.findMany({
             where: { categoryId: id, isActive: true, deletedAt: null },
-            orderBy: { createdAt: "desc" },
+            orderBy: [{ position: "asc" }, { createdAt: "desc" }],
         });
         const withPrices = (0, pricing_1.attachDisplayPrices)(products);
         return (0, errorHandler_1.errorHandler)(res, 200, "Products fetched", false, withPrices);
@@ -445,3 +517,21 @@ const getProductsByCategory = async (req, res) => {
     }
 };
 exports.getProductsByCategory = getProductsByCategory;
+// Admin only: persists the product list's drag-and-drop order. Takes the
+// full list of ids in their new order and assigns each one a position equal
+// to its index — simplest correct approach, since the admin list always
+// sends every row it has (no partial reorders).
+const reorderProducts = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.some((id) => typeof id !== "string" || !id.trim())) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "ids must be a list of product ids", true);
+        }
+        await prisma_1.prisma.$transaction(ids.map((id, index) => prisma_1.prisma.product.update({ where: { id }, data: { position: index } })));
+        return (0, errorHandler_1.errorHandler)(res, 200, "Product order updated", false, { count: ids.length });
+    }
+    catch (error) {
+        return (0, errorHandler_1.errorHandler)(res, 500, error.message || "Internal server error!", true);
+    }
+};
+exports.reorderProducts = reorderProducts;

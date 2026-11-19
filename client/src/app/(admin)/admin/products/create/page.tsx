@@ -9,6 +9,7 @@ import AxiosToastError from '@/utils/AxiosToastError';
 import toast from 'react-hot-toast';
 import { fetchCategories } from '@/redux/slices/categorySlice';
 import ImageUploader from '../../components/ImageUploader';
+import VideoUploader from '../../components/VideoUploader';
 import { PRODUCT_COLLECTION_OPTIONS } from '@/app/common/productCollections';
 
 interface MoreDetails {
@@ -26,6 +27,11 @@ interface Variant {
     price: string;
 }
 
+interface Swatch {
+    name: string;
+    image: string;
+}
+
 const ProductCreatePage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
@@ -35,8 +41,9 @@ const ProductCreatePage = () => {
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState('');
     const [description, setDescription] = useState('');
-    const [colors, setColors] = useState<string[]>([]);
-    const [colorInput, setColorInput] = useState('');
+    const [swatchLabel, setSwatchLabel] = useState('');
+    const [swatches, setSwatches] = useState<Swatch[]>([]);
+    const [swatchNameInput, setSwatchNameInput] = useState('');
     const [sizes, setSizes] = useState<string[]>([]);
     const [sizeInput, setSizeInput] = useState('');
     const [discount, setDiscount] = useState('');
@@ -53,6 +60,7 @@ const ProductCreatePage = () => {
     const [loadingSubcategories, setLoadingSubcategories] = useState(false);
     const [stock, setStock] = useState('');
     const [images, setImages] = useState<string[]>([]);
+    const [videos, setVideos] = useState<string[]>([]);
     const [isActive, setIsActive] = useState(true);
     const [loading, setLoading] = useState(false);
 
@@ -102,14 +110,25 @@ const ProductCreatePage = () => {
     }, [categoryId]);
 
     // ---- Handlers for arrays ----
-    const addColor = () => {
-        if (colorInput.trim() && !colors.includes(colorInput.trim())) {
-            setColors([...colors, colorInput.trim()]);
-            setColorInput('');
+    const addSwatch = (url: string) => {
+        if (!swatchNameInput.trim()) {
+            toast.error('Give this option a name first (e.g. "Red" or "Vanilla")');
+            return;
+        }
+        setSwatches([...swatches, { name: swatchNameInput.trim(), image: url }]);
+        setSwatchNameInput('');
+    };
+    const removeSwatch = (index: number) => {
+        setSwatches(swatches.filter((_, i) => i !== index));
+    };
+
+    const addVideo = (url: string) => {
+        if (!videos.includes(url)) {
+            setVideos([...videos, url]);
         }
     };
-    const removeColor = (color: string) => {
-        setColors(colors.filter(c => c !== color));
+    const removeVideo = (url: string) => {
+        setVideos(videos.filter(v => v !== url));
     };
 
     const addSize = () => {
@@ -174,12 +193,15 @@ const ProductCreatePage = () => {
             toast.error('Title, price, and category are required');
             return;
         }
+        if (swatchLabel.trim() && swatches.length === 0) {
+            toast.error('Add at least one swatch image, or clear the Color/Flavor label');
+            return;
+        }
 
         const productData = {
             title,
             price: parseFloat(price),
             description: description || undefined,
-            colors: colors.length ? colors : undefined,
             sizes: sizes.length ? sizes : undefined,
             discount: discount ? parseFloat(discount) : 0,
             more_details: Object.keys(moreDetails).length ? moreDetails : undefined,
@@ -187,6 +209,9 @@ const ProductCreatePage = () => {
             subcategoryId: subcategoryId || undefined,   // <-- include subcategory if selected
             stock: stock ? parseInt(stock) : 0,
             images: images.length ? images : [],
+            videos: videos.length ? videos : [],
+            swatchLabel: swatchLabel.trim() || undefined,
+            swatches: swatches.length ? swatches : undefined,
             isActive,
             pack: pack || undefined,
             absorbency: absorbency || undefined,
@@ -232,7 +257,7 @@ const ProductCreatePage = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Price * (USD)</label>
+                        <label className="block text-sm font-medium mb-1">Price * (BDT)</label>
                         <input
                             type="number"
                             step="0.01"
@@ -362,25 +387,41 @@ const ProductCreatePage = () => {
                     <p className="text-xs text-neutral-500 mt-1">Shows this product in that section on the home page.</p>
                 </div>
 
-                {/* Colors */}
+                {/* Color / Flavor swatches */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Colors</label>
+                    <label className="block text-sm font-medium mb-1">Color / Flavor picker (optional)</label>
+                    <p className="text-xs text-neutral-500 mb-2">
+                        Name the picker (e.g. &quot;Color&quot; or &quot;Flavor&quot;), then give each option a name and
+                        a photo. Customers choose by clicking the photo on the product page.
+                    </p>
+                    <input
+                        type="text"
+                        value={swatchLabel}
+                        onChange={(e) => setSwatchLabel(e.target.value)}
+                        placeholder="Picker name, e.g. Color or Flavor"
+                        className="w-full border rounded px-3 py-2 mb-3"
+                    />
                     <div className="flex gap-2 mb-2">
                         <input
                             type="text"
-                            value={colorInput}
-                            onChange={(e) => setColorInput(e.target.value)}
-                            placeholder="e.g., Red"
+                            value={swatchNameInput}
+                            onChange={(e) => setSwatchNameInput(e.target.value)}
+                            placeholder="Option name, e.g. Red or Vanilla"
                             className="flex-1 border rounded px-3 py-2"
                         />
-                        <button type="button" onClick={addColor} className="bg-blue-600 text-white px-4 rounded">Add</button>
+                        <ImageUploader onUploaded={addSwatch} label="Upload photo" />
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        {colors.map((color) => (
-                            <span key={color} className="bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
-                                {color}
-                                <button type="button" onClick={() => removeColor(color)} className="text-red-500">✕</button>
-                            </span>
+                    <div className="flex flex-wrap gap-3">
+                        {swatches.map((swatch, idx) => (
+                            <div key={swatch.name + idx} className="relative group">
+                                <img src={swatch.image} alt={swatch.name} className="w-16 h-16 object-cover rounded border" />
+                                <div className="text-xs text-center mt-1 max-w-16 truncate">{swatch.name}</div>
+                                <button
+                                    type="button"
+                                    onClick={() => removeSwatch(idx)}
+                                    className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                >✕</button>
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -436,7 +477,7 @@ const ProductCreatePage = () => {
                             rows={2}
                             value={pricingNotes}
                             onChange={(e) => setPricingNotes(e.target.value)}
-                            placeholder="e.g., Priced by size: S $34.90, M $37.90, L $40.90, XL $43.90"
+                            placeholder="e.g., Priced by size: S ৳350, M ৳380, L ৳410, XL ৳440"
                             className="w-full border rounded px-3 py-2"
                         />
                     </div>
@@ -509,6 +550,26 @@ const ProductCreatePage = () => {
                                     type="button"
                                     onClick={() => removeImage(url)}
                                     className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
+                                >✕</button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Videos */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Videos (optional)</label>
+                    <div className="mb-2">
+                        <VideoUploader onUploaded={addVideo} label="Upload video" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                        {videos.map((url, idx) => (
+                            <div key={idx} className="relative group">
+                                <video src={url} controls className="w-full h-32 object-cover rounded border bg-black" />
+                                <button
+                                    type="button"
+                                    onClick={() => removeVideo(url)}
+                                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition"
                                 >✕</button>
                             </div>
                         ))}
