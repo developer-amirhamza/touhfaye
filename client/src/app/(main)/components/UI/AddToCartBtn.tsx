@@ -13,13 +13,18 @@ interface Type {
     // plain single-price product, or to quick-add a product with variants
     // at its first/default option (matches the server's own default).
     variantLabel?: string;
+    // Which Color/Flavor swatch (Product.swatches[].name) this button is
+    // for — omit to quick-add at the first/default swatch. Always pass the
+    // exact value when rendering for an existing cart line (e.g. the cart
+    // drawer), or the dedupe check below will match the wrong line.
+    swatchLabel?: string;
     // Full-width outlined style used by the product list grid (matches the
     // design mock's "ADD TO BAG" quick-add strip) instead of the compact
     // pill/stepper used elsewhere (cart drawer, product detail, etc).
     fullWidth?: boolean;
 }
 
-const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
+const AddToCartButton: React.FC<Type> = ({ data, variantLabel, swatchLabel, fullWidth }) => {
     const [loading, setLoading] = useState(false);
     const [isAvailable, setIsAvailable] = useState(false);
     const [quantity, setQuantity] = useState(0);
@@ -31,6 +36,10 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
     // A product with variants always has one selected — default to the
     // first, mirroring the server's own default when none is passed.
     const effectiveVariantLabel = variantLabel ?? (data?.variants?.[0]?.label ?? "");
+    // Same default-to-first pattern for the Color/Flavor picker — this quick-add
+    // button offers no swatch choice, so it always targets the first swatch,
+    // matching what the server itself defaults to when none is sent.
+    const effectiveSwatchLabel = swatchLabel ?? (data?.swatches?.[0]?.name ?? "");
 
     // Fetch cart on mount if idle
     useEffect(() => {
@@ -43,7 +52,9 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
     useEffect(() => {
         if (cart?.items?.[0]) {
             const found = cart.items.find(
-                (item) => item?.product?.id === data?.id && (item.variantLabel || "") === effectiveVariantLabel
+                (item) => item?.product?.id === data?.id
+                    && (item.variantLabel || "") === effectiveVariantLabel
+                    && (item.swatchLabel || "") === effectiveSwatchLabel
             );
             setIsAvailable(!!found);
             setQuantity(found?.quantity || 0);
@@ -53,7 +64,7 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
             setQuantity(0);
             setCartItemDetails(null);
         }
-    }, [cart, data?.id, effectiveVariantLabel]);
+    }, [cart, data?.id, effectiveVariantLabel, effectiveSwatchLabel]);
 
     // Add to cart
     const handleAddToCart = async (e: React.MouseEvent) => {
@@ -62,7 +73,7 @@ const AddToCartButton: React.FC<Type> = ({ data, variantLabel, fullWidth }) => {
         if (loading) return;
         setLoading(true);
         try {
-            const resultAction = await dispatch(addToCart({ productId: data?.id, quantity: 1, variantLabel: effectiveVariantLabel || undefined }));
+            const resultAction = await dispatch(addToCart({ productId: data?.id, quantity: 1, variantLabel: effectiveVariantLabel || undefined, swatchLabel: effectiveSwatchLabel || undefined }));
             if (addToCart.fulfilled.match(resultAction)) {
                 toast.success("Added to bag");
             } else {

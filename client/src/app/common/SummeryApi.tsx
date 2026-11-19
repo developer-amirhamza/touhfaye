@@ -95,6 +95,10 @@ export const SummeryApi = {
         url: "/api/products/by-category",
         method: "post",
     },
+    reorderProducts: {
+        url: "/api/products/reorder",
+        method: "put",
+    },
     duplicateProduct: {
         url: "/api/products/duplicate",
         method: "post"

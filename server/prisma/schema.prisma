@@ -207,11 +207,22 @@ model Product {
   // independently-priced variants, no buyer-role math. Null/empty means the
   // product has a single price (the `price` field above) and no picker.
   variants      Json?
+  // Image-based option picker (e.g. Color or Flavor) — swatchLabel is the
+  // heading shown on the product page ("Color"/"Flavor"/anything the admin
+  // types), swatches is [{name, image}]. Both null/empty together means the
+  // product has no picker; set together or not at all.
+  swatchLabel   String?
+  swatches      Json?
+  // Manual sort order for storefront listings (ascending; ties fall back to
+  // newest first). Sparse — new products default to the end of the list.
+  position      Int          @default(0)
   cartItems     CartItem[]
   category      Category?    @relation(fields: [categoryId], references: [id])
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
   reviews       Reviews[]
   orderItems    OrderItem[]
+
+  @@index([position])
 }
 
 model Reviews {
@@ -273,13 +284,16 @@ model CartItem {
   // for a plain single-price product — never null, so the unique constraint
   // below can't be defeated by Postgres treating two NULLs as distinct.
   variantLabel String  @default("")
+  // Which swatch (Product.swatches[].name) this line is for, or "" for a
+  // product with no swatch picker — same never-null convention as above.
+  swatchLabel String  @default("")
   // Snapshot of that variant's (or the product's) unit price at add-to-cart
   // time, so the bag total doesn't drift if the price changes later.
   variantPrice Float?
   cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([cartId, productId, variantLabel])
+  @@unique([cartId, productId, variantLabel, swatchLabel])
 }
 
 model Order {
@@ -326,6 +340,9 @@ model OrderItem {
   // a plain single-price product — kept as a snapshot since Product.variants
   // can change or be removed after the order is placed.
   variantLabel String?
+  // Which swatch (Product.swatches[].name) was bought, or null — same
+  // snapshot reasoning as variantLabel above.
+  swatchLabel  String?
   price        Float
   quantity     Int
   total        Float

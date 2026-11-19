@@ -108,8 +108,8 @@ export const generateInvoicePdf = (data: InvoiceData): Promise<Buffer> => {
             doc.text(String(i + 1), colX.no, rowY + 7)
                 .text(item.productName, colX.name, rowY + 7, { width: colWidths.name - 10, ellipsis: true })
                 .text(String(item.quantity), colX.qty, rowY + 7)
-                .text(`$${item.price.toFixed(2)}`, colX.price, rowY + 7)
-                .text(`$${item.total.toFixed(2)}`, colX.total, rowY + 7);
+                .text(`Tk ${item.price.toFixed(2)}`, colX.price, rowY + 7)
+                .text(`Tk ${item.total.toFixed(2)}`, colX.total, rowY + 7);
             rowY += 22;
         });
 
@@ -128,10 +128,10 @@ export const generateInvoicePdf = (data: InvoiceData): Promise<Buffer> => {
             rowY += 22;
         };
 
-        addTotalRow('Subtotal', `$${data.subtotal.toFixed(2)}`);
-        addTotalRow('Shipping', `$${(data.shippingCost ?? 0).toFixed(2)}`);
-        addTotalRow('Tax', `$${(data.tax ?? 0).toFixed(2)}`);
-        addTotalRow('TOTAL', `$${data.total.toFixed(2)}`, true, true);
+        addTotalRow('Subtotal', `Tk ${data.subtotal.toFixed(2)}`);
+        addTotalRow('Shipping', `Tk ${(data.shippingCost ?? 0).toFixed(2)}`);
+        addTotalRow('Tax', `Tk ${(data.tax ?? 0).toFixed(2)}`);
+        addTotalRow('TOTAL', `Tk ${data.total.toFixed(2)}`, true, true);
 
         // Footer
         doc.fillColor(mutedGray).fontSize(8).font('Helvetica')

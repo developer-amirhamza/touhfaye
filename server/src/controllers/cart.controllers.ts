@@ -59,7 +59,7 @@ export const getOrCreateCart = async (token: string, userId?: string) => {
 
 export const addToCart = async (req: AuthRequest, res: Response) => {
     try {
-        const { productId, quantity = "1", variantLabel } = req.body;
+        const { productId, quantity = "1", variantLabel, swatchLabel } = req.body;
         if (!productId) return errorHandler(res, 404, "Product id is required!");
         const product = await prisma.product.findFirst({
             where: { id: productId, isActive: true }
@@ -78,6 +78,16 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
             if (!match) return errorHandler(res, 400, "That option is no longer available for this product.");
             effectiveLabel = match.label;
         }
+        // Same default-to-first-match pattern as the size variant above, for
+        // the image-based Color/Flavor picker.
+        const swatches = Array.isArray(product.swatches) ? (product.swatches as any[]) : [];
+        let effectiveSwatch = "";
+        if (swatches.length > 0) {
+            const requested = typeof swatchLabel === "string" ? swatchLabel.trim() : "";
+            const match = requested ? swatches.find((s) => s?.name === requested) : swatches[0];
+            if (!match) return errorHandler(res, 400, "That option is no longer available for this product.");
+            effectiveSwatch = match.name;
+        }
         const unitPrice = resolveProductPrice(product, effectiveLabel);
 
         const token = await getCartToken(req, res)
@@ -86,7 +96,7 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
         let cart: any = await getOrCreateCart(token, userId);
 
         const existingItem = await prisma.cartItem.findUnique({
-            where: { cartId_productId_variantLabel: { cartId: cart.id, productId, variantLabel: effectiveLabel } },
+            where: { cartId_productId_variantLabel_swatchLabel: { cartId: cart.id, productId, variantLabel: effectiveLabel, swatchLabel: effectiveSwatch } },
         });
 
         if (existingItem) {
@@ -96,7 +106,7 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
             });
         } else {
             await prisma.cartItem.create({
-                data: { cartId: cart.id, productId, quantity, variantLabel: effectiveLabel, variantPrice: unitPrice },
+                data: { cartId: cart.id, productId, quantity, variantLabel: effectiveLabel, swatchLabel: effectiveSwatch, variantPrice: unitPrice },
             });
         }
 
@@ -216,10 +226,11 @@ export const mergeCartAfterLogin = async (req: AuthRequest, res: Response) => {
         for (const guestItem of guestCart.items) {
             const existingUserItem = await prisma.cartItem.findUnique({
                 where: {
-                    cartId_productId_variantLabel: {
+                    cartId_productId_variantLabel_swatchLabel: {
                         cartId: userCart.id,
                         productId: guestItem.productId,
                         variantLabel: guestItem.variantLabel,
+                        swatchLabel: guestItem.swatchLabel,
                     },
                 },
             });
@@ -237,6 +248,7 @@ export const mergeCartAfterLogin = async (req: AuthRequest, res: Response) => {
                         productId: guestItem.productId,
                         quantity: guestItem.quantity,
                         variantLabel: guestItem.variantLabel,
+                        swatchLabel: guestItem.swatchLabel,
                         variantPrice: guestItem.variantPrice,
                     }
                 })

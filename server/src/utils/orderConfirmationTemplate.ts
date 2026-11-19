@@ -31,10 +31,10 @@ export const orderConfirmationTemplate = (data: OrderEmailData): string => {
         ${item.quantity}
       </td>
       <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;text-align:right;">
-        $${item.price.toFixed(2)}
+        ৳${item.price.toFixed(2)}
       </td>
       <td style="padding:12px 16px;border-bottom:1px solid #F3F4F6;font-size:14px;color:#374151;text-align:right;font-weight:600;">
-        $${item.total.toFixed(2)}
+        ৳${item.total.toFixed(2)}
       </td>
     </tr>
   `).join('');
@@ -125,19 +125,19 @@ export const orderConfirmationTemplate = (data: OrderEmailData): string => {
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding:4px 0;font-size:13px;color:#6B7280;">Subtotal</td>
-                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">$${data.subtotal.toFixed(2)}</td>
+                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">৳${data.subtotal.toFixed(2)}</td>
                       </tr>
                       <tr>
                         <td style="padding:4px 0;font-size:13px;color:#6B7280;">Shipping</td>
-                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">$${(data.shippingCost ?? 0).toFixed(2)}</td>
+                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">৳${(data.shippingCost ?? 0).toFixed(2)}</td>
                       </tr>
                       <tr>
                         <td style="padding:4px 0;font-size:13px;color:#6B7280;">Tax</td>
-                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">$${(data.tax ?? 0).toFixed(2)}</td>
+                        <td style="padding:4px 0;font-size:13px;color:#374151;text-align:right;">৳${(data.tax ?? 0).toFixed(2)}</td>
                       </tr>
                       <tr>
                         <td style="padding:10px 0 4px;font-size:15px;color:#111827;font-weight:700;border-top:2px solid #E5E7EB;">Total</td>
-                        <td style="padding:10px 0 4px;font-size:15px;color:#2563EB;font-weight:700;text-align:right;border-top:2px solid #E5E7EB;">$${data.total.toFixed(2)}</td>
+                        <td style="padding:10px 0 4px;font-size:15px;color:#2563EB;font-weight:700;text-align:right;border-top:2px solid #E5E7EB;">৳${data.total.toFixed(2)}</td>
                       </tr>
                     </table>
                   </td>
