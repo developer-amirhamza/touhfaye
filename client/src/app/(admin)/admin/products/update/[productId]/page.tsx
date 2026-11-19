@@ -263,7 +263,7 @@ const ProductEditPage = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Price * (USD)</label>
+            <label className="block text-sm font-medium mb-1">Price * (BDT)</label>
             <input
               type="number"
               step="0.01"
@@ -465,7 +465,7 @@ const ProductEditPage = () => {
               rows={2}
               value={pricingNotes}
               onChange={(e) => setPricingNotes(e.target.value)}
-              placeholder="e.g., Priced by size: S $34.90, M $37.90, L $40.90, XL $43.90"
+              placeholder="e.g., Priced by size: S ৳350, M ৳380, L ৳410, XL ৳440"
               className="w-full border rounded px-3 py-2"
             />
           </div>

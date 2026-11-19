@@ -307,7 +307,7 @@ const ProductsContent = () => {
                         Hand-finished scented candles and heirloom-style jewellery, packed to be given. Every order leaves our studio gift-wrapped with a handwritten card at no extra cost.
                     </p>
                     <div className="flex gap-2.5 mt-5 flex-wrap">
-                        {['Gift wrap included', 'Free over ৳1500', 'Cash on delivery · bKash · Nagad'].map((t) => (
+                        {['Gift wrap included', 'Free over ৳3000', 'Cash on delivery · bKash · Nagad'].map((t) => (
                             <span key={t} className="bg-background text-accent rounded-full px-4 py-2 text-sm font-medium">
                                 {t}
                             </span>

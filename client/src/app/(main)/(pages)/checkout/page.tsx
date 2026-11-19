@@ -24,9 +24,9 @@ interface FormData {
 type PayMethod = "COD" | "BKASH" | "NAGAD" | "CARD";
 type DeliveryArea = "DHAKA" | "OUTSIDE";
 
-const FREE_DELIVERY_THRESHOLD = 1500;
-const DELIVERY_COST_DHAKA = 60;
-const DELIVERY_COST_OUTSIDE = 120;
+const FREE_DELIVERY_THRESHOLD = 3000;
+const DELIVERY_COST_DHAKA = 70;
+const DELIVERY_COST_OUTSIDE = 130;
 
 const PAY_METHODS: { value: PayMethod; label: string; note: string }[] = [
   { value: "COD", label: "Cash on delivery", note: "Pay the courier when your parcel arrives." },

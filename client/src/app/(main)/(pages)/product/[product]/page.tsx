@@ -25,7 +25,7 @@ const INFO_ACCORDION: FaqItem[] = [
     {
         id: 'shipping',
         question: 'Shipping & delivery',
-        answer: 'Dhaka: 1–2 business days, ৳60. Outside Dhaka: 2–4 business days, ৳120. Free delivery on orders over ৳1500.',
+        answer: 'Dhaka: 1–2 business days, ৳70. Outside Dhaka: 2–4 business days, ৳130. Free delivery on orders over ৳3000.',
     },
     {
         id: 'returns',

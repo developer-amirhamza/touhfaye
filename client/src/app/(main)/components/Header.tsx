@@ -105,7 +105,7 @@ const Header = () => {
             {/* Top bar — a single static tracked line, matching the design mock */}
             <div className="bg-secondary text-secondary-light text-center">
                 <div className="px-4 py-2.5 text-[11.5px] tracking-[.16em] whitespace-nowrap overflow-x-auto no-scrollbar">
-                    FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳1500 · CASH ON DELIVERY · bKash · Nagad
+                    FREE DELIVERY INSIDE DHAKA ON ORDERS OVER ৳3000 · CASH ON DELIVERY · bKash · Nagad
                 </div>
             </div>
 
