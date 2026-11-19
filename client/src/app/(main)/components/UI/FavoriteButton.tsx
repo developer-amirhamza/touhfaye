@@ -11,7 +11,7 @@ interface Props {
     size?: number;
 }
 
-// Heart toggle used on product cards and the product detail gallery — matches
+// Heart toggle used on product cards and the product 
 // the design mock's favourite icon (outline when unsaved, filled when saved).
 const FavoriteButton: React.FC<Props> = ({ product, className = '', size = 17 }) => {
     const dispatch = useDispatch<AppDispatch>();
