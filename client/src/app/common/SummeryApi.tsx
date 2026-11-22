@@ -138,6 +138,11 @@ export const SummeryApi = {
         url: "/api/orders/lookup",
         method: "get",
     },
+    fetchMyOrderByNumber: {
+        // GET /api/orders/my-orders/:orderNumber — append the order number
+        url: "/api/orders/my-orders",
+        method: "get",
+    },
     fetchAllOrdersByAdmin: {
         url: "/api/orders/admin/get-all-orders",
         method: "get",

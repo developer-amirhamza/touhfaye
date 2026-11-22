@@ -29,7 +29,7 @@ const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { user, status: authStatus } = useSelector((state: RootState) => state.userSlice);
-  const { orders, status: ordersStatus } = useSelector((state: RootState) => state.orderSlice);
+  const { orders, myOrdersStatus: ordersStatus } = useSelector((state: RootState) => state.orderSlice);
 
   const [profile, setProfile] = useState<UserProfile>({
     id: '',

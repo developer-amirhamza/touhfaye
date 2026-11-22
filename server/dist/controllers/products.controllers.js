@@ -72,7 +72,7 @@ const parseSwatchesInput = (raw) => {
 };
 const createProduct = async (req, res) => {
     try {
-        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
+        const { title, price, description, longDescription, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof title !== "string" || !title.trim() || price === undefined || price === null || price === "") {
             return (0, errorHandler_1.errorHandler)(res, 400, "Please provide the required fields", true);
         }
@@ -121,7 +121,7 @@ const createProduct = async (req, res) => {
         const position = (_max.position ?? -1) + 1;
         const newProduct = await prisma_1.prisma.product.create({
             data: {
-                title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null,
+                title: title.trim(), price: priceNum, description, longDescription, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null,
                 variants: variantRows && variantRows.length > 0 ? variantRows : undefined,
                 swatchLabel: swatchLabelTrimmed || null,
                 swatches: swatchRows && swatchRows.length > 0 ? swatchRows : undefined,
@@ -137,7 +137,7 @@ const createProduct = async (req, res) => {
 exports.createProduct = createProduct;
 const updateProduct = async (req, res) => {
     try {
-        const { id, title, price, description, colors, sizes, discount, more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
+        const { id, title, price, description, longDescription, colors, sizes, discount, more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof id !== "string" || !id.trim())
             return (0, errorHandler_1.errorHandler)(res, 400, "Product id is required", true);
         const existing = await prisma_1.prisma.product.findUnique({ where: { id } });
@@ -209,6 +209,7 @@ const updateProduct = async (req, res) => {
                 title: typeof title === "string" ? title.trim() : undefined,
                 price: price !== undefined ? (0, validation_1.parseFiniteNumber)(price) : undefined,
                 description,
+                longDescription,
                 colors,
                 sizes,
                 discount: discount !== undefined ? (0, validation_1.parseFiniteNumber)(discount) : undefined,
@@ -277,6 +278,7 @@ const duplicateProduct = async (req, res) => {
                 images: source.images,
                 videos: source.videos,
                 description: source.description,
+                longDescription: source.longDescription,
                 price: source.price,
                 discount: source.discount,
                 stock: source.stock,

@@ -172,6 +172,10 @@ model Product {
   images        String[]
   videos        String[]     @default([])
   description   String?
+  // Rich HTML from the admin form's text editor — a fuller write-up shown
+  // on the product page below the gallery/buy box, separate from the
+  // short plain-text `description` used in cards and listings.
+  longDescription String?
   price         Float
   discount      Float?
   stock         Int          @default(0)
@@ -312,8 +316,17 @@ model Order {
   total                 Float
   paymentMethod         String      @default("Stripe")
   paymentStatus         String      @default("Pending")
+  // Canonical values: Pending, Approved, Preparing, ReadyToShip, WithCourier,
+  // Delivered, Cancelled — see client/src/app/common/orderStatus.ts for the
+  // display labels and step order.
   orderStatus           String      @default("Pending")
+  // Append-only log of status changes: [{status, at}], written whenever
+  // admin changes orderStatus — powers the customer-facing order timeline.
   statusHistory         Json?
+  // Set by admin once dispatched, so the customer can open the courier's
+  // own tracking page for this order.
+  courierName           String?
+  courierTrackingLink   String?
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
   stripeSessionId       String?     @unique

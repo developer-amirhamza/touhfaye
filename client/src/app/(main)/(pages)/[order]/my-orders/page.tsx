@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchMyOrders } from "@/redux/slices/orderSlice";
 import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
+import { orderStatusLabel } from "@/app/common/orderStatus";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Loader from "@/app/(main)/components/UI/Loader";
 
 const statusStyle = (status: string) => {
@@ -17,7 +19,7 @@ const statusStyle = (status: string) => {
 const MyOrdersPage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { orders, status, error } = useSelector((state: RootState) => state.orderSlice);
+    const { orders, myOrdersStatus, myOrdersError } = useSelector((state: RootState) => state.orderSlice);
     const { user, status: authStatus } = useSelector((state: RootState) => state.userSlice);
     const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
@@ -28,16 +30,16 @@ const MyOrdersPage = () => {
     }, [authStatus, user, router]);
 
     useEffect(() => {
-        if (user && status === "idle") {
+        if (user && myOrdersStatus === "idle") {
             dispatch(fetchMyOrders());
         }
-    }, [user, status, dispatch]);
+    }, [user, myOrdersStatus, dispatch]);
 
     const toggleOrderDetails = (orderId: string) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
-    if (status === "loading") {
+    if (myOrdersStatus === "loading" || myOrdersStatus === "idle") {
         return (
             <div className="bg-background flex justify-center items-center min-h-[60vh]">
                 <Loader />
@@ -45,10 +47,10 @@ const MyOrdersPage = () => {
         );
     }
 
-    if (error) {
+    if (myOrdersError) {
         return (
             <div className="bg-background text-center py-24">
-                <p className="text-red-600 font-light">Failed to load orders: {error}</p>
+                <p className="text-red-600 font-light">Failed to load orders: {myOrdersError}</p>
                 <button
                     onClick={() => dispatch(fetchMyOrders())}
                     className="mt-4 bg-secondary hover:bg-secondary-hover text-background px-6 py-3 text-[11px] tracking-[.18em] transition-colors"
@@ -88,39 +90,54 @@ const MyOrdersPage = () => {
                                 <div className="text-right">
                                     <p className="text-title font-medium">{DisplayPriceInBdt(order.total)}</p>
                                     <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full inline-block mt-1 ${statusStyle(order.orderStatus)}`}>
-                                        {order.orderStatus}
+                                        {orderStatusLabel(order.orderStatus)}
                                     </span>
                                 </div>
                             </div>
 
                             {expandedOrder === order.id && (
                                 <div className="p-5 border-t border-primary-hover">
-                                    <div className="mb-5">
-                                        <h3 className="text-[11px] tracking-[.18em] text-accent mb-2">DELIVERY</h3>
-                                        <p className="text-sm text-paragraph font-light">{order.email} · {order.phone}</p>
-                                        <p className="text-sm text-paragraph font-light">{order.shippingAddress}</p>
+                                    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                                        <div>
+                                            <h3 className="text-[11px] tracking-[.18em] text-accent mb-2">DELIVERY</h3>
+                                            <p className="text-sm text-paragraph font-light">{order.email} · {order.phone}</p>
+                                            <p className="text-sm text-paragraph font-light">{order.shippingAddress}</p>
+                                        </div>
+                                        <Link
+                                            href={`/order/my-orders/${order.orderNumber}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="bg-secondary hover:bg-secondary-hover text-background px-5 py-2.5 text-[11px] tracking-[.18em] transition-colors shrink-0"
+                                        >
+                                            TRACK ORDER
+                                        </Link>
                                     </div>
                                     <div>
                                         <h3 className="text-[11px] tracking-[.18em] text-accent mb-3">ITEMS</h3>
                                         <div className="flex flex-col gap-3">
-                                            {order.items.map((item: any) => (
-                                                <div key={item.id} className="flex gap-3 border-b border-primary-hover pb-3 last:border-0">
-                                                    {item.productImage && (
-                                                        <img
-                                                            src={item.productImage}
-                                                            alt={item.productName}
-                                                            className="w-16 h-16 object-cover flex-none bg-primary"
-                                                        />
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <p className="text-[14px] text-title">{item.productName}</p>
-                                                        <p className="text-[12.5px] text-foreground font-light mt-1">
-                                                            Qty {item.quantity} × {DisplayPriceInBdt(item.price)}
-                                                        </p>
+                                            {order.items.map((item: any) => {
+                                                const options = [item.swatchLabel, item.variantLabel].filter(Boolean).join(" · ");
+                                                return (
+                                                    <div key={item.id} className="flex gap-3 border-b border-primary-hover pb-3 last:border-0">
+                                                        {item.productImage && (
+                                                            <img
+                                                                src={item.productImage}
+                                                                alt={item.productName}
+                                                                className="w-16 h-16 object-cover flex-none bg-primary"
+                                                            />
+                                                        )}
+                                                        <div className="flex-1">
+                                                            <p className="text-[14px] text-title">{item.productName}</p>
+                                                            {options && (
+                                                                <p className="text-[12px] text-accent font-light mt-0.5">{options}</p>
+                                                            )}
+                                                            <p className="text-[12.5px] text-foreground font-light mt-1">
+                                                                Qty {item.quantity} × {DisplayPriceInBdt(item.price)}
+                                                            </p>
+                                                        </div>
+                                                        <p className="text-[14px] text-title whitespace-nowrap">{DisplayPriceInBdt(item.total)}</p>
                                                     </div>
-                                                    <p className="text-[14px] text-title whitespace-nowrap">{DisplayPriceInBdt(item.total)}</p>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                     <div className="mt-5 pt-4 border-t border-primary-hover flex flex-col items-end gap-1">

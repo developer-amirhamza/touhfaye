@@ -73,7 +73,7 @@ const parseSwatchesInput = (raw: unknown): { name: string; image: string }[] | n
 
 export const createProduct = async (req: Request, res: Response) => {
     try {
-        const { title, price, description, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
+        const { title, price, description, longDescription, colors, sizes, discount, more_details, category, stock, images, videos, categoryId, subcategoryId, variants, swatchLabel, swatches, slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
         if (typeof title !== "string" || !title.trim() || price === undefined || price === null || price === "") {
             return errorHandler(res, 400, "Please provide the required fields", true)
         }
@@ -123,7 +123,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
         const newProduct = await prisma.product.create({
             data: {
-                title: title.trim(), price: priceNum, description, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null,
+                title: title.trim(), price: priceNum, description, longDescription, colors, sizes, discount: discountNum, more_details, category, stock: stockNum, images, videos: videos || [], categoryId, subcategoryId, slug, metaTitle: metaTitle || null, metaDescription: metaDescription || null, collectionTag: collectionTag || null,
                 variants: variantRows && variantRows.length > 0 ? variantRows : undefined,
                 swatchLabel: swatchLabelTrimmed || null,
                 swatches: swatchRows && swatchRows.length > 0 ? swatchRows : undefined,
@@ -139,7 +139,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { id, title, price, description, colors, sizes, discount,
+    const { id, title, price, description, longDescription, colors, sizes, discount,
             more_details, categoryId, subcategoryId, stock, images, videos, isActive, variants,
             swatchLabel, swatches,
             slug: requestedSlug, metaTitle, metaDescription, collectionTag } = req.body;
@@ -214,6 +214,7 @@ export const updateProduct = async (req: Request, res: Response) => {
         title: typeof title === "string" ? title.trim() : undefined,
         price: price !== undefined ? parseFiniteNumber(price) as number : undefined,
         description,
+        longDescription,
         colors,
         sizes,
         discount: discount !== undefined ? parseFiniteNumber(discount) as number : undefined,
@@ -281,6 +282,7 @@ export const duplicateProduct = async (req: Request, res: Response) => {
                 images: source.images,
                 videos: source.videos,
                 description: source.description,
+                longDescription: source.longDescription,
                 price: source.price,
                 discount: source.discount,
                 stock: source.stock,

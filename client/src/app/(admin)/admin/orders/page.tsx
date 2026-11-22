@@ -9,6 +9,8 @@ import OrderDetailModal from "./components/OrderDetailModal";
 import { FaEye, FaFilter, FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { format } from "date-fns";
 import { baseUrl } from "@/app/common/SummeryApi";
+import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
+import { ALL_ORDER_STATUSES, orderStatusLabel } from "@/app/common/orderStatus";
 
 interface OrderItem {
     id: string;
@@ -22,7 +24,8 @@ interface OrderItem {
 interface Order {
     id: string;
     orderNumber: string;
-    name: string;
+    firstName?: string | null;
+    lastName?: string | null;
     email: string;
     phone: string;
     shippingAddress: string;
@@ -38,12 +41,23 @@ interface Order {
     items: OrderItem[];
     user?: {
         id: string;
-        name: string;
+        firstName?: string | null;
+        lastName?: string | null;
         email: string;
     };
 }
 
-type FilterType = "all" | "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+// Customer name isn't stored as a single field — fall back to the linked
+// account's name for a signed-in order, since a guest order only has the
+// snapshot firstName/lastName on the order itself.
+const customerName = (order: Order): string => {
+    const own = [order.firstName, order.lastName].filter(Boolean).join(" ");
+    if (own) return own;
+    const linked = [order.user?.firstName, order.user?.lastName].filter(Boolean).join(" ");
+    return linked || "—";
+};
+
+type FilterType = "all" | (typeof ALL_ORDER_STATUSES)[number];
 type PaymentFilterType = "all" | "Pending" | "Completed" | "Failed" | "Cancelled";
 
 const AdminOrdersPage = () => {
@@ -88,7 +102,7 @@ const AdminOrdersPage = () => {
 
         // Status filter
         if (statusFilter !== "all") {
-            filtered = filtered.filter((order) => order.orderStatus.toLowerCase() === statusFilter.toLowerCase());
+            filtered = filtered.filter((order) => order.orderStatus === statusFilter);
         }
 
         // Payment filter
@@ -111,7 +125,7 @@ const AdminOrdersPage = () => {
             filtered = filtered.filter((order) =>
                 order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 order.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                order.name.toLowerCase().includes(searchTerm.toLowerCase())
+                customerName(order).toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
 
@@ -143,7 +157,7 @@ const AdminOrdersPage = () => {
         order.items.map((it) => ({
             "Order #": order.orderNumber,
             Date: format(new Date(order.createdAt), "dd MMM yyyy"),
-            Customer: order.name,
+            Customer: customerName(order),
             Email: order.email,
             Phone: order.phone,
             "Shipping Address": order.shippingAddress,
@@ -231,17 +245,20 @@ const AdminOrdersPage = () => {
     };
 
     const getStatusBadgeColor = (status: string) => {
-        const statusLower = status.toLowerCase();
-        switch (statusLower) {
-            case "pending":
+        switch (status) {
+            case "Pending":
                 return "bg-yellow-100 text-yellow-800";
-            case "processing":
+            case "Approved":
                 return "bg-blue-100 text-blue-800";
-            case "shipped":
+            case "Preparing":
+                return "bg-purple-100 text-purple-800";
+            case "ReadyToShip":
+                return "bg-cyan-100 text-cyan-800";
+            case "WithCourier":
                 return "bg-indigo-100 text-indigo-800";
-            case "delivered":
+            case "Delivered":
                 return "bg-green-100 text-green-800";
-            case "cancelled":
+            case "Cancelled":
                 return "bg-red-100 text-red-800";
             default:
                 return "bg-gray-100 text-gray-800";
@@ -300,19 +317,19 @@ const AdminOrdersPage = () => {
                 <div className="bg-white rounded-lg shadow p-6">
                     <h3 className="text-gray-600 text-sm font-medium">Pending Orders</h3>
                     <p className="text-3xl font-bold text-yellow-600 mt-2">
-                        {orders.filter((o) => o.orderStatus.toLowerCase() === "pending").length}
+                        {orders.filter((o) => o.orderStatus === "Pending").length}
                     </p>
                 </div>
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h3 className="text-gray-600 text-sm font-medium">Shipped Orders</h3>
+                    <h3 className="text-gray-600 text-sm font-medium">With Courier</h3>
                     <p className="text-3xl font-bold text-blue-600 mt-2">
-                        {orders.filter((o) => o.orderStatus.toLowerCase() === "shipped").length}
+                        {orders.filter((o) => o.orderStatus === "WithCourier").length}
                     </p>
                 </div>
                 <div className="bg-white rounded-lg shadow p-6">
                     <h3 className="text-gray-600 text-sm font-medium">Total Revenue</h3>
                     <p className="text-3xl font-bold text-green-600 mt-2">
-                        ${orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)}
+                        {DisplayPriceInBdt(orders.reduce((sum, o) => sum + o.total, 0))}
                     </p>
                 </div>
             </div>
@@ -350,11 +367,9 @@ const AdminOrdersPage = () => {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="all">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
+                            {ALL_ORDER_STATUSES.map((s) => (
+                                <option key={s} value={s}>{orderStatusLabel(s)}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -469,7 +484,7 @@ const AdminOrdersPage = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm">
-                                            <p className="font-medium text-gray-900">{order.name}</p>
+                                            <p className="font-medium text-gray-900">{customerName(order)}</p>
                                             <p className="text-gray-500 text-xs">{order.email}</p>
                                         </div>
                                     </td>
@@ -480,12 +495,12 @@ const AdminOrdersPage = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className="text-sm font-semibold text-gray-900">
-                                            ${order.total.toFixed(2)}
+                                            {DisplayPriceInBdt(order.total)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(order.orderStatus)}`}>
-                                            {order.orderStatus}
+                                            {orderStatusLabel(order.orderStatus)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">

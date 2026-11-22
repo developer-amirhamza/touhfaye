@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useParams } from 'next/navigation';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -12,6 +13,8 @@ import { fetchSubcategoriesByCategory } from '@/redux/slices/subcategorySlice';
 import ImageUploader from '../../../components/ImageUploader';
 import VideoUploader from '../../../components/VideoUploader';
 import { PRODUCT_COLLECTION_OPTIONS } from '@/app/common/productCollections';
+
+const RichTextEditor = dynamic(() => import('@/app/(main)/components/UI/RichTextEditor'), { ssr: false });
 
 interface MoreDetails {
   [key: string]: string;
@@ -45,6 +48,7 @@ const ProductEditPage = () => {
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
+  const [longDescription, setLongDescription] = useState('');
   const [swatchLabel, setSwatchLabel] = useState('');
   const [swatches, setSwatches] = useState<Swatch[]>([]);
   const [swatchNameInput, setSwatchNameInput] = useState('');
@@ -97,6 +101,7 @@ const ProductEditPage = () => {
           setTitle(product.title || '');
           setPrice(product.price?.toString() || '');
           setDescription(product.description || '');
+          setLongDescription(product.longDescription || '');
           setSwatchLabel(product.swatchLabel || '');
           setSwatches(Array.isArray(product.swatches) ? product.swatches : []);
           setSizes(product.sizes || []);
@@ -231,6 +236,7 @@ const ProductEditPage = () => {
       title,
       price: parseFloat(price),
       description: description || undefined,
+      longDescription: longDescription || null,
       sizes: sizes.length ? sizes : undefined,
       discount: discount ? parseFloat(discount) : 0,
       more_details: Object.keys(moreDetails).length ? moreDetails : undefined,
@@ -328,6 +334,15 @@ const ProductEditPage = () => {
               className="w-full border rounded px-3 py-2"
             />
           </div>
+        </div>
+
+        {/* Long description — shown on the product page below the gallery */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Long description (optional)</label>
+          <p className="text-xs text-neutral-500 mb-2">
+            A fuller write-up with headings, lists or links — shown on the product page below the photos.
+          </p>
+          <RichTextEditor value={longDescription} onChange={setLongDescription} />
         </div>
 
         {/* Priced options — the product page's SIZE picker */}
