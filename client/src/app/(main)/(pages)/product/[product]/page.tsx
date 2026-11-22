@@ -245,6 +245,7 @@ const ProductDetailsPage = () => {
 
             <section className="max-w-[1240px] mx-auto px-7 pt-6.5 pb-19 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] gap-12 items-start">
                 {/* Gallery */}
+                <div>
                 <div className={`grid ${media.length > 1 ? 'grid-cols-[62px_minmax(0,1fr)]' : 'grid-cols-1'} gap-3`}>
                     {media.length > 1 && (
                         <div className="flex flex-col gap-2.5">
@@ -281,6 +282,14 @@ const ProductDetailsPage = () => {
                             </span>
                         )}
                     </div>
+                </div>
+
+                {data.longDescription && (
+                    <div
+                        className="mt-7 text-[#3F3A30] font-light text-[15px] leading-[1.85] [&>*+*]:mt-4.5 [&_a]:text-title [&_a]:no-underline [&_a:hover]:underline [&_h2]:font-secondary [&_h2]:text-title [&_h2]:text-xl [&_h2]:font-normal [&_h3]:font-secondary [&_h3]:text-title [&_h3]:text-lg [&_h3]:font-normal"
+                        dangerouslySetInnerHTML={{ __html: data.longDescription }}
+                    />
+                )}
                 </div>
 
                 {/* Info */}

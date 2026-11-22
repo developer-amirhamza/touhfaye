@@ -172,6 +172,10 @@ model Product {
   images        String[]
   videos        String[]     @default([])
   description   String?
+  // Rich HTML from the admin form's text editor — a fuller write-up shown
+  // on the product page below the gallery/buy box, separate from the
+  // short plain-text `description` used in cards and listings.
+  longDescription String?
   price         Float
   discount      Float?
   stock         Int          @default(0)
