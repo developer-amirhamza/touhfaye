@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 const Hero = () => {
     return (
-        <section className="relative min-h-[560px] md:min-h-[640px] flex items-center overflow-hidden bg-primary">
+        <section className="relative min-h-140 md:min-h-160 flex items-center overflow-hidden bg-primary">
             <video
                 className="absolute inset-0 w-full h-full object-cover"
                 src="/touhfaye/gift-box-1.mp4"
@@ -15,7 +15,7 @@ const Hero = () => {
             />
             <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(90deg, rgba(10,20,14,.62) 0%, rgba(10,20,14,.4) 35%, rgba(10,20,14,.15) 100%)" }}
+                // style={{ background: "linear-gradient(90deg, rgba(10,20,14,.62) 0%, rgba(10,20,14,.4) 35%, rgba(10,20,14,.15) 100%)" }}
             />
 
             {/* <div className="relative z-10 container mx-auto px-6 py-18 w-full">
