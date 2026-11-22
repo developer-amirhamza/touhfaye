@@ -7,6 +7,9 @@ import { SummeryApi } from "@/app/common/SummeryApi";
 import AxiosToastError from "@/utils/AxiosToastError";
 import toast from "react-hot-toast";
 import { MdNoteAlt } from "react-icons/md";
+import { DisplayPriceInBdt } from "@/utils/DisplayPriceInBdt";
+import { ALL_ORDER_STATUSES, orderStatusLabel } from "@/app/common/orderStatus";
+import { format } from "date-fns";
 
 interface OrderItem {
     id: string;
@@ -15,12 +18,15 @@ interface OrderItem {
     price: number;
     quantity: number;
     total: number;
+    variantLabel?: string | null;
+    swatchLabel?: string | null;
 }
 
 interface Order {
     id: string;
     orderNumber: string;
-    name: string;
+    firstName?: string | null;
+    lastName?: string | null;
     email: string;
     phone: string;
     shippingAddress: string;
@@ -31,6 +37,9 @@ interface Order {
     paymentMethod: string;
     paymentStatus: string;
     orderStatus: string;
+    statusHistory?: { status: string; at: string }[] | null;
+    courierName?: string | null;
+    courierTrackingLink?: string | null;
     orderNote?: string;
     adminNote?: string;
     fundingDetails?: any;
@@ -39,10 +48,21 @@ interface Order {
     items: OrderItem[];
     user?: {
         id: string;
-        name: string;
+        firstName?: string | null;
+        lastName?: string | null;
         email: string;
     };
 }
+
+// Customer name isn't stored as a single field — fall back to the linked
+// account's name for a signed-in order, since a guest order only has the
+// snapshot firstName/lastName on the order itself.
+const customerName = (order: Order): string => {
+    const own = [order.firstName, order.lastName].filter(Boolean).join(" ");
+    if (own) return own;
+    const linked = [order.user?.firstName, order.user?.lastName].filter(Boolean).join(" ");
+    return linked || "—";
+};
 
 interface OrderDetailModalProps {
     order: Order;
@@ -57,12 +77,20 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
 }) => {
     const [orderStatus, setOrderStatus] = useState(order.orderStatus);
     const [paymentStatus, setPaymentStatus] = useState(order.paymentStatus);
-    const [adminNote, setAdminNote] = useState(order.adminNote);
+    const [adminNote, setAdminNote] = useState(order.adminNote || "");
+    const [courierName, setCourierName] = useState(order.courierName || "");
+    const [courierTrackingLink, setCourierTrackingLink] = useState(order.courierTrackingLink || "");
     const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
     const handleUpdate = async () => {
-        if (orderStatus === order.orderStatus && paymentStatus === order.paymentStatus && adminNote === order.adminNote) {
+        if (
+            orderStatus === order.orderStatus &&
+            paymentStatus === order.paymentStatus &&
+            adminNote === (order.adminNote || "") &&
+            courierName === (order.courierName || "") &&
+            courierTrackingLink === (order.courierTrackingLink || "")
+        ) {
             toast.error("No changes to update");
             return;
         }
@@ -75,7 +103,9 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 data: {
                     orderStatus,
                     paymentStatus,
-                    adminNote
+                    adminNote,
+                    courierName,
+                    courierTrackingLink,
                 },
             });
 
@@ -123,7 +153,7 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                     </div>
                                     <div className="flex-1">
                                         <p className="text-xs text-gray-500 uppercase">Name</p>
-                                        <p className="text-sm font-medium text-gray-900">{order.name}</p>
+                                        <p className="text-sm font-medium text-gray-900">{customerName(order)}</p>
                                     </div>
                                 </div>
 
@@ -180,23 +210,29 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                 Order Items ({order.items?.length || 0})
                             </h3>
                             <div className="space-y-3 max-h-64 overflow-y-auto">
-                                {order.items?.map((item, index) => (
-                                    <div key={item.id} className="flex gap-4 p-3 bg-gray-50 rounded-lg">
-                                        {item.productImage && (
-                                            <img
-                                                src={item.productImage}
-                                                alt={item.productName}
-                                                className="w-16 h-16 object-cover rounded"
-                                            />
-                                        )}
-                                        <div className="flex-1">
-                                            <p className="font-medium text-gray-900">{item.productName}</p>
-                                            <p className="text-sm text-gray-600">
-                                                ${item.price.toFixed(2)} × {item.quantity} = ${item.total.toFixed(2)}
-                                            </p>
+                                {order.items?.map((item, index) => {
+                                    const options = [item.swatchLabel, item.variantLabel].filter(Boolean).join(" · ");
+                                    return (
+                                        <div key={item.id} className="flex gap-4 p-3 bg-gray-50 rounded-lg">
+                                            {item.productImage && (
+                                                <img
+                                                    src={item.productImage}
+                                                    alt={item.productName}
+                                                    className="w-16 h-16 object-cover rounded"
+                                                />
+                                            )}
+                                            <div className="flex-1">
+                                                <p className="font-medium text-gray-900">{item.productName}</p>
+                                                {options && (
+                                                    <p className="text-xs text-secondary font-medium">{options}</p>
+                                                )}
+                                                <p className="text-sm text-gray-600">
+                                                    {DisplayPriceInBdt(item.price)} × {item.quantity} = {DisplayPriceInBdt(item.total)}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
 
@@ -210,20 +246,20 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                             <div className="space-y-2 mb-4 pb-4 border-b border-gray-200">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Subtotal:</span>
-                                    <span className="font-medium text-gray-900">${order.subtotal.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-900">{DisplayPriceInBdt(order.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Shipping:</span>
-                                    <span className="font-medium text-gray-900">${order.shippingCost.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-900">{DisplayPriceInBdt(order.shippingCost)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Tax:</span>
-                                    <span className="font-medium text-gray-900">${order.tax.toFixed(2)}</span>
+                                    <span className="font-medium text-gray-900">{DisplayPriceInBdt(order.tax)}</span>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-semibold text-gray-900">Total:</span>
-                                <span className="font-bold text-lg text-green-600">${order.total.toFixed(2)}</span>
+                                <span className="font-bold text-lg text-green-600">{DisplayPriceInBdt(order.total)}</span>
                             </div>
                         </div>
 
@@ -242,11 +278,9 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                     disabled={loading}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
                                 >
-                                    <option value="Pending">Pending</option>
-                                    <option value="Processing">Processing</option>
-                                    <option value="Shipped">Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Cancelled">Cancelled</option>
+                                    {ALL_ORDER_STATUSES.map((s) => (
+                                        <option key={s} value={s}>{orderStatusLabel(s)}</option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -282,6 +316,29 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                 />
                             </div>
 
+                            {/* Courier tracking — shown to the customer once set */}
+                            <div className="mb-4 space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Courier tracking
+                                </label>
+                                <input
+                                    type="text"
+                                    value={courierName}
+                                    onChange={(e) => setCourierName(e.target.value)}
+                                    disabled={loading}
+                                    placeholder="Courier name, e.g. Pathao, Sundarban"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
+                                />
+                                <input
+                                    type="url"
+                                    value={courierTrackingLink}
+                                    onChange={(e) => setCourierTrackingLink(e.target.value)}
+                                    disabled={loading}
+                                    placeholder="Tracking link, e.g. https://merchant.pathao.com/track/..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary disabled:opacity-50"
+                                />
+                            </div>
+
                             {/* Order Details */}
                             <div className="space-y-2 text-xs mb-4 pb-4 border-b border-gray-200">
                                 <div className="flex justify-between">
@@ -311,6 +368,19 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                 </div>
                             </div>
 
+                            {/* Status history — what the customer sees on their tracking page */}
+                            {order.statusHistory && order.statusHistory.length > 0 && (
+                                <div className="space-y-1.5 text-xs mb-4 pb-4 border-b border-gray-200">
+                                    <p className="font-medium text-gray-700 mb-1">Status history</p>
+                                    {order.statusHistory.map((h, i) => (
+                                        <div key={i} className="flex justify-between gap-3">
+                                            <span className="text-gray-600">{orderStatusLabel(h.status)}</span>
+                                            <span className="text-gray-900">{format(new Date(h.at), "dd MMM, h:mm a")}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             {/* Edit/Save Buttons */}
                             {!isEditing ? (
                                 <button
@@ -325,6 +395,8 @@ const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                                         onClick={() => {
                                             setOrderStatus(order.orderStatus);
                                             setPaymentStatus(order.paymentStatus);
+                                            setCourierName(order.courierName || "");
+                                            setCourierTrackingLink(order.courierTrackingLink || "");
                                             setIsEditing(false);
                                         }}
                                         disabled={loading}

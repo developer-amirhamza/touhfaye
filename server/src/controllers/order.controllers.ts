@@ -6,6 +6,7 @@ import { sendEmail } from "../config/sendEmail";
 import { generateInvoicePdf } from "../utils/generateInvoicePdf";
 import { orderConfirmationTemplate } from "../utils/orderConfirmationTemplate";
 import { resolveProductPrice } from "../services/pricing";
+import { isValidOrderStatus } from "../constants/orderStatus";
 
 
 
@@ -274,15 +275,37 @@ export const updateOrderByAdmin = async (req: AuthRequest, res: Response) => {
         const { orderId } = req.query;
         if (!orderId) return errorHandler(res, 400, "orderId is required");
 
-        const { orderStatus, paymentStatus, adminNote } = req.body;
-        if (!orderStatus && !paymentStatus) {
-            return errorHandler(res, 400, "Provide at least one of orderStatus or paymentStatus");
+        const { orderStatus, paymentStatus, adminNote, courierName, courierTrackingLink } = req.body;
+        if (!orderStatus && !paymentStatus && courierName === undefined && courierTrackingLink === undefined) {
+            return errorHandler(res, 400, "Provide at least one of orderStatus, paymentStatus, courierName or courierTrackingLink");
+        }
+        if (orderStatus && !isValidOrderStatus(orderStatus)) {
+            return errorHandler(res, 400, "Invalid order status");
         }
 
-        const data: { orderStatus?: string; paymentStatus?: string; adminNote?: string; } = {};
+        const existing = await prisma.order.findUnique({ where: { id: orderId as string } });
+        if (!existing) return errorHandler(res, 404, "Order not found");
+
+        const data: {
+            orderStatus?: string; paymentStatus?: string; adminNote?: string;
+            courierName?: string | null; courierTrackingLink?: string | null;
+            statusHistory?: any;
+        } = {};
         if (orderStatus) data.orderStatus = orderStatus;
         if (paymentStatus) data.paymentStatus = paymentStatus;
         if (adminNote) data.adminNote = adminNote;
+        if (courierName !== undefined) data.courierName = courierName || null;
+        if (courierTrackingLink !== undefined) data.courierTrackingLink = courierTrackingLink || null;
+
+        // Log the transition for the customer-facing timeline — only when
+        // the status actually changed, and never duplicate an already-logged
+        // step (e.g. admin re-saves the same status alongside a courier link).
+        if (orderStatus && orderStatus !== existing.orderStatus) {
+            const history = Array.isArray(existing.statusHistory) ? (existing.statusHistory as any[]) : [];
+            if (!history.some((h) => h?.status === orderStatus)) {
+                data.statusHistory = [...history, { status: orderStatus, at: new Date().toISOString() }];
+            }
+        }
 
         const updatedOrder = await prisma.order.update({
             where: { id: orderId as string },
@@ -290,6 +313,28 @@ export const updateOrderByAdmin = async (req: AuthRequest, res: Response) => {
             include: { items: true }
         })
         return errorHandler(res, 200, "The order updated successfully!", false, updatedOrder);
+    } catch (error: any) {
+        return errorHandler(res, 500, error.message || "Internal server error!");
+    }
+};
+
+// Signed-in customer: a single order of their own, by orderNumber. 404s
+// (rather than 403) if it exists but belongs to someone else, so this can't
+// be used to probe which order numbers exist.
+export const getMyOrderByNumber = async (req: AuthRequest, res: Response) => {
+    try {
+        const userId = req.userId;
+        if (!userId) return errorHandler(res, 401, "Unauthorized, Please login again");
+        const orderNumber = String(req.params.orderNumber ?? "");
+        if (!orderNumber) return errorHandler(res, 400, "Order number is required");
+
+        const order = await prisma.order.findFirst({
+            where: { orderNumber, userId },
+            include: { items: true },
+        });
+        if (!order) return errorHandler(res, 404, "Order not found");
+
+        return errorHandler(res, 200, "The order found successfully!", false, order);
     } catch (error: any) {
         return errorHandler(res, 500, error.message || "Internal server error!");
     }

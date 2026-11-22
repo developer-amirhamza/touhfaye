@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadInvoiceByAdmin = exports.updateOrderByAdmin = exports.getAllOrdersByAdmin = exports.getOrdersByOrderNumber = exports.getMyOrders = exports.placeOrder = void 0;
+exports.downloadInvoiceByAdmin = exports.getMyOrderByNumber = exports.updateOrderByAdmin = exports.getAllOrdersByAdmin = exports.getOrdersByOrderNumber = exports.getMyOrders = exports.placeOrder = void 0;
 const prisma_1 = require("../lib/prisma");
 const errorHandler_1 = require("../utils/errorHandler");
 const cart_controllers_1 = require("./cart.controllers");
@@ -8,6 +8,7 @@ const sendEmail_1 = require("../config/sendEmail");
 const generateInvoicePdf_1 = require("../utils/generateInvoicePdf");
 const orderConfirmationTemplate_1 = require("../utils/orderConfirmationTemplate");
 const pricing_1 = require("../services/pricing");
+const orderStatus_1 = require("../constants/orderStatus");
 const generateOrderNumber = async () => {
     const date = new Date();
     const prefix = `ORD-${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, "0")}${date.getDate().toString().padStart(2, "0")}`;
@@ -244,10 +245,16 @@ const updateOrderByAdmin = async (req, res) => {
         const { orderId } = req.query;
         if (!orderId)
             return (0, errorHandler_1.errorHandler)(res, 400, "orderId is required");
-        const { orderStatus, paymentStatus, adminNote } = req.body;
-        if (!orderStatus && !paymentStatus) {
-            return (0, errorHandler_1.errorHandler)(res, 400, "Provide at least one of orderStatus or paymentStatus");
+        const { orderStatus, paymentStatus, adminNote, courierName, courierTrackingLink } = req.body;
+        if (!orderStatus && !paymentStatus && courierName === undefined && courierTrackingLink === undefined) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Provide at least one of orderStatus, paymentStatus, courierName or courierTrackingLink");
         }
+        if (orderStatus && !(0, orderStatus_1.isValidOrderStatus)(orderStatus)) {
+            return (0, errorHandler_1.errorHandler)(res, 400, "Invalid order status");
+        }
+        const existing = await prisma_1.prisma.order.findUnique({ where: { id: orderId } });
+        if (!existing)
+            return (0, errorHandler_1.errorHandler)(res, 404, "Order not found");
         const data = {};
         if (orderStatus)
             data.orderStatus = orderStatus;
@@ -255,6 +262,19 @@ const updateOrderByAdmin = async (req, res) => {
             data.paymentStatus = paymentStatus;
         if (adminNote)
             data.adminNote = adminNote;
+        if (courierName !== undefined)
+            data.courierName = courierName || null;
+        if (courierTrackingLink !== undefined)
+            data.courierTrackingLink = courierTrackingLink || null;
+        // Log the transition for the customer-facing timeline — only when
+        // the status actually changed, and never duplicate an already-logged
+        // step (e.g. admin re-saves the same status alongside a courier link).
+        if (orderStatus && orderStatus !== existing.orderStatus) {
+            const history = Array.isArray(existing.statusHistory) ? existing.statusHistory : [];
+            if (!history.some((h) => h?.status === orderStatus)) {
+                data.statusHistory = [...history, { status: orderStatus, at: new Date().toISOString() }];
+            }
+        }
         const updatedOrder = await prisma_1.prisma.order.update({
             where: { id: orderId },
             data,
@@ -267,6 +287,30 @@ const updateOrderByAdmin = async (req, res) => {
     }
 };
 exports.updateOrderByAdmin = updateOrderByAdmin;
+// Signed-in customer: a single order of their own, by orderNumber. 404s
+// (rather than 403) if it exists but belongs to someone else, so this can't
+// be used to probe which order numbers exist.
+const getMyOrderByNumber = async (req, res) => {
+    try {
+        const userId = req.userId;
+        if (!userId)
+            return (0, errorHandler_1.errorHandler)(res, 401, "Unauthorized, Please login again");
+        const orderNumber = String(req.params.orderNumber ?? "");
+        if (!orderNumber)
+            return (0, errorHandler_1.errorHandler)(res, 400, "Order number is required");
+        const order = await prisma_1.prisma.order.findFirst({
+            where: { orderNumber, userId },
+            include: { items: true },
+        });
+        if (!order)
+            return (0, errorHandler_1.errorHandler)(res, 404, "Order not found");
+        return (0, errorHandler_1.errorHandler)(res, 200, "The order found successfully!", false, order);
+    }
+    catch (error) {
+        return (0, errorHandler_1.errorHandler)(res, 500, error.message || "Internal server error!");
+    }
+};
+exports.getMyOrderByNumber = getMyOrderByNumber;
 // Admin: download an order's invoice as a PDF file.
 const downloadInvoiceByAdmin = async (req, res) => {
     try {

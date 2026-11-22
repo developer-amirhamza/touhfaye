@@ -9,6 +9,7 @@ const router = (0, express_1.Router)();
 // place an order. The controller requires an email when there's no userId.
 router.post("/place-order", auth_1.optionalAuth, order_controllers_1.placeOrder);
 router.get("/my-orders", auth_1.auth, order_controllers_1.getMyOrders);
+router.get("/my-orders/:orderNumber", auth_1.auth, order_controllers_1.getMyOrderByNumber);
 router.get("/lookup", order_controllers_1.getOrdersByOrderNumber);
 // Admin only
 router.get("/admin/get-all-orders", auth_1.auth, admin_1.admin, order_controllers_1.getAllOrdersByAdmin);
